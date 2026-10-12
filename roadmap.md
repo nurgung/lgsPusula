@@ -13,7 +13,7 @@
 | Faz | Konu | Durum |
 |---|---|---|
 | 0 | Ürün ve servis kararları | Tamamlandı — 13/13 karar verildi ([docs/DECISIONS.md](docs/DECISIONS.md)) |
-| 1 | Proje altyapısı | Devam ediyor |
+| 1 | Proje altyapısı | Tamamlandı |
 | 2 | Tasarım sistemi ve CI | Başlanmadı |
 | 3 | Veri tabanı ve kimlik doğrulama | Başlanmadı |
 | 4 | Roller ve veli-öğrenci ilişkisi | Başlanmadı |
@@ -79,14 +79,14 @@
 - [x] 1.11 Temel bileşenleri yaz: Button, Card, StateMessage, ProgressMeter, TableScroll, SkipLink
 - [x] 1.12 Ana sayfa, giriş yer tutucusu, yükleniyor, hata ve bulunamadı sayfalarını oluştur
 - [x] 1.13 Öğrenci, veli ve yönetici sayfa taslaklarını örnek veriyle hazırla (`/onizleme`, yalnızca geliştirme ortamında açılır)
-- [ ] 1.14 İlk commit'i oluştur ve GitHub'a push et
+- [x] 1.14 İlk commit'i oluştur ve GitHub'a push et — `8e2e5f5`, gizli depo `nurgung/lgsPusula`, `main` dalı
 
 **Bitti sayılması için**
 - [x] Uygulama yerelde çalışır, production build alınır
 - [x] Lint, tip kontrolü, 23 birim testi ve 26 uçtan uca test geçer
 - [x] Mevcut sayfalarda 320 px ve masaüstünde yatay taşma yoktur
 - [x] Depoda gizli anahtar yoktur
-- [ ] Kod GitHub'dadır
+- [x] Kod GitHub'dadır
 
 ---
 

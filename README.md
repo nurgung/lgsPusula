@@ -4,7 +4,7 @@ LGS Pusula; 8. sınıf öğrencilerinin günlük çalışmalarını, deneme sın
 
 > **Kullanım kapsamı:** Uygulama yalnızca aile içinde kullanılır: proje sahibi (veli + yönetici) ve çocuğu (öğrenci). Herkese açık kayıt yoktur. Ayrıntı: [docs/DECISIONS.md](docs/DECISIONS.md) (0.13).
 
-> **Proje durumu:** Faz 1 (proje altyapısı) neredeyse tamamlandı; ilerleme [roadmap.md](roadmap.md) içinde izlenir. Next.js iskeleti, lint/tip/test altyapısı, ortam değişkeni doğrulaması ve örnek veriyle çalışan sayfa taslakları vardır. Kimlik doğrulama, yetkilendirme, veri tabanı ve iş özellikleri **henüz yoktur**; gerçek öğrenci verisi kullanılmamalıdır. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+> **Proje durumu:** Faz 0 (ürün kararları) ve Faz 1 (proje altyapısı) tamamlandı; ilerleme [roadmap.md](roadmap.md) içinde izlenir. Next.js iskeleti, lint/tip/test altyapısı, ortam değişkeni doğrulaması ve örnek veriyle çalışan sayfa taslakları vardır. Kimlik doğrulama, yetkilendirme, veri tabanı ve iş özellikleri **henüz yoktur**; gerçek öğrenci verisi kullanılmamalıdır. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Ürün hedefleri
 
