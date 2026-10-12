@@ -14,7 +14,7 @@
 |---|---|---|
 | 0 | Ürün ve servis kararları | Tamamlandı — 13/13 karar verildi ([docs/DECISIONS.md](docs/DECISIONS.md)) |
 | 1 | Proje altyapısı | Tamamlandı |
-| 2 | Tasarım sistemi ve CI | Devam ediyor — bileşenler bitti; CI'ın GitHub'da doğrulanması ve Vercel staging kurulumu bekliyor |
+| 2 | Tasarım sistemi ve CI | Devam ediyor — bileşenler ve CI bitti; Vercel staging kurulumu (proje sahibi) ve `braces` yaması bekliyor |
 | 3 | Veri tabanı ve kimlik doğrulama | Başlanmadı |
 | 4 | Roller ve veli-öğrenci ilişkisi | Başlanmadı |
 | 5 | Müfredat kataloğu | Başlanmadı |
@@ -103,10 +103,10 @@
 - [x] 2.5 GitHub Actions: her push'ta lint, typecheck, test, build ve e2e
   - [x] 2.5.1 İş akışını yaz (`.github/workflows/ci.yml`); içindeki komutlar yerelde geçti
   - [x] 2.5.2 Push sonrası GitHub'da çalıştığını ve yeşil olduğunu doğrula — `5411b27`, [çalışma 38247539696](https://github.com/nurgung/lgsPusula/actions/runs/38247539696)
-- [ ] 2.6 CI'da bağımlılık denetimi (`npm audit`) ve gizli anahtar taraması
+- [x] 2.6 CI'da bağımlılık denetimi (`npm audit`) ve gizli anahtar taraması
   - [x] 2.6.1 Engelleyici production `npm audit`, rapor amaçlı tam `npm audit`, Gitleaks ve Dependabot ekle
   - [x] 2.6.2 Push sonrası GitHub'da çalıştığını ve temiz olduğunu doğrula — production audit 0 uyarı, Gitleaks yeni commit'te bulgu yok
-  - [ ] 2.6.3 Tüm geçmişi tarayan elle/haftalık Gitleaks çalıştırmasının temiz olduğunu doğrula
+  - [x] 2.6.3 Tüm geçmişi tarayan elle/haftalık Gitleaks çalıştırmasının temiz olduğunu doğrula — [çalışma 38247767095](https://github.com/nurgung/lgsPusula/actions/runs/38247767095): 5 commit, bulgu yok
 - [ ] 2.7 `npm audit` uyarılarını çöz (`eslint-config-next` → `braces`)
   - [x] 2.7.1 Production bağımlılıklarında uyarı yok (`npm audit --omit=dev`: 0)
   - [x] 2.7.2 `braces` uyarısı için yamalı sürüm yok; yalnızca geliştirme aracı olduğu için kabul edilen risk olarak `SECURITY.md`'ye yazıldı
