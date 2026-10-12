@@ -1,0 +1,21 @@
+---
+description: LGS Pusula genel proje kuralları
+alwaysApply: true
+---
+
+# LGS Pusula — Genel Kurallar
+
+- Önce `README.md`, `roadmap.md`, `SECURITY.md`, `AUTHORIZATION.md`, `PRIVACY.md` ve `UI_UX_GUIDELINES.md` belgelerini bağlamına göre incele.
+- Kullanıcıya görünen tüm metinler Türkçe, anlaşılır ve 8. sınıf öğrencisine uygun olsun. Kod, tip ve dosya isimleri tutarlı İngilizce olabilir.
+- Proje tamamlanmış gibi davranma. Çalıştırılmamış testleri başarılı olarak bildirme; henüz uygulanmayan özellikleri açıkça belirt.
+- Büyük değişikliklerden önce kısa bir plan, etkilenecek dosyalar ve riskleri belirt.
+- Küçük ve odaklı değişiklikler yap. İlgisiz dosyaları yeniden biçimlendirme.
+- Gereksiz bağımlılık ekleme. Yeni paket eklemeden önce gerekçesini ve mevcut alternatifleri değerlendir.
+- TypeScript kullan; gerekçesiz `any`, `@ts-ignore` ve sessiz hata yutma kullanma.
+- İş kurallarını UI bileşenlerinden ayır; doğrulama ve hesaplamaları tekrar kullanılabilir servis/alan katmanında tut.
+- Her yeni işlev için uygun test ve hata/boş/yükleniyor durumlarını ekle.
+- Gizli anahtarları, kişisel verileri veya gerçek öğrenci kayıtlarını kod, örnek, test, log veya dokümana ekleme.
+- Belirsiz ürün kararı gerekiyorsa güvenli varsayımı seç ve kararı açıkça belgeleyerek kullanıcıya sor.
+- Veri modeli, erişim veya mimari değişikliklerini ilgili dokümana yansıt.
+- `roadmap.md` kutucuklarını yalnızca iş yapılıp ilgili test/kontrol çalıştırıldıktan sonra işaretle; kısmi işleri alt maddelere böl ve durum özetini güncelle.
+- Proje sahibi açıkça onay vermeden yeni bir faza veya faz işine başlama.

@@ -1,0 +1,23 @@
+---
+description: Güvenlik, gizlilik ve yetkilendirme kuralları
+alwaysApply: true
+---
+
+# Güvenlik Kuralları
+
+- `SECURITY.md`, `AUTHORIZATION.md` ve `PRIVACY.md` belgelerini izlemelisin.
+- Her sunucu isteğinde kimlik doğrulamasını ve kaynak düzeyinde yetkilendirmeyi doğrula.
+- UI'da öğe gizlemek erişim kontrolü sayılmaz.
+- İstemciden gelen `userId`, `studentId`, role, owner veya ilişki durumuna güvenme; oturum ve veri tabanından doğrula.
+- Öğrenci kayıtlarında sahiplik; veli erişiminde aktif ve onaylı ilişki kontrolü yap.
+- Yetki kontrolleri için pozitif ve negatif test ekle. URL/ID değiştirme, iptal edilmiş ilişki ve yatay ayrıcalık yükseltme senaryolarını dene.
+- Veri tabanı RLS kullanılıyorsa politika ekle ve gerçek kullanıcı rolleriyle test et.
+- Ayrıcalıklı anahtarları yalnızca sunucuda kullan; `NEXT_PUBLIC_` değişkenlerine asla koyma.
+- Girdileri sunucuda şema ile doğrula; SQL için parametreli sorgu veya güvenli ORM kullan.
+- XSS, CSRF, SSRF, IDOR/BOLA, açık yönlendirme ve dosya enjeksiyonu risklerini değerlendir.
+- Dosya yüklemede boyut, tür, içerik ve işlem sınırları uygula; dosyayı çalıştırılabilir web yolunda tutma.
+- CSV/XLSX formül enjeksiyonunu ve rapor üretiminde şablon enjeksiyonunu önle.
+- Yapay zekâ çıktısını güvenilmeyen veri kabul et. Çıktıyı doğrula; modelin SQL, izin, puan veya karakter gelişimini doğrudan belirlemesine izin verme.
+- Modele yalnızca gerekli en az veriyi gönder; kişisel tanımlayıcıları mümkün olduğunca çıkar.
+- Parola, token, API anahtarı veya gereksiz öğrenci verisini loglama.
+- Güvenlik davranışını etkileyen kod değişikliğinde test ekle; testleri çalıştırmadıysan bunu açıkça söyle.

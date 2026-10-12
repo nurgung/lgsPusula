@@ -1,0 +1,21 @@
+---
+description: UI, UX, erişilebilirlik ve öğrenci deneyimi
+alwaysApply: true
+---
+
+# UI/UX Kuralları
+
+- `UI_UX_GUIDELINES.md` ile tutarlı tasarım sistemi kullan.
+- Önce mobil görünümü düşün; küçük ekranlarda yatay taşmayı önle.
+- Kullanıcıya görünen metinleri Türkçe yaz ve 8. sınıf seviyesinde açık tut.
+- Her sayfada yükleniyor, boş, hata ve başarı durumlarını tasarla.
+- Formlara görünür etiket, doğrulama mesajı ve klavye erişimi ekle.
+- Klavye odağı görünür olmalı; semantik HTML kullan; ikon düğmelerine erişilebilir ad ver.
+- Renk tek başına bilgi taşımasın. Grafikler için metin veya tablo alternatifi sun.
+- Animasyonları ölçülü kullan ve `prefers-reduced-motion` tercihine saygı göster.
+- Dokunma hedeflerini tercihen en az 44×44 CSS piksel tut.
+- Karakter mesajları destekleyici olsun. Öğrenciyi suçlama, utandırma, korkutma veya akranlarıyla kıyaslama.
+- Karakteri bir günlük ara verdiği için geriletme veya cezalandırma.
+- Hedef, net ve kazanım bilgilerini yanıltıcı görselleştirme; tarih aralığı ve ölçü birimini belirt.
+- Mobilde tabloların önemli sütunlarını kaybetme; uygun kart görünümü veya kontrollü kaydırma sun.
+- Gerçek veri yerine örnek veri kullanıyorsan bunu geliştirme ortamında açıkça belirt.

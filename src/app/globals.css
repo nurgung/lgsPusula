@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+/*
+ * LGS Pusula design tokens. Components must use these tokens instead of raw hex values.
+ * Text/background pairs below are chosen to meet WCAG 2.2 AA contrast on white/canvas.
+ */
+@theme {
+  --font-sans:
+    var(--font-nunito), ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+
+  --color-canvas: #f6f8fb;
+  --color-surface: #ffffff;
+  --color-border: #d5dde8;
+
+  --color-ink-900: #0f1b2d;
+  --color-ink-700: #2b3a52;
+  --color-ink-600: #4a5870;
+
+  --color-brand-50: #effcfa;
+  --color-brand-100: #cdf5ef;
+  --color-brand-600: #0f766e;
+  --color-brand-700: #115e59;
+  --color-brand-800: #134e4a;
+
+  --color-success-50: #effbf3;
+  --color-success-700: #166534;
+  --color-warning-50: #fff8eb;
+  --color-warning-500: #d97706;
+  --color-warning-800: #92400e;
+  --color-danger-50: #fef2f2;
+  --color-danger-700: #b91c1c;
+  --color-info-50: #eff5ff;
+  --color-info-700: #1d4ed8;
+
+  --color-focus: #1d4ed8;
+
+  --radius-card: 1rem;
+  --shadow-card: 0 1px 2px rgb(15 27 45 / 0.06), 0 1px 3px rgb(15 27 45 / 0.08);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink-900);
+    font-family: var(--font-sans);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

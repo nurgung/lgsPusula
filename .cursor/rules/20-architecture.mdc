@@ -1,0 +1,20 @@
+---
+description: Mimari, veri modeli ve iş kuralları
+alwaysApply: true
+---
+
+# Mimari Kuralları
+
+- Özellikleri `src/features/<feature>` altında, ortak bileşenleri `src/components` altında, sunucu servislerini `src/services` veya uygun domain katmanında tut.
+- Framework'e özgü kodu iş kurallarından mümkün olduğunca ayır.
+- Veri doğrulama şemalarını ortak ve tekrar kullanılabilir biçimde tanımla; sunucu doğrulaması zorunlu olsun.
+- Soru sayısı, doğru, yanlış ve boş alanları için negatif değerleri reddet; toplamların tutarlılığını açık kurallarla kontrol et.
+- Net hesaplamasını tek bir merkezi fonksiyonda, deneme türü/ayarına bağlı ve birim testli tut. Kuralı varsayarak sabitleme.
+- Kazanım verisi girilmemişse kazanım tespiti yapılmış gibi gösterme.
+- Kural tabanlı koçluk sonucunu veri ve kurala dayandır; açıklanabilir öneri nedenlerini sakla/göster.
+- Yapay zekâ sağlayıcısını adaptör arkasında tut. Hata, zaman aşımı ve kota durumunda kural tabanlı geri dönüş sağla.
+- Karakter puanlarını sunucu tarafında hesapla. Aynı olay tekrar işlenirse çift puan üretmemesi için idempotent tasarım kullan.
+- Saat ve tarih alanlarında saat dilimini açık tanımla; günlük raporların sınırlarını test et.
+- Veritabanı şeması değişikliklerinde migration oluştur; üretim verisini kaybetme riski olan migration'ları açıklamadan uygulama.
+- Rapor ve dosya içe aktarma servislerinde kaynak sahibini ve yetkiyi yeniden doğrula.
+- Arka plan işleri ve API uçları kullanıcı arayüzünden bağımsız güvenlik kontrollerine sahip olsun.

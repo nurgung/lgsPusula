@@ -1,0 +1,70 @@
+import "server-only";
+import { z } from "zod";
+
+const emptyToUndefined = (value: unknown) =>
+  typeof value === "string" && value.trim() === "" ? undefined : value;
+
+const optionalText = z.preprocess(emptyToUndefined, z.string().trim().min(1).optional());
+const optionalUrl = z.preprocess(emptyToUndefined, z.url().optional());
+
+export const APP_ENVS = ["development", "test", "staging", "production"] as const;
+export type AppEnv = (typeof APP_ENVS)[number];
+
+export const serverEnvSchema = z
+  .object({
+    APP_ENV: z.preprocess(emptyToUndefined, z.enum(APP_ENVS).default("development")),
+    UI_PREVIEW_ENABLED: z
+      .preprocess(emptyToUndefined, z.enum(["true", "false"]).default("false"))
+      .transform((value) => value === "true"),
+
+    DATABASE_URL: optionalUrl,
+    AUTH_SECRET: z.preprocess(emptyToUndefined, z.string().min(32).optional()),
+    SUPABASE_URL: optionalUrl,
+    SUPABASE_ANON_KEY: optionalText,
+    SUPABASE_SERVICE_ROLE_KEY: optionalText,
+
+    AI_PROVIDER: optionalText,
+    AI_API_KEY: optionalText,
+    AI_MODEL: optionalText,
+
+    STORAGE_BUCKET: optionalText,
+    REPORT_TEMP_TTL_MINUTES: z.preprocess(
+      emptyToUndefined,
+      z.coerce.number().int().min(1).max(1440).default(30),
+    ),
+  })
+  .superRefine((env, ctx) => {
+    if (env.APP_ENV === "production" && env.UI_PREVIEW_ENABLED) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["UI_PREVIEW_ENABLED"],
+        message: "UI previews cannot be enabled when APP_ENV=production.",
+      });
+    }
+  });
+
+export type ServerEnv = z.infer<typeof serverEnvSchema>;
+
+export class ServerEnvError extends Error {
+  constructor(readonly invalidKeys: string[]) {
+    // Only variable names are reported; values may be secrets.
+    super(`Invalid server environment variables: ${invalidKeys.join(", ")}`);
+    this.name = "ServerEnvError";
+  }
+}
+
+export function parseServerEnv(source: Record<string, string | undefined>): ServerEnv {
+  const result = serverEnvSchema.safeParse(source);
+  if (!result.success) {
+    const keys = [...new Set(result.error.issues.map((issue) => String(issue.path[0])))];
+    throw new ServerEnvError(keys);
+  }
+  return result.data;
+}
+
+let cached: ServerEnv | undefined;
+
+export function getServerEnv(): ServerEnv {
+  cached ??= parseServerEnv(process.env);
+  return cached;
+}
