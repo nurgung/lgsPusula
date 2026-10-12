@@ -56,10 +56,11 @@
 
 ```text
 src/app/                 sayfalar ve route dosyaları (Türkçe URL'ler)
-src/components/ui/       ortak arayüz bileşenleri (Button, Card, StateMessage, ProgressMeter, TableScroll)
-src/components/layout/   ortak yerleşim parçaları (SkipLink)
-src/features/<feature>/  özellik modülleri; şu an yalnızca `preview`
-src/lib/                 framework'ten bağımsız yardımcılar (env, güvenlik başlıkları)
+src/components/ui/       ortak arayüz bileşenleri (Button, Card, StateMessage, ProgressMeter, TableScroll,
+                         form alanları, ConfirmDialog, Toast)
+src/components/layout/   ortak yerleşim parçaları (SkipLink, AppShell, AppNav)
+src/features/<feature>/  özellik modülleri; şu an `preview` ve `navigation` (rol bazlı menü)
+src/lib/                 framework'ten bağımsız yardımcılar (env, güvenlik başlıkları, menü eşleşmesi)
 src/services/            sunucu servisleri (henüz boş)
 src/types/               ortak tipler (roller)
 tests/unit, tests/e2e    kaynağa bağlı olmayan birim testleri ve uçtan uca testler
@@ -71,10 +72,54 @@ tests/unit, tests/e2e    kaynağa bağlı olmayan birim testleri ve uçtan uca t
 - `UI_PREVIEW_ENABLED=true` olmadıkça veya `APP_ENV=production` ise 404 döner. Bu bir **özellik bayrağıdır, erişim kontrolü değildir.** Bayrak derleme zamanında okunur.
 - Gerçek rol sayfaları (ör. `/ogrenci`) kimlik doğrulama ve sunucu tarafı yetkilendirme (Faz 3 ve 4) tamamlanmadan oluşturulmamalıdır. Önizleme sayfaları hiçbir zaman gerçek kayıt okumamalıdır.
 
+## Tasarım sistemi ve CI (Faz 2)
+
+### Ortak bileşenler
+
+| Bileşen | Dosya | Notlar |
+|---|---|---|
+| `TextField`, `NumberField`, `SelectField`, `FormErrorSummary` | `src/components/ui/form-field.tsx` | Görünür etiket, yardım metni ve alan hatası `aria-describedby` ile bağlanır; hatalı alan `aria-invalid` alır. `NumberField`, `type="text"` + `inputMode="numeric"` kullanır (mobil rakam klavyesi, fare tekerleğiyle değişme yok). Sayı doğrulaması yine sunucudaki ortak şemada yapılmalıdır. |
+| `ConfirmDialog` | `src/components/ui/confirm-dialog.tsx` | Yerleşik `<dialog>` + `showModal()`: sayfanın geri kalanı etkisizleşir, Esc kapatır, odak açan öğeye döner, Tab içeride döner. İlk odak güvenli "Vazgeç" düğmesindedir. `pending` iken düğmeler kilitlenir (çift gönderim yok). |
+| `ToastProvider`, `useToast` | `src/components/ui/toast.tsx` | Kök yerleşimde. Canlı bölgeler ilk çizimden itibaren sayfadadır. Hatalar `role="alert"`, diğerleri `role="status"` ile duyurulur. Başarı/bilgi 6 sn sonra kapanır (üzerine gelince/odaklanınca durur); hata kullanıcı kapatana kadar kalır. En fazla 3 bildirim görünür. |
+| `AppShell`, `AppNav` | `src/components/layout/` | Üst başlık; `sm` ve üstünde başlıkta menü, küçük ekranda sabit alt menü. Aynı anda yalnızca bir "Ana menü" görünür. Etkin sayfa `aria-current="page"` ve alt çizgiyle (yalnızca renkle değil) gösterilir. |
+| `getNavItems(roles)` | `src/features/navigation/nav-items.ts` | Rol bazlı menü yapısı. Veli + yönetici hesabı iki menünün birleşimini görür. Menü yalnızca neyin **gösterileceğini** belirler; erişim kontrolü değildir. En fazla 5 öğe (320 px'te 64 px hedef). |
+
+Bileşenler `/onizleme/bilesenler` sayfasında örnek olarak görülebilir. Satır içi `style` kullanılmaz; ileride eklenecek katı CSP (Faz 12.3) ile uyumlu kalmak için sabit sınıflar tercih edilir.
+
+### CI hattı
+
+`.github/workflows/ci.yml` her push ve PR'da üç iş çalıştırır:
+
+1. **Lint, tip, test ve build:** `lint`, `format:check`, `typecheck`, `test`, `build`.
+2. **Uçtan uca testler:** Playwright (Chromium, 320 px ve masaüstü). Başarısızlıkta izler 7 gün saklanır.
+3. **Bağımlılık ve gizli anahtar denetimi:** production bağımlılıkları için engelleyici `npm audit`, tüm bağımlılıklar için rapor amaçlı `npm audit`, Gitleaks ile tüm geçmişte gizli anahtar taraması. Kabul edilen riskler `SECURITY.md` içindedir.
+
+Dependabot (`.github/dependabot.yml`) npm ve GitHub Actions güncellemelerini haftalık önerir.
+
+### Dağıtım (Vercel) — kurulum adımları
+
+`vercel.json` sunucu fonksiyonlarını Frankfurt'ta (`fra1`) çalıştırır (karar 0.2). Vercel projesinin bağlanması proje sahibinin hesabıyla yapılır:
+
+1. Vercel'de **Add New → Project** ile `nurgung/lgsPusula` deposunu içe aktar. Çatı: Next.js; ayarlar varsayılan kalabilir.
+2. **Settings → Environment Variables** içinde ortam bazında ayrı değer gir:
+
+   | Değişken | Preview (staging) | Production |
+   |---|---|---|
+   | `APP_ENV` | `staging` | `production` |
+   | `UI_PREVIEW_ENABLED` | `false` (örnek veri sayfalarını görmek istersen `true`; bu sayfalarda giriş yok) | `false` (production'da zaten reddedilir) |
+   | `NEXT_PUBLIC_APP_URL` | staging alan adı (ör. `https://lgs-pusula-git-staging-<hesap>.vercel.app`) | production alan adı |
+   | Supabase ve diğer gizli değerler | Faz 3'te, staging Supabase projesinin değerleri | Faz 3'te, production projesinin değerleri |
+
+   Gizli değerler yalnızca Vercel'de tutulur; depoya veya `NEXT_PUBLIC_` değişkenlerine konmaz. Preview ortamına production anahtarı verilmez.
+3. **Settings → Deployment Protection** içinde preview dağıtımları için **Vercel Authentication** açık kalmalı. Böylece staging adresini yalnızca Vercel hesabıyla giriş yapan kişi görür.
+4. Kalıcı bir staging adresi için `staging` dalını oluştur. Vercel bu dal için `...-git-staging-...vercel.app` adresini verir. İstersen **Settings → Domains** içinden bu dala ayrı bir alan adı bağlayabilirsin.
+5. Adresin HTTPS ile açıldığını ve güvenlik başlıklarının (`x-content-type-options`, `x-frame-options`, `strict-transport-security`) geldiğini kontrol et.
+
 ### Henüz uygulanmayanlar
 
 - Kimlik doğrulama, oturum, roller, veli-öğrenci ilişkisi ve tüm yetkilendirme kontrolleri (Faz 3 ve 4).
 - Veri tabanı, migration'lar ve RLS politikaları. Sağlayıcı olarak Supabase seçildi ([DECISIONS.md](DECISIONS.md)) ama henüz bağlanmadı.
 - Net hesaplama kuralları, hedefler, günlük kayıt ve deneme formları, kazanım kataloğu.
 - Koçluk motoru, yapay zekâ adaptörü, karakter puanları, bildirimler, içe aktarma, PDF/DOCX raporlar.
-- PWA manifesti ve simgeler, nonce tabanlı CSP, oran sınırlama, hata izleme, CI hattı, gizli anahtar taraması.
+- PWA manifesti ve simgeler, nonce tabanlı CSP, oran sınırlama, hata izleme.
+- Vercel projesinin bağlanması ve staging ortamı (adımlar yukarıda; proje sahibinin hesabıyla yapılacak).

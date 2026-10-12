@@ -7,6 +7,7 @@ const pages = [
   "/onizleme/ogrenci",
   "/onizleme/veli",
   "/onizleme/yonetici",
+  "/onizleme/bilesenler",
   "/onizleme/durumlar",
 ];
 

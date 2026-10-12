@@ -20,6 +20,11 @@ const pages = [
     text: "Müfredat kataloğu ve sistem ayarları taslağı.",
   },
   {
+    href: "/onizleme/bilesenler",
+    title: "Bileşenler",
+    text: "Form alanları, onay penceresi ve anlık bildirimler.",
+  },
+  {
     href: "/onizleme/durumlar",
     title: "Durum örnekleri",
     text: "Yükleniyor, boş, hata, başarı ve bilgi mesajları.",

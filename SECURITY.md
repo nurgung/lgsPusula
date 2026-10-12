@@ -74,6 +74,23 @@ Bu belge, LGS Pusula geliştirme ve işletim süreçlerinde uygulanması gereken
 - Üretim dağıtımında en az yetkili servis hesapları kullanın.
 - Geliştirme, test ve production verilerini ayırın.
 
+### Otomatik denetimler (CI)
+
+`.github/workflows/ci.yml` her push ve PR'da şunları çalıştırır:
+
+- `npm audit --omit=dev --audit-level=moderate`: uygulamayla birlikte çalışan (production) bağımlılıklarda orta veya üstü uyarı varsa CI **kırmızı** olur.
+- `npm audit --audit-level=high` (tüm bağımlılıklar): yalnızca rapor verir, CI'ı durdurmaz. Aşağıdaki kabul edilen riskler bu yüzden görünür kalır.
+- Gitleaks: tüm commit geçmişinde gizli anahtar taraması; bulgu varsa CI kırmızı olur.
+- Dependabot haftalık olarak npm ve GitHub Actions güncellemelerini önerir.
+
+### Kabul edilen bağımlılık riskleri
+
+Bir uyarı düzeltilemiyorsa burada gerekçesi ve gözden geçirme koşuluyla kayıt altına alınır.
+
+| Uyarı | Paket ve yol | Neden kabul edildi | Ne zaman yeniden bakılır |
+|---|---|---|---|
+| [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) (yüksek, DoS) | `braces` ≤ 3.0.3, yalnızca geliştirme aracı: `eslint-config-next` → `@next/eslint-plugin-next` → `fast-glob` → `micromatch` → `braces` | Yamalı sürüm yok (12 Ekim 2026). `npm audit fix --force` ESLint yapılandırmasını Next 14'e düşürür. Paket production paketine girmez; yalnızca geliştiricinin kendi kodunu tarayan lint sırasında, depodaki glob desenleriyle çalışır. Saldırganın desen gönderebileceği bir yol yok. | `braces` veya `eslint-config-next` yamalı sürüm yayınladığında (Dependabot PR'ı) hemen güncellenir. |
+
 ## Loglama ve izleme
 
 - Giriş hataları, yetki reddi, dosya içe aktarma hataları ve yönetici değişiklikleri gibi olayları gerekli ölçüde kaydedin.

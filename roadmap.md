@@ -14,7 +14,7 @@
 |---|---|---|
 | 0 | Ürün ve servis kararları | Tamamlandı — 13/13 karar verildi ([docs/DECISIONS.md](docs/DECISIONS.md)) |
 | 1 | Proje altyapısı | Tamamlandı |
-| 2 | Tasarım sistemi ve CI | Başlanmadı |
+| 2 | Tasarım sistemi ve CI | Devam ediyor — bileşenler bitti; CI'ın GitHub'da doğrulanması ve Vercel staging kurulumu bekliyor |
 | 3 | Veri tabanı ve kimlik doğrulama | Başlanmadı |
 | 4 | Roller ve veli-öğrenci ilişkisi | Başlanmadı |
 | 5 | Müfredat kataloğu | Başlanmadı |
@@ -79,7 +79,7 @@
 - [x] 1.11 Temel bileşenleri yaz: Button, Card, StateMessage, ProgressMeter, TableScroll, SkipLink
 - [x] 1.12 Ana sayfa, giriş yer tutucusu, yükleniyor, hata ve bulunamadı sayfalarını oluştur
 - [x] 1.13 Öğrenci, veli ve yönetici sayfa taslaklarını örnek veriyle hazırla (`/onizleme`, yalnızca geliştirme ortamında açılır)
-- [x] 1.14 İlk commit'i oluştur ve GitHub'a push et — `8e2e5f5`, gizli depo `nurgung/lgsPusula`, `main` dalı
+- [x] 1.14 İlk commit'i oluştur ve GitHub'a push et — `8e2e5f5`, depo `nurgung/lgsPusula` (sonradan herkese açık yapıldı, 0.11), `main` dalı
 
 **Bitti sayılması için**
 - [x] Uygulama yerelde çalışır, production build alınır
@@ -96,17 +96,27 @@
 **Ön koşul:** Faz 1, karar 0.2
 
 **İşler**
-- [ ] 2.1 Form bileşenleri: görünür etiket, yardım metni, alan hatası, sayı alanı (mobil klavye)
-- [ ] 2.2 Onay penceresi (modal): klavye ile kapanır, odak içeride kalır
-- [ ] 2.3 Anlık bildirim (toast): ekran okuyucuya duyurulur
-- [ ] 2.4 Uygulama yerleşimi: üst başlık + mobil alt gezinme (rol bazlı menü yapısı)
+- [x] 2.1 Form bileşenleri: görünür etiket, yardım metni, alan hatası, sayı alanı (mobil klavye) — `TextField`, `NumberField`, `SelectField`, `FormErrorSummary`
+- [x] 2.2 Onay penceresi (modal): klavye ile kapanır, odak içeride kalır — `ConfirmDialog` (yerleşik `<dialog>`)
+- [x] 2.3 Anlık bildirim (toast): ekran okuyucuya duyurulur — `ToastProvider` / `useToast`
+- [x] 2.4 Uygulama yerleşimi: üst başlık + mobil alt gezinme (rol bazlı menü yapısı) — `AppShell`, `getNavItems`; `/onizleme` bu yerleşime geçti
 - [ ] 2.5 GitHub Actions: her push'ta lint, typecheck, test, build ve e2e
+  - [x] 2.5.1 İş akışını yaz (`.github/workflows/ci.yml`); içindeki komutlar yerelde geçti
+  - [ ] 2.5.2 Push sonrası GitHub'da çalıştığını ve yeşil olduğunu doğrula
 - [ ] 2.6 CI'da bağımlılık denetimi (`npm audit`) ve gizli anahtar taraması
+  - [x] 2.6.1 Engelleyici production `npm audit`, rapor amaçlı tam `npm audit`, Gitleaks ve Dependabot ekle
+  - [ ] 2.6.2 Push sonrası GitHub'da çalıştığını ve temiz olduğunu doğrula
 - [ ] 2.7 `npm audit` uyarılarını çöz (`eslint-config-next` → `braces`)
+  - [x] 2.7.1 Production bağımlılıklarında uyarı yok (`npm audit --omit=dev`: 0)
+  - [x] 2.7.2 `braces` uyarısı için yamalı sürüm yok; yalnızca geliştirme aracı olduğu için kabul edilen risk olarak `SECURITY.md`'ye yazıldı
+  - [ ] 2.7.3 Yamalı sürüm çıkınca güncelle (Dependabot haber verir)
 - [ ] 2.8 Staging ortamını kur ve ortam değişkenlerini platformun secret yönetimine taşı
+  - [x] 2.8.1 `vercel.json` (Frankfurt, `fra1`) ve kurulum adımları ([docs/ARCHITECTURE.md](docs/ARCHITECTURE.md))
+  - [ ] 2.8.2 Proje sahibi Vercel projesini bağlar ve ortam değişkenlerini Preview/Production için ayrı girer
+  - [ ] 2.8.3 Preview dağıtımlarında Vercel Authentication açık; staging adresi HTTPS ve güvenlik başlıklarıyla açılır
 
 **Bitti sayılması için**
-- [ ] Yeni bileşenlerin erişilebilirlik testleri geçer
+- [x] Yeni bileşenlerin erişilebilirlik testleri geçer — 59 birim testi, 46 uçtan uca test (klavye, odak, canlı bölge, 44 px hedef, 320 px taşma)
 - [ ] Bir push sonrası CI otomatik çalışır ve yeşildir
 - [ ] Staging adresi HTTPS ile açılır
 

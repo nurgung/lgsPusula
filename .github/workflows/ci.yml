@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  APP_ENV: test
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  checks:
+    name: Lint, tip, test ve build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm run test
+      - run: npm run build
+
+  e2e:
+    name: Uçtan uca testler
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - name: Upload Playwright traces on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7
+
+  security:
+    name: Bağımlılık ve gizli anahtar denetimi
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Full history so the secret scan also covers earlier commits.
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Audit production dependencies (blocking)
+        run: npm audit --omit=dev --audit-level=moderate
+      - name: Audit all dependencies (report only, see SECURITY.md accepted risks)
+        continue-on-error: true
+        run: npm audit --audit-level=high
+      - name: Scan for committed secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
