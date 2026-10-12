@@ -88,11 +88,11 @@ Bileşenler `/onizleme/bilesenler` sayfasında örnek olarak görülebilir. Sat�
 
 ### CI hattı
 
-`.github/workflows/ci.yml` her push ve PR'da üç iş çalıştırır:
+`.github/workflows/ci.yml` her push ve PR'da, haftalık olarak (pazartesi 05:00 UTC) ve elle başlatıldığında üç iş çalıştırır:
 
 1. **Lint, tip, test ve build:** `lint`, `format:check`, `typecheck`, `test`, `build`.
 2. **Uçtan uca testler:** Playwright (Chromium, 320 px ve masaüstü). Başarısızlıkta izler 7 gün saklanır.
-3. **Bağımlılık ve gizli anahtar denetimi:** production bağımlılıkları için engelleyici `npm audit`, tüm bağımlılıklar için rapor amaçlı `npm audit`, Gitleaks ile tüm geçmişte gizli anahtar taraması. Kabul edilen riskler `SECURITY.md` içindedir.
+3. **Bağımlılık ve gizli anahtar denetimi:** production bağımlılıkları için engelleyici `npm audit`, tüm bağımlılıklar için rapor amaçlı `npm audit`, Gitleaks ile gizli anahtar taraması (push/PR'da yeni commit'ler, haftalık ve elle çalıştırmada tüm geçmiş). Kabul edilen riskler `SECURITY.md` içindedir.
 
 Dependabot (`.github/dependabot.yml`) npm ve GitHub Actions güncellemelerini haftalık önerir.
 

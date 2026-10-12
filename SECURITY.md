@@ -76,11 +76,11 @@ Bu belge, LGS Pusula geliştirme ve işletim süreçlerinde uygulanması gereken
 
 ### Otomatik denetimler (CI)
 
-`.github/workflows/ci.yml` her push ve PR'da şunları çalıştırır:
+`.github/workflows/ci.yml` her push ve PR'da, ayrıca her pazartesi 08:00'de (Türkiye saati, 05:00 UTC) şunları çalıştırır:
 
 - `npm audit --omit=dev --audit-level=moderate`: uygulamayla birlikte çalışan (production) bağımlılıklarda orta veya üstü uyarı varsa CI **kırmızı** olur.
 - `npm audit --audit-level=high` (tüm bağımlılıklar): yalnızca rapor verir, CI'ı durdurmaz. Aşağıdaki kabul edilen riskler bu yüzden görünür kalır.
-- Gitleaks: tüm commit geçmişinde gizli anahtar taraması; bulgu varsa CI kırmızı olur.
+- Gitleaks: push ve PR'da yeni commit'lerde, haftalık ve elle başlatılan çalıştırmada tüm commit geçmişinde gizli anahtar taraması; bulgu varsa CI kırmızı olur.
 - Dependabot haftalık olarak npm ve GitHub Actions güncellemelerini önerir.
 
 ### Kabul edilen bağımlılık riskleri

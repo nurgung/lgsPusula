@@ -100,12 +100,13 @@
 - [x] 2.2 Onay penceresi (modal): klavye ile kapanır, odak içeride kalır — `ConfirmDialog` (yerleşik `<dialog>`)
 - [x] 2.3 Anlık bildirim (toast): ekran okuyucuya duyurulur — `ToastProvider` / `useToast`
 - [x] 2.4 Uygulama yerleşimi: üst başlık + mobil alt gezinme (rol bazlı menü yapısı) — `AppShell`, `getNavItems`; `/onizleme` bu yerleşime geçti
-- [ ] 2.5 GitHub Actions: her push'ta lint, typecheck, test, build ve e2e
+- [x] 2.5 GitHub Actions: her push'ta lint, typecheck, test, build ve e2e
   - [x] 2.5.1 İş akışını yaz (`.github/workflows/ci.yml`); içindeki komutlar yerelde geçti
-  - [ ] 2.5.2 Push sonrası GitHub'da çalıştığını ve yeşil olduğunu doğrula
+  - [x] 2.5.2 Push sonrası GitHub'da çalıştığını ve yeşil olduğunu doğrula — `5411b27`, [çalışma 38247539696](https://github.com/nurgung/lgsPusula/actions/runs/38247539696)
 - [ ] 2.6 CI'da bağımlılık denetimi (`npm audit`) ve gizli anahtar taraması
   - [x] 2.6.1 Engelleyici production `npm audit`, rapor amaçlı tam `npm audit`, Gitleaks ve Dependabot ekle
-  - [ ] 2.6.2 Push sonrası GitHub'da çalıştığını ve temiz olduğunu doğrula
+  - [x] 2.6.2 Push sonrası GitHub'da çalıştığını ve temiz olduğunu doğrula — production audit 0 uyarı, Gitleaks yeni commit'te bulgu yok
+  - [ ] 2.6.3 Tüm geçmişi tarayan elle/haftalık Gitleaks çalıştırmasının temiz olduğunu doğrula
 - [ ] 2.7 `npm audit` uyarılarını çöz (`eslint-config-next` → `braces`)
   - [x] 2.7.1 Production bağımlılıklarında uyarı yok (`npm audit --omit=dev`: 0)
   - [x] 2.7.2 `braces` uyarısı için yamalı sürüm yok; yalnızca geliştirme aracı olduğu için kabul edilen risk olarak `SECURITY.md`'ye yazıldı
@@ -117,7 +118,7 @@
 
 **Bitti sayılması için**
 - [x] Yeni bileşenlerin erişilebilirlik testleri geçer — 59 birim testi, 46 uçtan uca test (klavye, odak, canlı bölge, 44 px hedef, 320 px taşma)
-- [ ] Bir push sonrası CI otomatik çalışır ve yeşildir
+- [x] Bir push sonrası CI otomatik çalışır ve yeşildir — [çalışma 38247539696](https://github.com/nurgung/lgsPusula/actions/runs/38247539696)
 - [ ] Staging adresi HTTPS ile açılır
 
 ---

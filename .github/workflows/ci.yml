@@ -5,6 +5,9 @@ on:
     branches: ["**"]
   pull_request:
   workflow_dispatch:
+  # Weekly run: new advisories for unchanged dependencies and a full-history secret scan.
+  schedule:
+    - cron: "0 5 * * 1"
 
 permissions:
   contents: read
@@ -66,7 +69,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          # Full history so the secret scan also covers earlier commits.
+          # Push/PR runs scan only the new commits; scheduled and manual runs scan all history.
           fetch-depth: 0
       - uses: actions/setup-node@v5
         with:
