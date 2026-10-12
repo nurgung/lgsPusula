@@ -52,8 +52,8 @@
   - [x] 0.7.3 Güncel LGS soru dağılımını MEB kılavuzuyla doğrula — proje sahibi doğruladı (20/20/20/10/10/10, toplam 90)
 - [x] 0.8 E-posta/bildirim servisini seç *(Faz 10'dan önce)* — yalnızca uygulama içi bildirim; alan adı olmadığı için e-posta yok
 - [x] 0.9 Hata izleme servisini seç *(Faz 12'den önce)* — Sentry ücretsiz plan, AB bölgesi
-- [x] 0.10 Güvenlik açığı bildirim adresini belirle ve `SECURITY.md`'ye yaz *(Faz 12'den önce)* — GitHub özel bildirim; depo push edilince ayardan açılacak
-- [x] 0.11 Lisans kararını ver *(Faz 12'den önce)* — kapalı kaynak, `LICENSE` eklendi, depo gizli
+- [x] 0.10 Güvenlik açığı bildirim adresini belirle ve `SECURITY.md`'ye yaz *(Faz 12'den önce)* — GitHub özel bildirim; depo ayarında açıldı
+- [x] 0.11 Lisans kararını ver *(Faz 12'den önce)* — kapalı kaynak, `LICENSE` eklendi; depo herkese açık, kullanım hakkı verilmez
 - [x] 0.12 Yapay zekâ sağlayıcısını, veri işleme şartlarını ve maliyetini değerlendir *(Faz 13'ten önce)* — Groq ücretsiz plan, sıfır veri saklama açık
   - [x] 0.12.1 Kullanımı MVP sonrasına bırak ve değerlendirme ölçütlerini yaz
   - [x] 0.12.2 Ücretsiz sağlayıcıları ölçütlerle karşılaştır (Groq, Mistral, Gemini)

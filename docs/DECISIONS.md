@@ -21,7 +21,7 @@ Bu belge Faz 0'da proje sahibinin verdiği kararları ve gerekçelerini tutar. K
 | 0.8  | E-posta/bildirim                | Yalnızca uygulama içi bildirim; e-posta yok (alan adı yok)                            | Karar verildi |
 | 0.9  | Hata izleme                     | Sentry (ücretsiz plan), AB veri bölgesi, kişisel veri maskeli                         | Karar verildi |
 | 0.10 | Güvenlik açığı bildirimi        | GitHub özel güvenlik açığı bildirimi                                                  | Karar verildi |
-| 0.11 | Lisans                          | Kapalı kaynak, tüm hakları saklı; depo gizli (private)                                | Karar verildi |
+| 0.11 | Lisans                          | Kapalı kaynak, tüm hakları saklı; depo herkese açık (kod görünür, kullanım hakkı yok) | Karar verildi |
 | 0.12 | Yapay zekâ sağlayıcısı          | Groq ücretsiz plan, sıfır veri saklama açık; kullanım Faz 13'te (MVP sonrası)         | Karar verildi |
 
 ## Değişiklik kaydı
@@ -32,6 +32,7 @@ Bu belge Faz 0'da proje sahibinin verdiği kararları ve gerekçelerini tutar. K
 | 12 Ekim 2026 | Kullanım kapsamı aile içi olarak belirlendi (0.13); 0.1, 0.2, 0.3, 0.4, 0.5, 0.8, 0.9 ve 0.11 buna göre sadeleşti.                                                                    |
 | 12 Ekim 2026 | Negatif net kuralı belirlendi (0.7): ders neti eksi olabilir, toplam net eksiyse 0 alınır.                                                                                            |
 | 12 Ekim 2026 | Kullanıcı akışları onaylandı (0.3); LGS soru dağılımı proje sahibince doğrulandı (0.7); alan adı olmadığı için e-posta kapsam dışı (0.8); yapay zekâ sağlayıcısı Groq seçildi (0.12). |
+| 12 Ekim 2026 | Depo herkese açık yapıldı (0.11); GitHub özel güvenlik açığı bildirimi açıldı (0.10).                                                                                                 |
 
 ---
 
@@ -250,14 +251,15 @@ Bu akışlar MVP'nin (Faz 1–12) kapsamını tanımlar ve proje sahibi tarafın
 
 **Karar:** Bildirimler GitHub'ın özel güvenlik açığı bildirimi (Private vulnerability reporting) özelliğiyle alınır. Aile içi kullanımda ayrı bir e-posta adresi gerekmez.
 
-- Bu özellik depo GitHub'a gönderildikten sonra depo ayarlarından açılmalıdır (Faz 1.14'e bağlı).
+- Özellik 12 Ekim 2026'da açıldı. GitHub bu özelliği yalnızca herkese açık depolarda sunar; depo yeniden gizli yapılırsa bildirim kanalı proje sahibinin kendisi olur.
 
 ## 0.11 Lisans
 
 **Karar:** Kapalı kaynak, tüm hakları saklı. Açık kaynak lisansı verilmez.
 
 - Depo kökünde `LICENSE` dosyası bu kararı belirtir.
-- GitHub deposu gizli (private) tutulur.
+- GitHub deposu herkese açıktır (12 Ekim 2026, proje sahibi kararı). Kod görülebilir ama `LICENSE` gereği kullanım hakkı verilmez.
+- Depo herkese açık olduğu için depoya ve Git geçmişine hiçbir zaman gizli anahtar, `.env.local`, gerçek öğrenci verisi, yedek veya rapor dosyası eklenmez. Yanlışlıkla eklenen bir anahtar hemen iptal edilip yenilenir; yalnızca silmek yetmez.
 - Kullanılan açık kaynak bağımlılıkların lisans yükümlülükleri kontrol edilir.
 
 ## 0.12 Yapay zekâ sağlayıcısı — Groq

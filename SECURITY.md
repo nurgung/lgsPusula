@@ -92,7 +92,7 @@ Bu belge, LGS Pusula geliştirme ve işletim süreçlerinde uygulanması gereken
 
 Güvenlik açıklarını herkese açık issue olarak değil, GitHub'ın özel bildirim kanalıyla iletin. Bildirimlerde gerçek öğrenci verisi veya açıkları istismar etmeye yarayacak gereksiz ayrıntılar paylaşılmamalıdır.
 
-- Bildirim kanalı: GitHub deposunda **Security → Report a vulnerability** (Private vulnerability reporting). Bu özellik depo GitHub'a gönderildikten sonra ayarlardan açılmalıdır.
+- Bildirim kanalı: GitHub deposunda **Security → Report a vulnerability** (Private vulnerability reporting). Bu kanal açıktır.
 - E-posta adresi: **Henüz açılmadı**; açıldığında buraya eklenecek.
 - Beklenen bilgiler: etkilenen bileşen, etki, yeniden üretim için güvenli adımlar ve iletişim yöntemi.
 - Bildirimler doğrulanana kadar kamuya açık paylaşım yapılmaması rica edilir.
