@@ -8,6 +8,9 @@ import { USER_ROLES, type UserRole } from "@/types/roles";
 import { getSupabaseConfig } from "@/services/supabase/config";
 import { createSessionClient } from "@/services/supabase/server-client";
 import { AuthProviderError } from "@/services/supabase/auth-adapters";
+import { ACCOUNT_PATH, CHANGE_PASSWORD_PATH, LOGIN_PATH, landingPathFor } from "./paths";
+
+export type AssuranceLevel = "aal1" | "aal2";
 
 export type CurrentUser = {
   id: string;
@@ -15,6 +18,8 @@ export type CurrentUser = {
   displayName: string;
   roles: UserRole[];
   mustChangePassword: boolean;
+  /** aal2 means this session completed TOTP. Admin pages require it (decision 0.13). */
+  assuranceLevel: AssuranceLevel;
 };
 
 const profileRowSchema = z.object({
@@ -52,6 +57,11 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   // An account without a profile was not created by the setup script: treat as signed out.
   if (!profile) return null;
 
+  const { data: assurance, error: assuranceError } =
+    await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  // Unknown assurance is treated as aal1, so admin pages stay closed.
+  if (assuranceError) console.error("get_aal failed", { code: assuranceError.code });
+
   const row = profileRowSchema.parse(profile);
   return {
     id: data.user.id,
@@ -59,16 +69,11 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     displayName: row.display_name,
     roles: row.roles,
     mustChangePassword: row.must_change_password,
+    assuranceLevel: assurance?.currentLevel === "aal2" ? "aal2" : "aal1",
   };
 });
 
-export const LOGIN_PATH = "/giris";
-export const ACCOUNT_PATH = "/hesap";
-export const CHANGE_PASSWORD_PATH = "/parola-degistir";
-
-export function landingPathFor(user: Pick<CurrentUser, "mustChangePassword">): string {
-  return user.mustChangePassword ? CHANGE_PASSWORD_PATH : ACCOUNT_PATH;
-}
+export { ACCOUNT_PATH, CHANGE_PASSWORD_PATH, LOGIN_PATH, landingPathFor };
 
 /**
  * Redirects to the login page when nobody is signed in, and to the password change page while

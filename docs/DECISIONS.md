@@ -26,14 +26,15 @@ Bu belge Faz 0'da proje sahibinin verdiği kararları ve gerekçelerini tutar. K
 
 ## Değişiklik kaydı
 
-| Tarih        | Değişiklik                                                                                                                                                                            |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 12 Ekim 2026 | İlk kararlar verildi.                                                                                                                                                                 |
-| 12 Ekim 2026 | Kullanım kapsamı aile içi olarak belirlendi (0.13); 0.1, 0.2, 0.3, 0.4, 0.5, 0.8, 0.9 ve 0.11 buna göre sadeleşti.                                                                    |
-| 12 Ekim 2026 | Negatif net kuralı belirlendi (0.7): ders neti eksi olabilir, toplam net eksiyse 0 alınır.                                                                                            |
-| 12 Ekim 2026 | Kullanıcı akışları onaylandı (0.3); LGS soru dağılımı proje sahibince doğrulandı (0.7); alan adı olmadığı için e-posta kapsam dışı (0.8); yapay zekâ sağlayıcısı Groq seçildi (0.12). |
-| 12 Ekim 2026 | Depo herkese açık yapıldı (0.11); GitHub özel güvenlik açığı bildirimi açıldı (0.10).                                                                                                 |
-| 12 Ekim 2026 | Faz 3 için: giriş kullanıcı adıyla yapılır, yerel geliştirme Docker'da yerel Supabase ile yapılır; `@supabase/supabase-js`, `@supabase/ssr` ve `supabase` CLI eklenmesi onaylandı (0.1). |
+| Tarih        | Değişiklik                                                                                                                                                                                                                             |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 12 Ekim 2026 | İlk kararlar verildi.                                                                                                                                                                                                                  |
+| 12 Ekim 2026 | Kullanım kapsamı aile içi olarak belirlendi (0.13); 0.1, 0.2, 0.3, 0.4, 0.5, 0.8, 0.9 ve 0.11 buna göre sadeleşti.                                                                                                                     |
+| 12 Ekim 2026 | Negatif net kuralı belirlendi (0.7): ders neti eksi olabilir, toplam net eksiyse 0 alınır.                                                                                                                                             |
+| 12 Ekim 2026 | Kullanıcı akışları onaylandı (0.3); LGS soru dağılımı proje sahibince doğrulandı (0.7); alan adı olmadığı için e-posta kapsam dışı (0.8); yapay zekâ sağlayıcısı Groq seçildi (0.12).                                                  |
+| 12 Ekim 2026 | Depo herkese açık yapıldı (0.11); GitHub özel güvenlik açığı bildirimi açıldı (0.10).                                                                                                                                                  |
+| 12 Ekim 2026 | Faz 3 için: giriş kullanıcı adıyla yapılır, yerel geliştirme Docker'da yerel Supabase ile yapılır; `@supabase/supabase-js`, `@supabase/ssr` ve `supabase` CLI eklenmesi onaylandı (0.1).                                               |
+| 13 Ekim 2026 | Faz 4 uygulaması: bekleyen veli isteği 24 saat içinde yanıtlanmazsa süresi dolar; öğrenci başına aynı anda en fazla bir bekleyen bağlantı vardır (0.4). Yönetici MFA'sı TOTP'dir; MFA'sız oturum veli sayfalarını kullanabilir (0.13). |
 
 ---
 
@@ -163,6 +164,7 @@ Bu akışlar MVP'nin (Faz 1–12) kapsamını tanımlar ve proje sahibi tarafın
 - Kod girme denemelerinde hesap ve IP başına oran sınırlaması uygulanır.
 - Öğrenci başına en fazla 1 aktif veli bağlantısı.
 - Kod girmek tek başına erişim vermez; öğrencinin onayı zorunludur.
+- Bekleyen istek de 24 saat içinde yanıtlanmazsa `expired` olur. Öğrenci başına aynı anda en fazla bir bekleyen bağlantı vardır.
 
 ## 0.5 Veli onayı, veri saklama ve KVKK — Aile içi kullanım
 

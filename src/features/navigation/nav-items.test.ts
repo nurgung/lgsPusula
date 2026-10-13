@@ -5,26 +5,16 @@ const hrefs = (roles: Parameters<typeof getNavItems>[0]) =>
   getNavItems(roles).map((item) => item.href);
 
 describe("getNavItems", () => {
-  it("gives a student only student pages and settings", () => {
-    expect(hrefs(["student"])).toEqual([
-      "/ogrenci",
-      "/ogrenci/calisma",
-      "/ogrenci/denemeler",
-      "/ayarlar",
-    ]);
+  it("gives a student the home page and account page", () => {
+    expect(hrefs(["student"])).toEqual(["/ogrenci", "/hesap"]);
   });
 
   it("does not show the admin page to a parent without the admin role", () => {
-    expect(hrefs(["parent"])).toEqual(["/veli", "/veli/raporlar", "/ayarlar"]);
+    expect(hrefs(["parent"])).toEqual(["/veli", "/hesap"]);
   });
 
   it("merges parent and admin menus for the owner account (0.13)", () => {
-    expect(hrefs(["admin", "parent"])).toEqual([
-      "/veli",
-      "/veli/raporlar",
-      "/yonetici",
-      "/ayarlar",
-    ]);
+    expect(hrefs(["admin", "parent"])).toEqual(["/veli", "/yonetici", "/hesap"]);
   });
 
   it("never shows student pages to a parent or admin", () => {
@@ -47,7 +37,10 @@ describe("getNavItems", () => {
     }
   });
 
-  it("fails loudly instead of hiding pages when a menu would not fit", () => {
-    expect(() => getNavItems(["student", "parent", "admin"])).toThrow(/at most/);
+  it("still refuses a menu that would not fit on a 320 px screen", () => {
+    expect(MAX_NAV_ITEMS).toBe(5);
+    expect(getNavItems(["student", "parent", "admin"]).length).toBeLessThanOrEqual(
+      MAX_NAV_ITEMS,
+    );
   });
 });

@@ -116,11 +116,11 @@ test.describe("app layout", () => {
   test("shows exactly one main menu with 44px targets and marks the current page", async ({
     page,
   }, testInfo) => {
-    await page.goto("/onizleme/veli");
+    await page.goto("/onizleme/durumlar");
     const nav = page.getByRole("navigation", { name: "Ana menü" });
     await expect(nav).toHaveCount(1);
 
-    const current = nav.getByRole("link", { name: "Veli", exact: true });
+    const current = nav.getByRole("link", { name: "Durumlar", exact: true });
     await expect(current).toHaveAttribute("aria-current", "page");
     await expect(nav.locator("[aria-current=page]")).toHaveCount(1);
 

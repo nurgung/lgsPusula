@@ -1,15 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const pages = [
-  "/",
-  "/giris",
-  "/onizleme",
-  "/onizleme/ogrenci",
-  "/onizleme/veli",
-  "/onizleme/yonetici",
-  "/onizleme/bilesenler",
-  "/onizleme/durumlar",
-];
+const pages = ["/", "/giris", "/onizleme", "/onizleme/bilesenler", "/onizleme/durumlar"];
 
 for (const path of pages) {
   test(`${path} renders one h1 without horizontal overflow`, async ({ page }) => {
@@ -25,25 +16,10 @@ for (const path of pages) {
   });
 }
 
-for (const path of ["/onizleme/ogrenci", "/onizleme/veli", "/onizleme/yonetici"]) {
-  test(`${path} tables keep all columns visible without scrolling`, async ({ page }) => {
-    await page.goto(path);
-    const regions = page.locator("[role=region] table").locator("..");
-    const count = await regions.count();
-    expect(count).toBeGreaterThan(0);
-    for (let i = 0; i < count; i++) {
-      const overflow = await regions
-        .nth(i)
-        .evaluate((el) => el.scrollWidth - el.clientWidth);
-      expect(overflow).toBeLessThanOrEqual(0);
-    }
-  });
-}
-
 test("preview pages show the sample-data warning", async ({ page }) => {
-  await page.goto("/onizleme/ogrenci");
+  await page.goto("/onizleme/bilesenler");
   await expect(page.getByRole("note", { name: "Önizleme uyarısı" })).toContainText(
-    "örnek veri",
+    "Gerçek öğrenci verisi göstermez",
   );
 });
 

@@ -70,7 +70,7 @@ test("first login with a temporary password forces a password change", async ({
 test("password change validates input and the current password", async ({ page }) => {
   const account = await createTestAccount();
   await signIn(page, account.username, account.password);
-  await expect(page).toHaveURL(/\/hesap$/);
+  await expect(page).toHaveURL(/\/ogrenci$/);
   await page.goto("/parola-degistir");
 
   await page.getByLabel("Şu anki parola").fill("yanlis-parola-1");
@@ -103,7 +103,7 @@ test("session cookies are Secure, HttpOnly and SameSite=Lax", async ({
 }) => {
   const account = await createTestAccount();
   await signIn(page, account.username, account.password);
-  await expect(page).toHaveURL(/\/hesap$/);
+  await expect(page).toHaveURL(/\/ogrenci$/);
 
   const authCookies = (await context.cookies()).filter((cookie) =>
     cookie.name.startsWith("sb-"),
@@ -122,7 +122,8 @@ test("session cookies are Secure, HttpOnly and SameSite=Lax", async ({
 test("sign out ends the session", async ({ page }) => {
   const account = await createTestAccount();
   await signIn(page, account.username, account.password);
-  await expect(page).toHaveURL(/\/hesap$/);
+  await expect(page).toHaveURL(/\/ogrenci$/);
+  await page.getByRole("link", { name: "Hesap" }).click();
 
   await page.getByRole("button", { name: "Çıkış yap", exact: true }).click();
   await expect(page).toHaveURL(/\/giris\?cikis=tamam$/);
@@ -139,10 +140,11 @@ test("signing out everywhere ends sessions on other devices", async ({
   const otherPage = await otherDevice.newPage();
   await useFreshClientIp(otherPage);
   await signIn(otherPage, account.username, account.password);
-  await expect(otherPage).toHaveURL(/\/hesap$/);
+  await expect(otherPage).toHaveURL(/\/ogrenci$/);
 
   await signIn(page, account.username, account.password);
-  await expect(page).toHaveURL(/\/hesap$/);
+  await expect(page).toHaveURL(/\/ogrenci$/);
+  await page.getByRole("link", { name: "Hesap" }).click();
   await page.getByRole("button", { name: "Tüm cihazlarda çıkış yap" }).click();
   await page.getByRole("button", { name: "Hepsinden çıkış yap" }).click();
   await expect(page).toHaveURL(/\/giris\?cikis=tum$/);
@@ -156,7 +158,7 @@ test("a reset by the setup script ends sessions and forces a new password", asyn
 }) => {
   const account = await createTestAccount();
   await signIn(page, account.username, account.password);
-  await expect(page).toHaveURL(/\/hesap$/);
+  await expect(page).toHaveURL(/\/ogrenci$/);
 
   const temporary = "gecici-parola-77";
   await resetPassword(localAdminEnv(), admin(), account.username, temporary);
@@ -253,7 +255,7 @@ test("audit events never contain passwords, usernames or tokens", async ({ page 
   await signIn(page, account.username, "yanlis-parola-1");
   await expectAlert(page, "Kullanıcı adı veya parola hatalı.");
   await signIn(page, account.username, account.password);
-  await expect(page).toHaveURL(/\/hesap$/);
+  await expect(page).toHaveURL(/\/ogrenci$/);
 
   const { data } = await admin()
     .from("audit_events")

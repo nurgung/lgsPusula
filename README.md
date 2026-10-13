@@ -4,7 +4,7 @@ LGS Pusula; 8. sınıf öğrencilerinin günlük çalışmalarını, deneme sın
 
 > **Kullanım kapsamı:** Uygulama yalnızca aile içinde kullanılır: proje sahibi (veli + yönetici) ve çocuğu (öğrenci). Herkese açık kayıt yoktur. Ayrıntı: [docs/DECISIONS.md](docs/DECISIONS.md) (0.13).
 
-> **Proje durumu:** Faz 0 (ürün kararları) ve Faz 1 (proje altyapısı) tamamlandı. Faz 2'de (tasarım sistemi ve CI) staging kurulumu bekliyor. Faz 3'te (veri tabanı ve kimlik doğrulama) kod ve yerel testler bitti; bulut Supabase projeleri kurulmadı. İlerleme [roadmap.md](roadmap.md) içinde izlenir. Kullanıcı adıyla giriş, çıkış, parola değiştirme, kurulum betiği, `profiles`/`audit_events` tabloları ve oran sınırlaması vardır. Roller arası yetkilendirme, veli-öğrenci ilişkisi ve iş özellikleri **henüz yoktur**; gerçek öğrenci verisi kullanılmamalıdır. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+> **Proje durumu:** Faz 0 ve Faz 1 tamamlandı. Faz 2'de staging (ertelendi) ve Vercel–GitHub bağlantısı bekliyor. Faz 3'te kimlik doğrulama yerelde ve production'da var; aile hesapları production'da henüz oluşturulmadı. Faz 4'te roller, veli-öğrenci bağlantısı ve yönetici MFA'sı yerelde uygulandı; production veri tabanına yeni migration proje sahibi tarafından uygulanacak. Günlük çalışma, deneme ve koçluk henüz yoktur. İlerleme [roadmap.md](roadmap.md) içinde izlenir. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Ürün hedefleri
 
@@ -56,7 +56,7 @@ cp .env.example .env.local   # Windows: copy .env.example .env.local
 npm run dev
 ```
 
-Gerçek anahtarları yalnızca `.env.local` içine yazın; bu dosya Git'e eklenmez. Örnek veriyle çalışan rol taslaklarını görmek için `.env.local` içinde `UI_PREVIEW_ENABLED=true` yapın ve `http://localhost:3000/onizleme` adresini açın. Bu sayfalarda giriş veya yetkilendirme yoktur.
+Gerçek anahtarları yalnızca `.env.local` içine yazın; bu dosya Git'e eklenmez. Ortak bileşen örneklerini görmek için `.env.local` içinde `UI_PREVIEW_ENABLED=true` yapın ve `http://localhost:3000/onizleme` adresini açın. Bu sayfalarda giriş yoktur ve gerçek öğrenci verisi gösterilmez.
 
 ### Yerel veri tabanı ve giriş
 
@@ -142,6 +142,7 @@ lgs-pusula/
 Kural motoru önce güvenilir metrikler üretir: hedef tamamlama, ders bazında doğruluk, son denemeler arasındaki değişim ve tekrar gerektiren kazanımlar. Yapay zekâ yalnızca gerekli ve izin verilen bağlamı kullanarak bu sonuçları öğrenci seviyesine uygun bir dille açıklayabilir.
 
 Yapay zekâ:
+
 - Net, puan veya kazanım verisi uydurmamalı.
 - Girdiler eksikse bunu açıkça belirtmeli veya ek bilgi istemeli.
 - Teşhis, tehdit, utandırma ve kesin başarı garantisi vermemeli.

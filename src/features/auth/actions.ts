@@ -29,6 +29,7 @@ import {
   getCurrentUser,
   landingPathFor,
   requireUser,
+  type CurrentUser,
 } from "./session";
 
 // Every action re-reads the session on the server; nothing from the client (user id, role,
@@ -87,12 +88,13 @@ export async function signInAction(
     }
     const { data: profile, error } = await service
       .from("profiles")
-      .select("must_change_password")
+      .select("must_change_password, roles")
       .eq("id", result.userId)
-      .maybeSingle<{ must_change_password: boolean }>();
+      .maybeSingle<{ must_change_password: boolean; roles: CurrentUser["roles"] }>();
     if (error) throw new AuthProviderError("get_profile");
     destination = landingPathFor({
       mustChangePassword: profile?.must_change_password ?? true,
+      roles: profile?.roles ?? [],
     });
   } catch (error) {
     if (!(error instanceof AuthProviderError)) throw error;

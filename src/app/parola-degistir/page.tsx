@@ -8,6 +8,7 @@ import { ChangePasswordForm } from "@/features/auth/components/change-password-f
 import { requireUser } from "@/features/auth/session";
 
 export const metadata: Metadata = { title: "Parola değiştir" };
+export const instant = false;
 
 export default function ChangePasswordPage() {
   return (

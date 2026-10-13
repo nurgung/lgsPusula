@@ -5,9 +5,20 @@ export const RATE_LIMITS = {
   loginByIp: { maxAttempts: 20, windowSeconds: 15 * 60 },
   loginByUsername: { maxAttempts: 5, windowSeconds: 15 * 60 },
   passwordChangeByUser: { maxAttempts: 5, windowSeconds: 15 * 60 },
+  inviteCreateByUser: { maxAttempts: 10, windowSeconds: 15 * 60 },
+  inviteRedeemByIp: { maxAttempts: 20, windowSeconds: 15 * 60 },
+  inviteRedeemByUser: { maxAttempts: 5, windowSeconds: 15 * 60 },
+  mfaVerifyByUser: { maxAttempts: 5, windowSeconds: 15 * 60 },
 } as const satisfies Record<string, RateLimitPolicy>;
 
-export type RateLimitScope = "login:ip" | "login:username" | "password_change:user";
+export type RateLimitScope =
+  | "login:ip"
+  | "login:username"
+  | "password_change:user"
+  | "invite_create:user"
+  | "invite_redeem:ip"
+  | "invite_redeem:user"
+  | "mfa_verify:user";
 
 /** The subject (IP, username, user id) is stored only as an HMAC, never in plain text. */
 export function rateLimitKey(

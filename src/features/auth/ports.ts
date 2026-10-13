@@ -15,8 +15,14 @@ export const AUDIT_EVENT_TYPES = [
   "auth.logout",
   "auth.logout_all",
   "auth.password_change",
+  "auth.mfa_enroll",
+  "auth.mfa_verify",
   "admin.account_create",
   "admin.password_reset",
+  "family.invite_create",
+  "family.invite_redeem",
+  "family.link_respond",
+  "family.link_revoke",
 ] as const;
 export type AuditEventType = (typeof AUDIT_EVENT_TYPES)[number];
 
@@ -32,7 +38,13 @@ export type AuditMetadata = {
     | "rate_limited"
     | "invalid_current_password"
     | "weak_password"
-    | "provider_error";
+    | "provider_error"
+    | "invalid_code"
+    | "expired_code"
+    | "already_linked"
+    | "pending_exists"
+    | "not_allowed"
+    | "invalid_mfa_code";
   rateLimitScope?: "ip" | "username" | "user";
 };
 

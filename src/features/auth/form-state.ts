@@ -22,4 +22,9 @@ export const AUTH_MESSAGES = {
     "Bu parola yeterince güçlü değil. Daha uzun ve tahmini zor bir parola seç.",
   samePassword: "Yeni parola eskisinden farklı olmalı.",
   signOutFailed: "Çıkış yapılamadı. Biraz sonra tekrar dene.",
+  notAllowed: "Bu işlem bu hesapla yapılamaz.",
+  mfaCodeRequired: "6 haneli kodu yaz.",
+  mfaCodeInvalid: "Kod hatalı veya süresi doldu. Uygulamadaki güncel kodu yaz.",
+  mfaAlreadyEnrolled:
+    "Doğrulama zaten kurulu. Uygulamadaki 6 haneli kodu girmen yeterli.",
 } as const;

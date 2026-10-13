@@ -7,6 +7,7 @@ Bu belge, LGS Pusula'daki rollerin ve kayıt erişiminin nasıl kontrol edilece�
 ## Roller
 
 ### Öğrenci
+
 - Kendi profilini ve tercihlerini görebilir/düzenleyebilir.
 - Kendi günlük çalışma kayıtlarını ve denemelerini oluşturabilir, görebilir ve düzeltebilir.
 - Kendi karakterini, hedeflerini ve raporlarını görebilir.
@@ -14,12 +15,14 @@ Bu belge, LGS Pusula'daki rollerin ve kayıt erişiminin nasıl kontrol edilece�
 - Başka öğrencilerin kayıtlarına erişemez.
 
 ### Veli
+
 - Yalnızca aktif ve onaylı ilişki bulunan öğrencilerin verilerini görüntüleyebilir.
 - Öğrenci verisini değiştirme yetkisi varsayılan olarak verilmez.
 - Öğrenci adına kayıt girişi yapılacaksa bu ayrı ve açıkça tanımlanmış bir yetki olmalıdır.
-- İlişki daveti oluşturabilir, kabul/ret sürecini tamamlayabilir veya ilişkiyi sonlandırabilir; hangi tarafın hangi işlemi yapabileceği ürün akışında açıkça belirlenmelidir.
+- Daveti öğrenci başlatır ve son onayı verir. Veli kodu girer. İki taraf da aktif bağlantıyı kaldırabilir (0.4).
 
 ### Yönetici
+
 - Müfredat katalogları, sistem ayarları ve kullanıcı desteği için gerekli asgari yetkilere sahip olur.
 - Yönetici rolü öğrenci kayıtlarını sınırsız görüntüleme hakkı anlamına gelmemelidir.
 - Hassas verilere destek amacıyla erişim gerekiyorsa gerekçe, kapsam, süre ve denetim kaydı bulunmalıdır.
@@ -34,11 +37,21 @@ Uygulamada iki hesap vardır ([docs/DECISIONS.md](docs/DECISIONS.md), 0.13): pro
 - Veli, öğrencinin kayıtlarını yalnızca okur; giremez ve değiştiremez.
 - Yetki testleri iki aile hesabıyla sınırlı kalmaz: kurgusal ek öğrenci/veli hesaplarıyla yatay erişim senaryoları da test edilir.
 
-### Uygulanan durum (Faz 3)
+### Uygulanan durum
+
+**Faz 3**
 
 - Oturum ve kullanıcı yalnızca sunucudaki veri erişim katmanından (`src/features/auth/session.ts`) okunur. `requireUser()` oturum yoksa `/giris`'e yönlendirir.
 - `profiles` tablosunda RLS açıktır: kullanıcı yalnızca kendi satırını okur; rolünü, geçici parola bayrağını veya başka bir profili değiştiremez (uçtan uca testle doğrulandı). `audit_events` ve oran sınırı tablolarına kullanıcıların hiç erişimi yoktur.
-- Rol bazlı sayfa erişimi, veli-öğrenci ilişkisi kontrolleri ve yönetici için MFA **henüz yoktur** (Faz 4). Şu an oturum açan herkes yalnızca kendi `/hesap` sayfasını görür.
+
+**Faz 4**
+
+- Roller yalnızca sunucuda atanır (kurulum betiği, `service_role`). Öğrenci rolü başka rolle birleşmez; `admin` yalnızca `parent` ile birlikte verilir. Kullanıcı kendi rolünü değiştiremez.
+- Sayfa koruması `src/features/access/guards.ts` içindedir. `requireStudent` yalnızca tam olarak `student` rolüne izin verir. `requireParent` veli veya veli+yönetici ister. `requireAdmin` yönetici rolü ve MFA doğrulanmış oturum (`aal2`) ister; MFA'sız oturum `/mfa`'ya gider ve veli sayfalarını kullanmaya devam edebilir. Eksik rol `notFound` döner: sayfanın yokluğu ile yetkisizlik kullanıcıya ayrılmaz.
+- Öğrenci kaydını okuma kuralı `canReadStudentRecord` (`src/features/access/student-access.ts`): öğrenci yalnızca kendi kimliğini okur; veli yalnızca durumu `active` olan bağlantısındaki öğrenciyi okur. Yönetici rolü bu erişimi genişletmez. Bilinmeyen güvence düzeyi `aal1` sayılır.
+- Davet ve bağlantı yazmaları `service_role` SQL fonksiyonlarından geçer. Oturumdaki kullanıcı `family_links` satırını yalnızca kendisi öğrenciyse veya veliyse okur; ekleme, güncelleme ve silme politikası yoktur. `family_invites` kullanıcıya kapalıdır. Karşı tarafın görünen adı `visible_family_links()` ile gelir; kullanıcı adı, rol ve parola bayrağı dönmez.
+- Ekranlar: `/ogrenci`, `/veli`, `/veli/ogrenci/[studentId]`, `/yonetici`, `/mfa`. Menü yalnızca var olan sayfaları gösterir ve erişim kontrolü değildir. `/onizleme` altındaki rol taslakları kaldırıldı. Bileşen galerisi (`/onizleme/bilesenler`, `/onizleme/durumlar`) `UI_PREVIEW_ENABLED` ile durur; bu bir erişim kontrolü değildir.
+- Doğrulama: `tests/e2e/access.spec.ts` (yerel Supabase, 320 px ve masaüstü) ve `src/features/access/student-access.test.ts`.
 
 ## Veli-öğrenci ilişkilendirme akışı
 
@@ -56,16 +69,16 @@ Karar ve gerekçe: [docs/DECISIONS.md](docs/DECISIONS.md) (0.4).
 
 ## Erişim matrisi
 
-| Kaynak/işlem | Öğrenci | Veli | Yönetici |
-|---|---|---|---|
-| Kendi profili | Oku/düzenle | Oku/düzenle | Gerekli asgari yönetim |
-| Kendi günlük kayıtları | CRUD | Aktif ilişki varsa oku | Sınırlı destek; gerekçeli |
-| Kendi denemeleri | CRUD | Aktif ilişki varsa oku | Sınırlı destek; gerekçeli |
-| Öğrenci karakteri | Kendi karakteri | Oku | Sistem içeriğini yönet |
-| Veli-öğrenci bağlantısı | Kendi bağlantısını yönet | Kendi bağlantısını yönet | İstisna desteği, denetimli |
-| Müfredat kataloğu | Oku | Oku | CRUD |
-| Rapor dışa aktarma | Kendi verisi | Bağlı öğrenci verisi | Varsayılan olarak kapalı; istisna denetimli |
-| Sistem rolleri | Hayır | Hayır | Sınırlı ve denetimli |
+| Kaynak/işlem            | Öğrenci                  | Veli                     | Yönetici                                    |
+| ----------------------- | ------------------------ | ------------------------ | ------------------------------------------- |
+| Kendi profili           | Oku/düzenle              | Oku/düzenle              | Gerekli asgari yönetim                      |
+| Kendi günlük kayıtları  | CRUD                     | Aktif ilişki varsa oku   | Sınırlı destek; gerekçeli                   |
+| Kendi denemeleri        | CRUD                     | Aktif ilişki varsa oku   | Sınırlı destek; gerekçeli                   |
+| Öğrenci karakteri       | Kendi karakteri          | Oku                      | Sistem içeriğini yönet                      |
+| Veli-öğrenci bağlantısı | Kendi bağlantısını yönet | Kendi bağlantısını yönet | İstisna desteği, denetimli                  |
+| Müfredat kataloğu       | Oku                      | Oku                      | CRUD                                        |
+| Rapor dışa aktarma      | Kendi verisi             | Bağlı öğrenci verisi     | Varsayılan olarak kapalı; istisna denetimli |
+| Sistem rolleri          | Hayır                    | Hayır                    | Sınırlı ve denetimli                        |
 
 CRUD: oluşturma, okuma, güncelleme ve silme. Tablo başlangıç politikasıdır; nihai davranış kullanıcı hikâyeleriyle netleştirilmelidir.
 

@@ -41,16 +41,16 @@
 
 ## Uygulanan altyapı kararları (Faz 1)
 
-| Konu | Karar |
-|---|---|
-| Çatı | Next.js 16.4 (App Router, Turbopack), React 19.3, TypeScript 5.9 (strict + `noUncheckedIndexedAccess`) |
-| Önbellek modeli | `cacheComponents` ve `partialPrefetching` açık. Oturum/çerez okuyan bileşenler `<Suspense>` arkasında olmalı; oturuma bağlı veri paylaşılan önbelleğe alınmamalı. |
-| Stil | Tailwind CSS 4; renk/gölge/köşe token'ları yalnızca `src/app/globals.css` içindeki `@theme` bloğunda |
-| Doğrulama | Zod 4. Sunucu ortam değişkenleri `src/lib/env/server.ts` içinde doğrulanır; hata mesajı yalnızca değişken adını içerir, değeri içermez. |
-| Sunucu sınırı | Sunucuya özel modüller `import "server-only"` ile işaretlenir; istemci paketine girerse build hata verir. |
+| Konu                | Karar                                                                                                                                                                      |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Çatı                | Next.js 16.4 (App Router, Turbopack), React 19.3, TypeScript 5.9 (strict + `noUncheckedIndexedAccess`)                                                                     |
+| Önbellek modeli     | `cacheComponents` ve `partialPrefetching` açık. Oturum/çerez okuyan bileşenler `<Suspense>` arkasında olmalı; oturuma bağlı veri paylaşılan önbelleğe alınmamalı.          |
+| Stil                | Tailwind CSS 4; renk/gölge/köşe token'ları yalnızca `src/app/globals.css` içindeki `@theme` bloğunda                                                                       |
+| Doğrulama           | Zod 4. Sunucu ortam değişkenleri `src/lib/env/server.ts` içinde doğrulanır; hata mesajı yalnızca değişken adını içerir, değeri içermez.                                    |
+| Sunucu sınırı       | Sunucuya özel modüller `import "server-only"` ile işaretlenir; istemci paketine girerse build hata verir.                                                                  |
 | Güvenlik başlıkları | `src/lib/security-headers.ts`: nosniff, çerçeveleme yasağı, referrer ve izin politikaları, HSTS, nonce gerektirmeyen CSP yönergeleri. Betik/stil CSP'si (nonce) henüz yok. |
-| Testler | Vitest + Testing Library (birim/bileşen, test dosyaları kaynağın yanında `*.test.ts(x)`), Playwright (`tests/e2e`, 320 px mobil ve masaüstü). |
-| Biçim | Prettier; ESLint `eslint-config-next` + `any`/`@ts-ignore` yasağı + `NEXT_PUBLIC_` gizli ad yasağı |
+| Testler             | Vitest + Testing Library (birim/bileşen, test dosyaları kaynağın yanında `*.test.ts(x)`), Playwright (`tests/e2e`, 320 px mobil ve masaüstü).                              |
+| Biçim               | Prettier; ESLint `eslint-config-next` + `any`/`@ts-ignore` yasağı + `NEXT_PUBLIC_` gizli ad yasağı                                                                         |
 
 ### Klasör yapısı
 
@@ -59,7 +59,7 @@ src/app/                 sayfalar ve route dosyaları (Türkçe URL'ler)
 src/components/ui/       ortak arayüz bileşenleri (Button, Card, StateMessage, ProgressMeter, TableScroll,
                          form alanları, ConfirmDialog, Toast)
 src/components/layout/   ortak yerleşim parçaları (SkipLink, AppShell, AppNav)
-src/features/<feature>/  özellik modülleri: `auth` (Faz 3), `preview`, `navigation` (rol bazlı menü)
+src/features/<feature>/  özellik modülleri: `auth` (Faz 3), `access` ve `family` (Faz 4), `preview`, `navigation` (rol bazlı menü)
 src/lib/                 framework'ten bağımsız yardımcılar (env, güvenlik başlıkları, menü eşleşmesi)
 src/services/supabase/   Supabase adaptörü (sunucu istemcileri, çerez ayarları, oturum yenileme)
 src/proxy.ts             her istekte oturum yenileme (yetki kontrolü değildir)
@@ -69,23 +69,23 @@ src/types/               ortak tipler (roller)
 tests/unit, tests/e2e    kaynağa bağlı olmayan birim testleri ve uçtan uca testler
 ```
 
-### Rol sayfası taslakları (`/onizleme`)
+### Bileşen önizlemesi (`/onizleme`)
 
-- `/onizleme/ogrenci`, `/onizleme/veli`, `/onizleme/yonetici`, `/onizleme/durumlar` yalnızca kurgusal örnek veri (`src/features/preview/demo-data.ts`) gösterir.
+- `/onizleme/bilesenler` ve `/onizleme/durumlar` ortak bileşenleri kurgusal örneklerle gösterir. Gerçek öğrenci kaydı okumaz.
+- Rol taslakları (`/onizleme/ogrenci`, `/onizleme/veli`, `/onizleme/yonetici`) kaldırıldı. Gerçek sayfalar `/ogrenci`, `/veli` ve `/yonetici` altındadır.
 - `UI_PREVIEW_ENABLED=true` olmadıkça veya `APP_ENV=production` ise 404 döner. Bu bir **özellik bayrağıdır, erişim kontrolü değildir.** Bayrak derleme zamanında okunur.
-- Gerçek rol sayfaları (ör. `/ogrenci`) kimlik doğrulama ve sunucu tarafı yetkilendirme (Faz 3 ve 4) tamamlanmadan oluşturulmamalıdır. Önizleme sayfaları hiçbir zaman gerçek kayıt okumamalıdır.
 
 ## Tasarım sistemi ve CI (Faz 2)
 
 ### Ortak bileşenler
 
-| Bileşen | Dosya | Notlar |
-|---|---|---|
-| `TextField`, `NumberField`, `SelectField`, `FormErrorSummary` | `src/components/ui/form-field.tsx` | Görünür etiket, yardım metni ve alan hatası `aria-describedby` ile bağlanır; hatalı alan `aria-invalid` alır. `NumberField`, `type="text"` + `inputMode="numeric"` kullanır (mobil rakam klavyesi, fare tekerleğiyle değişme yok). Sayı doğrulaması yine sunucudaki ortak şemada yapılmalıdır. |
-| `ConfirmDialog` | `src/components/ui/confirm-dialog.tsx` | Yerleşik `<dialog>` + `showModal()`: sayfanın geri kalanı etkisizleşir, Esc kapatır, odak açan öğeye döner, Tab içeride döner. İlk odak güvenli "Vazgeç" düğmesindedir. `pending` iken düğmeler kilitlenir (çift gönderim yok). |
-| `ToastProvider`, `useToast` | `src/components/ui/toast.tsx` | Kök yerleşimde. Canlı bölgeler ilk çizimden itibaren sayfadadır. Hatalar `role="alert"`, diğerleri `role="status"` ile duyurulur. Başarı/bilgi 6 sn sonra kapanır (üzerine gelince/odaklanınca durur); hata kullanıcı kapatana kadar kalır. En fazla 3 bildirim görünür. |
-| `AppShell`, `AppNav` | `src/components/layout/` | Üst başlık; `sm` ve üstünde başlıkta menü, küçük ekranda sabit alt menü. Aynı anda yalnızca bir "Ana menü" görünür. Etkin sayfa `aria-current="page"` ve alt çizgiyle (yalnızca renkle değil) gösterilir. |
-| `getNavItems(roles)` | `src/features/navigation/nav-items.ts` | Rol bazlı menü yapısı. Veli + yönetici hesabı iki menünün birleşimini görür. Menü yalnızca neyin **gösterileceğini** belirler; erişim kontrolü değildir. En fazla 5 öğe (320 px'te 64 px hedef). |
+| Bileşen                                                       | Dosya                                  | Notlar                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TextField`, `NumberField`, `SelectField`, `FormErrorSummary` | `src/components/ui/form-field.tsx`     | Görünür etiket, yardım metni ve alan hatası `aria-describedby` ile bağlanır; hatalı alan `aria-invalid` alır. `NumberField`, `type="text"` + `inputMode="numeric"` kullanır (mobil rakam klavyesi, fare tekerleğiyle değişme yok). Sayı doğrulaması yine sunucudaki ortak şemada yapılmalıdır. |
+| `ConfirmDialog`                                               | `src/components/ui/confirm-dialog.tsx` | Yerleşik `<dialog>` + `showModal()`: sayfanın geri kalanı etkisizleşir, Esc kapatır, odak açan öğeye döner, Tab içeride döner. İlk odak güvenli "Vazgeç" düğmesindedir. `pending` iken düğmeler kilitlenir (çift gönderim yok).                                                                |
+| `ToastProvider`, `useToast`                                   | `src/components/ui/toast.tsx`          | Kök yerleşimde. Canlı bölgeler ilk çizimden itibaren sayfadadır. Hatalar `role="alert"`, diğerleri `role="status"` ile duyurulur. Başarı/bilgi 6 sn sonra kapanır (üzerine gelince/odaklanınca durur); hata kullanıcı kapatana kadar kalır. En fazla 3 bildirim görünür.                       |
+| `AppShell`, `AppNav`                                          | `src/components/layout/`               | Üst başlık; `sm` ve üstünde başlıkta menü, küçük ekranda sabit alt menü. Aynı anda yalnızca bir "Ana menü" görünür. Etkin sayfa `aria-current="page"` ve alt çizgiyle (yalnızca renkle değil) gösterilir.                                                                                      |
+| `getNavItems(roles)`                                          | `src/features/navigation/nav-items.ts` | Rol bazlı menü yapısı. Veli + yönetici hesabı iki menünün birleşimini görür. Menü yalnızca neyin **gösterileceğini** belirler; erişim kontrolü değildir. En fazla 5 öğe (320 px'te 64 px hedef).                                                                                               |
 
 Bileşenler `/onizleme/bilesenler` sayfasında örnek olarak görülebilir. Satır içi `style` kullanılmaz; ileride eklenecek katı CSP (Faz 12.3) ile uyumlu kalmak için sabit sınıflar tercih edilir.
 
@@ -106,14 +106,15 @@ Dependabot (`.github/dependabot.yml`) npm ve GitHub Actions güncellemelerini ha
 1. Vercel'de **Add New → Project** ile `nurgung/lgsPusula` deposunu içe aktar. Çatı: Next.js; ayarlar varsayılan kalabilir.
 2. **Settings → Environment Variables** içinde ortam bazında ayrı değer gir:
 
-   | Değişken | Preview (staging) | Production |
-   |---|---|---|
-   | `APP_ENV` | `staging` | `production` |
-   | `UI_PREVIEW_ENABLED` | `false` (örnek veri sayfalarını görmek istersen `true`; bu sayfalarda giriş yok) | `false` (production'da zaten reddedilir) |
-   | `NEXT_PUBLIC_APP_URL` | staging alan adı (ör. `https://lgs-pusula-git-staging-<hesap>.vercel.app`) | production alan adı |
-   | `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `AUTH_SECRET` | staging Supabase projesinin değerleri; ayrı üretilmiş `AUTH_SECRET` | production projesinin değerleri; ayrı üretilmiş `AUTH_SECRET` |
+   | Değişken                                                                        | Preview (staging)                                                                | Production                                                    |
+   | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+   | `APP_ENV`                                                                       | `staging`                                                                        | `production`                                                  |
+   | `UI_PREVIEW_ENABLED`                                                            | `false` (örnek veri sayfalarını görmek istersen `true`; bu sayfalarda giriş yok) | `false` (production'da zaten reddedilir)                      |
+   | `NEXT_PUBLIC_APP_URL`                                                           | staging alan adı (ör. `https://lgs-pusula-git-staging-<hesap>.vercel.app`)       | production alan adı                                           |
+   | `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `AUTH_SECRET` | staging Supabase projesinin değerleri; ayrı üretilmiş `AUTH_SECRET`              | production projesinin değerleri; ayrı üretilmiş `AUTH_SECRET` |
 
    Gizli değerler yalnızca Vercel'de tutulur; depoya veya `NEXT_PUBLIC_` değişkenlerine konmaz. Preview ortamına production anahtarı verilmez.
+
 3. **Settings → Deployment Protection** içinde preview dağıtımları için **Vercel Authentication** açık kalmalı. Böylece staging adresini yalnızca Vercel hesabıyla giriş yapan kişi görür.
 4. Kalıcı bir staging adresi için `staging` dalını oluştur. Vercel bu dal için `...-git-staging-...vercel.app` adresini verir. İstersen **Settings → Domains** içinden bu dala ayrı bir alan adı bağlayabilirsin.
 5. Adresin HTTPS ile açıldığını ve güvenlik başlıklarının (`x-content-type-options`, `x-frame-options`, `strict-transport-security`) geldiğini kontrol et.
@@ -122,15 +123,15 @@ Dependabot (`.github/dependabot.yml`) npm ve GitHub Actions güncellemelerini ha
 
 ### Katmanlar
 
-| Katman | Dosyalar | Görev |
-|---|---|---|
-| Alan (çatıdan bağımsız) | `src/features/auth/username.ts`, `schemas.ts`, `ports.ts`, `rate-limit.ts`, `login.ts`, `change-password.ts`, `client-ip.ts` | Kullanıcı adı kuralı, Zod şemaları (istemci ve sunucu aynı şemayı kullanır), oran sınırı politikaları, giriş ve parola değiştirme kullanım senaryoları. Supabase'i bilmez; testlerde sahte bağımlılık kullanılır. |
-| Veri erişim katmanı (DAL) | `src/features/auth/session.ts` (`server-only`) | `getCurrentUser()` her istekte oturumu Auth sunucusuna sorar (`getUser`), profili RLS altında kullanıcının kendi yetkisiyle okur. `requireUser()` oturum yoksa `/giris`'e, geçici parola varsa `/parola-degistir`'e yönlendirir. İstek içinde `React.cache` ile tekrar kullanılır; istekler veya kullanıcılar arasında önbelleğe alınmaz. |
-| Server Actions | `src/features/auth/actions.ts` | Giriş, çıkış, tüm cihazlarda çıkış, parola değiştirme. Her işlem oturumu sunucuda yeniden okur; istemciden kullanıcı kimliği, rol veya yönlendirme adresi alınmaz (açık yönlendirme yok). CSRF'e karşı Next.js Server Action'larının Origin denetimine dayanır. |
-| Sağlayıcı adaptörü | `src/services/supabase/` (`server-only`) | `createSessionClient` (çerezli, RLS altında), `createServiceClient` (`service_role`, yalnızca sunucu), `createEphemeralAuthClient` (mevcut parolayı oturuma dokunmadan doğrulamak için). `auth-adapters.ts` port'ların Supabase karşılıkları. |
-| Proxy | `src/proxy.ts` → `refresh-session.ts` | Süresi dolmak üzere olan oturumu Server Component'ler çizilmeden yeniler ve iptal edilmiş oturumun çerezlerini temizler. **Yetki kontrolü değildir.** |
-| Sayfalar | `/giris`, `/parola-degistir`, `/hesap` | Oturum okuyan kısımlar `<Suspense>` içinde ve `connection()` ile her zaman istek anında çalışır (build anındaki ortam değişkenlerine bağlı kalmaz). |
-| Betik | `scripts/accounts.ts`, `scripts/lib/account-admin.ts` | `npm run accounts -- setup` iki aile hesabını oluşturur; `npm run accounts -- reset-password <ad>` geçici parola verir, ilk girişte değiştirmeyi zorunlu kılar ve hesabın tüm oturumlarını kapatır. Geçici parola yalnızca terminalde bir kez gösterilir. |
+| Katman                    | Dosyalar                                                                                                                     | Görev                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Alan (çatıdan bağımsız)   | `src/features/auth/username.ts`, `schemas.ts`, `ports.ts`, `rate-limit.ts`, `login.ts`, `change-password.ts`, `client-ip.ts` | Kullanıcı adı kuralı, Zod şemaları (istemci ve sunucu aynı şemayı kullanır), oran sınırı politikaları, giriş ve parola değiştirme kullanım senaryoları. Supabase'i bilmez; testlerde sahte bağımlılık kullanılır.                                                                                                                         |
+| Veri erişim katmanı (DAL) | `src/features/auth/session.ts` (`server-only`)                                                                               | `getCurrentUser()` her istekte oturumu Auth sunucusuna sorar (`getUser`), profili RLS altında kullanıcının kendi yetkisiyle okur. `requireUser()` oturum yoksa `/giris`'e, geçici parola varsa `/parola-degistir`'e yönlendirir. İstek içinde `React.cache` ile tekrar kullanılır; istekler veya kullanıcılar arasında önbelleğe alınmaz. |
+| Server Actions            | `src/features/auth/actions.ts`                                                                                               | Giriş, çıkış, tüm cihazlarda çıkış, parola değiştirme. Her işlem oturumu sunucuda yeniden okur; istemciden kullanıcı kimliği, rol veya yönlendirme adresi alınmaz (açık yönlendirme yok). CSRF'e karşı Next.js Server Action'larının Origin denetimine dayanır.                                                                           |
+| Sağlayıcı adaptörü        | `src/services/supabase/` (`server-only`)                                                                                     | `createSessionClient` (çerezli, RLS altında), `createServiceClient` (`service_role`, yalnızca sunucu), `createEphemeralAuthClient` (mevcut parolayı oturuma dokunmadan doğrulamak için). `auth-adapters.ts` port'ların Supabase karşılıkları.                                                                                             |
+| Proxy                     | `src/proxy.ts` → `refresh-session.ts`                                                                                        | Süresi dolmak üzere olan oturumu Server Component'ler çizilmeden yeniler ve iptal edilmiş oturumun çerezlerini temizler. **Yetki kontrolü değildir.**                                                                                                                                                                                     |
+| Sayfalar                  | `/giris`, `/parola-degistir`, `/hesap`                                                                                       | Oturum okuyan kısımlar `<Suspense>` içinde ve `connection()` ile her zaman istek anında çalışır (build anındaki ortam değişkenlerine bağlı kalmaz).                                                                                                                                                                                       |
+| Betik                     | `scripts/accounts.ts`, `scripts/lib/account-admin.ts`                                                                        | `npm run accounts -- setup` iki aile hesabını oluşturur; `npm run accounts -- reset-password <ad>` geçici parola verir, ilk girişte değiştirmeyi zorunlu kılar ve hesabın tüm oturumlarını kapatır. Geçici parola yalnızca terminalde bir kez gösterilir.                                                                                 |
 
 ### Oturum ve çerezler
 
@@ -144,11 +145,15 @@ Dependabot (`.github/dependabot.yml`) npm ve GitHub Actions güncellemelerini ha
 
 `public.consume_rate_limit` (sabit pencere, atomik `insert … on conflict`). Kova anahtarı `kapsam:HMAC-SHA256(AUTH_SECRET, kapsam + konu)` biçimindedir; kullanıcı adı ve IP açık hâliyle saklanmaz.
 
-| Kapsam | Sınır | Not |
-|---|---|---|
-| Giriş, IP başına | 15 dakikada 20 deneme | IP, Vercel'in üzerine yazdığı `x-real-ip` / `x-forwarded-for` başlığından okunur. Yerelde bu başlık taklit edilebilir; kullanıcı adı sınırı yine geçerlidir. |
-| Giriş, kullanıcı adı başına | 15 dakikada 5 deneme | Doğru parola da bu süre içinde reddedilir. Başarılı girişte sayaç sıfırlanır. |
-| Parola değiştirme, kullanıcı başına | 15 dakikada 5 deneme | Mevcut parolanın tahmin edilmesini sınırlar. |
+| Kapsam                              | Sınır                 | Not                                                                                                                                                          |
+| ----------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Giriş, IP başına                    | 15 dakikada 20 deneme | IP, Vercel'in üzerine yazdığı `x-real-ip` / `x-forwarded-for` başlığından okunur. Yerelde bu başlık taklit edilebilir; kullanıcı adı sınırı yine geçerlidir. |
+| Giriş, kullanıcı adı başına         | 15 dakikada 5 deneme  | Doğru parola da bu süre içinde reddedilir. Başarılı girişte sayaç sıfırlanır.                                                                                |
+| Parola değiştirme, kullanıcı başına | 15 dakikada 5 deneme  | Mevcut parolanın tahmin edilmesini sınırlar.                                                                                                                 |
+| Davet kodu üretme, kullanıcı başına | 15 dakikada 10        |                                                                                                                                                              |
+| Davet kodu girme, IP başına         | 15 dakikada 20        |                                                                                                                                                              |
+| Davet kodu girme, kullanıcı başına  | 15 dakikada 5         | Sayaç, biçim hatasından önce düşer.                                                                                                                          |
+| MFA doğrulama, kullanıcı başına     | 15 dakikada 5         |                                                                                                                                                              |
 
 Sınırlayıcıya ulaşılamazsa istek reddedilir (fail closed). Parola sıfırlama uygulamada bir uç değildir; yalnızca kurulum betiğiyle yapılır (karar 0.8).
 
@@ -167,23 +172,39 @@ Sınırlayıcıya ulaşılamazsa istek reddedilir (fail closed). Parola sıfırl
 4. Vercel ortam değişkenleri: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (projenin **Settings → API** sayfasından) ve her ortam için ayrı üretilmiş `AUTH_SECRET`. Preview'a staging, Production'a production değerleri girilir.
 5. Aile hesaplarını oluştur: production değerlerini geçici olarak yerel bir dosyaya koyup `node --env-file=<dosya> scripts/accounts.ts setup` komutunu çalıştır, ardından dosyayı sil. Betik hedef adresi gösterir ve "evet" yazılmadan bir şey yapmaz.
 
-**Uyarı:** `supabase/config.toml` bulut projesine olduğu gibi `supabase config push` ile gönderilmemelidir. Dosyada yalnızca yerel ortam için olan değerler var (giriş oran sınırı 1000, TOTP MFA kapalı). Auth ayarları için yalnızca gereken anahtarları içeren geçici bir yapılandırma ile önce `supabase config diff`, sonra `supabase config push` kullanılır.
+**Uyarı:** `supabase/config.toml` bulut projesine olduğu gibi `supabase config push` ile gönderilmemelidir. Dosyada yalnızca yerel ortam için olan değerler var (giriş oran sınırı 1000). TOTP yerel ortamda da açıktır; barındırılan projelerde TOTP varsayılan olarak açık ve ücretsizdir, bu yüzden MFA için ayrıca `config push` gerekmez. Telefon MFA kapalı kalır. Auth ayarları için yalnızca gereken anahtarları içeren geçici bir yapılandırma ile önce `supabase config diff`, sonra `supabase config push` kullanılır.
 
 ### Bulut ortamlarının durumu (13 Ekim 2026)
 
-| Ortam | Supabase | Vercel | Durum |
-|---|---|---|---|
+| Ortam      | Supabase                      | Vercel                                                                                       | Durum                                                                                                                                                                                      |
+| ---------- | ----------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Production | `lgs-pusula-prod` (Frankfurt) | Production değişkenleri girildi; adres `https://lgs-pusula.vercel.app` (fonksiyonlar `fra1`) | Migration uygulandı; dışarıdan kayıt kapalı (doğrulandı: `signup_disabled`); parola kuralı 10 karakter, harf + rakam; HTTPS ve güvenlik başlıkları doğrulandı; giriş Supabase'e bağlanıyor |
-| Staging | Açılmadı | Preview için değişken yok | Ücretsiz planın 2 proje sınırı nedeniyle proje sahibi kararıyla ertelendi. Preview dağıtımlarında giriş "şu an kullanılamıyor" mesajı verir; production anahtarı Preview'a verilmez |
+| Staging    | Açılmadı                      | Preview için değişken yok                                                                    | Ücretsiz planın 2 proje sınırı nedeniyle proje sahibi kararıyla ertelendi. Preview dağıtımlarında giriş "şu an kullanılamıyor" mesajı verir; production anahtarı Preview'a verilmez        |
 
 - Önizleme dağıtım adresleri Vercel Authentication ile korunuyor (oturumsuz istek Vercel girişine yönlenir).
 - Vercel projesi GitHub deposuna henüz bağlanamadı (`vercel git connect` hata veriyor). Bu yüzden push sonrası otomatik dağıtım yok; dağıtım `npx vercel deploy --prod` ile elle yapılır. Bağlantı için Vercel hesabında GitHub bağlantısı ve Vercel GitHub uygulamasının depoya erişimi gerekir.
 - Aile hesapları production'da henüz oluşturulmadı (adım 5). Geçici parolalar yalnızca ekranda gösterildiği için bu adımı proje sahibi kendi bilgisayarında çalıştırır.
 
+## Roller ve veli-öğrenci ilişkisi (Faz 4)
+
+Yetki kuralları [AUTHORIZATION.md](../AUTHORIZATION.md) içindedir. Menüde bir bağlantıyı göstermek erişim kontrolü değildir.
+
+| Katman   | Dosyalar                                             | Görev                                                                                                                                                                                                                                           |
+| -------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Yetki    | `src/features/access/guards.ts`, `student-access.ts` | Sayfa koruması ve "bu öğrenci kaydını okuyabilir mi?" kuralı. Supabase'i bilmez.                                                                                                                                                                |
+| Davet    | `src/features/family/`                               | Kod üretme (12 karakter, 4'lü gruplar, karışan harfler yok), HMAC-SHA256 özeti, kodu kullanma, onay/ret ve kaldırma. Kod ve özeti loglanmaz.                                                                                                    |
+| Adaptör  | `src/services/supabase/family-store.ts`              | SQL fonksiyon çağrıları. Liste, oturum istemcisiyle RLS altında okunur; yazmalar `service_role` ile yapılır.                                                                                                                                    |
+| MFA      | `src/features/auth/mfa-actions.ts`                   | Supabase Auth TOTP. Kurulum gizli anahtarı ekranda gösterilir; karekod üretilmez. Doğrulama sonrası oturum `aal2` olur ve `/yonetici`'ye gider.                                                                                                 |
+| Sayfalar | `src/app/(panel)/`                                   | `/ogrenci`, `/veli`, `/veli/ogrenci/[studentId]`, `/yonetici`, `/mfa`, `/hesap`. Ortak yerleşim oturumu `<Suspense>` içinde okur ve `instant = false` ile anlık önizleme doğrulamasının dışındadır; oturum istekler arasında önbelleğe alınmaz. |
+
+- Girişten sonra öğrenci `/ogrenci`'ye, veli (yönetici olsa da) `/veli`'ye gider. Geçici parola hâlâ `/parola-degistir`'e gider.
+- Yönetici sayfası öğrenci kaydı göstermez. Katalog düzenleme Faz 5'tedir. Yönetici rolü, veli bağlantısının verdiğinden fazla öğrenci verisi açmaz.
+- Bekleyen istek 24 saat içinde yanıtlanmazsa `expired` olur (karar 0.4). Süresi dolan satırlar bir sonraki davet veya liste okumasında `expire_stale_family_links` ile güncellenir.
+- Production veri tabanına bu migration henüz uygulanmadı. Proje sahibi `npx supabase db push` çalıştırır; ajan bunu yapmaz.
+
 ### Henüz uygulanmayanlar
 
-- Roller arası yetki yardımcıları, veli-öğrenci ilişkisi, MFA, gerçek rol sayfaları (Faz 4). `profiles.roles` alanı ve RLS şu an yalnızca "kullanıcı kendi profilini okur, rolünü değiştiremez" kuralını uygular.
-- `audit_events` ve süresi dolan oran sınırı kayıtlarının saklama süresine göre otomatik silinmesi (karar 0.5: 1 yıl). Silme işi Faz 12'deki yedekleme/veri betikleriyle birlikte planlanacak.
+- Bitmiş bağlantı, `audit_events` ve süresi dolan oran sınırı kayıtlarının saklama süresine göre otomatik silinmesi (karar 0.5: 1 yıl). Silme işi Faz 12'deki yedekleme betikleriyle birlikte planlanacak.
 - Net hesaplama kuralları, hedefler, günlük kayıt ve deneme formları, kazanım kataloğu.
 - Koçluk motoru, yapay zekâ adaptörü, karakter puanları, bildirimler, içe aktarma, PDF/DOCX raporlar.
 - PWA manifesti ve simgeler, nonce tabanlı CSP, hata izleme.

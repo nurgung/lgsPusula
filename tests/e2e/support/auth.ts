@@ -43,12 +43,17 @@ export type TestAccount = { id: string; username: string; password: string };
 export async function createTestAccount({
   roles = ["student"],
   mustChangePassword = false,
-}: { roles?: AccountRole[]; mustChangePassword?: boolean } = {}): Promise<TestAccount> {
+  displayName = "Deneme Kullanıcı",
+}: {
+  roles?: AccountRole[];
+  mustChangePassword?: boolean;
+  displayName?: string;
+} = {}): Promise<TestAccount> {
   const username = `${E2E_USERNAME_PREFIX}${randomBytes(6).toString("hex")}`;
   const password = generateTemporaryPassword();
   const id = await createAccount(admin(), {
     username,
-    displayName: "Deneme Kullanıcı",
+    displayName,
     roles,
     password,
   });

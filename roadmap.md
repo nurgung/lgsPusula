@@ -16,7 +16,7 @@
 | 1 | Proje altyapısı | Tamamlandı |
 | 2 | Tasarım sistemi ve CI | Devam ediyor — Vercel production `https://lgs-pusula.vercel.app` HTTPS ve güvenlik başlıklarıyla açık; staging (ertelendi), Vercel–GitHub bağlantısı ve `braces` yaması (hâlâ yok) bekliyor |
 | 3 | Veri tabanı ve kimlik doğrulama | Devam ediyor — production Supabase (Frankfurt) kuruldu, kayıt kapalı, CI yeşil; staging projesi (ertelendi) ve production aile hesapları (proje sahibi) bekliyor |
-| 4 | Roller ve veli-öğrenci ilişkisi | Başlanmadı |
+| 4 | Roller ve veli-öğrenci ilişkisi | Tamamlandı — yerel testler geçti; production veri tabanına migration proje sahibinde |
 | 5 | Müfredat kataloğu | Başlanmadı |
 | 6 | Günlük çalışma kayıtları ve hedefler | Başlanmadı |
 | 7 | Deneme sınavları ve net hesabı | Başlanmadı |
@@ -174,23 +174,23 @@
 **Ön koşul:** Faz 3, kararlar 0.3, 0.4, 0.5
 
 **İşler**
-- [ ] 4.1 Öğrenci, veli ve yönetici rolleri; rol yalnızca sunucuda atanır; veli hesabı aynı zamanda yönetici olabilir (0.13)
-- [ ] 4.2 Ortak yetki yardımcıları: sahiplik ve aktif ilişki kontrolü
-- [ ] 4.3 `family_links` migration'ı (`pending`, `active`, `declined`, `expired`, `revoked`)
-- [ ] 4.4 Veli daveti: kısa ömürlü, tek kullanımlık belirteç
-- [ ] 4.5 Davet kabul, ret ve ilişkiyi sonlandırma ekranları
-- [ ] 4.6 RLS politikaları (her tablo için okuma/yazma ayrı)
+- [x] 4.1 Öğrenci, veli ve yönetici rolleri; rol yalnızca sunucuda atanır; veli hesabı aynı zamanda yönetici olabilir (0.13)
+- [x] 4.2 Ortak yetki yardımcıları: sahiplik ve aktif ilişki kontrolü
+- [x] 4.3 `family_links` migration'ı (`pending`, `active`, `declined`, `expired`, `revoked`) — yerelde uygulandı; production için `supabase db push` proje sahibinde
+- [x] 4.4 Veli daveti: kısa ömürlü, tek kullanımlık belirteç
+- [x] 4.5 Davet kabul, ret ve ilişkiyi sonlandırma ekranları
+- [x] 4.6 RLS politikaları (her tablo için okuma/yazma ayrı)
 - [ ] ~~4.7 Hesap devre dışı bırakma~~ — kapsam dışı (0.13)
-- [ ] 4.8 Yönetici yetkisi olan hesap için MFA; yönetici sayfaları MFA doğrulanmış oturum ister
-- [ ] 4.9 Gerçek `/ogrenci`, `/veli`, `/yonetici` sayfalarını yetki kontrolüyle oluştur; `/onizleme` taslaklarını kaldır
+- [x] 4.8 Yönetici yetkisi olan hesap için MFA; yönetici sayfaları MFA doğrulanmış oturum ister
+- [x] 4.9 Gerçek `/ogrenci`, `/veli`, `/yonetici` sayfalarını yetki kontrolüyle oluştur; `/onizleme` taslaklarını kaldır
 
 **Bitti sayılması için**
-- [ ] Öğrenci A, URL'deki ID'yi değiştirerek Öğrenci B'nin kaydını okuyamaz (test)
-- [ ] Veli yalnızca aktif ilişkisi olan öğrenciyi görür (test)
-- [ ] İptal edilen ilişki bir sonraki istekte erişimi kaldırır (test)
-- [ ] Normal kullanıcı kendini yönetici yapamaz (test)
-- [ ] Yönetici işlemleri normal oturumla yapılamaz (test)
-- [ ] RLS politikaları gerçek rollerle test edilir
+- [x] Öğrenci A, URL'deki ID'yi değiştirerek Öğrenci B'nin kaydını okuyamaz (test) — `tests/e2e/access.spec.ts`, yerel Supabase, 320 px ve masaüstü
+- [x] Veli yalnızca aktif ilişkisi olan öğrenciyi görür (test) — aynı dosya
+- [x] İptal edilen ilişki bir sonraki istekte erişimi kaldırır (test) — aynı dosya
+- [x] Normal kullanıcı kendini yönetici yapamaz (test) — aynı dosya
+- [x] Yönetici işlemleri normal oturumla yapılamaz (test) — aynı dosya; TOTP sonrası `/yonetici` açılır
+- [x] RLS politikaları gerçek rollerle test edilir — aynı dosya
 
 ---
 

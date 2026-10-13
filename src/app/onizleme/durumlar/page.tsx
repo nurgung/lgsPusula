@@ -19,8 +19,8 @@ export default function StatesPreviewPage() {
           title="Çalışma kaydını henüz eklemedin."
           description="İstersen şimdi kaydedebilirsin."
           action={
-            <ButtonLink href="/onizleme/ogrenci" variant="secondary">
-              Kayıt ekle
+            <ButtonLink href="/onizleme/bilesenler" variant="secondary">
+              Örnek forma git
             </ButtonLink>
           }
         />
