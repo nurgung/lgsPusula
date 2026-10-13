@@ -2,6 +2,22 @@
 
 Bu taslak nihai şema değildir. Gerçek şema migration dosyalarıyla yönetilmeli ve erişim politikaları her tablo için ayrıca tanımlanmalıdır.
 
+## Uygulanan şema (Faz 3)
+
+Migration: `supabase/migrations/20261012120000_auth_foundation.sql`. Yerel yapılandırmada `auto_expose_new_tables = false` olduğundan hiçbir tablo açık `grant` verilmeden Data API'ye açılmaz. Bulut projelerinde de açıklar aynı migration'daki `revoke` ifadeleriyle kapatılır.
+
+| Tablo / fonksiyon | Alanlar | Erişim (`authenticated`) | Erişim (`service_role`) |
+|---|---|---|---|
+| `profiles` | `id` (→ `auth.users`, silinince silinir), `username` (benzersiz, `^[a-z0-9_]{3,32}$`), `display_name` (1–50), `roles` (`app_role[]`), `must_change_password`, `created_at` | Yalnızca kendi satırını **okur** (RLS). Ekleme, güncelleme, silme yetkisi yok; rol ve geçici parola bayrağı kullanıcı tarafından değiştirilemez. | Okur/yazar (sunucu ve kurulum betiği) |
+| `audit_events` | `occurred_at`, `event_type`, `actor_id` (→ `auth.users`, silinince `null`), `outcome` (`success`/`failure`/`blocked`), `metadata` (en fazla 2 KB nesne) | Erişim yok | Ekler ve okur; güncelleme/silme yetkisi yok |
+| `auth_rate_limits` | `bucket_key` (HMAC), `window_started_at`, `attempt_count` | Erişim yok | Okur/yazar |
+| `consume_rate_limit(key, max, window)` | Bir denemeyi atomik sayar; `allowed`, `retry_after_seconds` döner | Çalıştıramaz | Çalıştırır |
+| `reset_rate_limit(key)` | Başarılı girişten sonra kullanıcı adı sayacını siler | Çalıştıramaz | Çalıştırır |
+
+Rol kısıtları veri tabanında da vardır: öğrenci rolü başka bir rolle birleşemez; `admin` yalnızca `parent` ile birlikte verilir (karar 0.13). Zaman alanları `timestamptz` (UTC) tutulur; gün sınırı hesapları Faz 6'da Europe/Istanbul'a göre yapılacak.
+
+`audit_events` içine parola, belirteç, davet kodu, açık kullanıcı adı veya IP yazılmaz. Uygulama tarafında olay tipleri ve `metadata` alanları kapalı bir listeyle sınırlıdır (`src/features/auth/ports.ts`).
+
 ## Önerilen tablolar
 
 - `profiles`: kimlik sağlayıcı kullanıcı kimliği, görünen ad, rol/profil durumu; rol ataması kullanıcı tarafından değiştirilemez.

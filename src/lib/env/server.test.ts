@@ -33,6 +33,29 @@ describe("parseServerEnv", () => {
     expect(() => parseServerEnv({ AUTH_SECRET: "short" })).toThrow(/AUTH_SECRET/);
   });
 
+  it("rejects a half-configured auth provider and names every missing variable", () => {
+    try {
+      parseServerEnv({ SUPABASE_URL: "http://127.0.0.1:54321" });
+      expect.unreachable();
+    } catch (error) {
+      expect((error as ServerEnvError).invalidKeys).toEqual([
+        "SUPABASE_ANON_KEY",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "AUTH_SECRET",
+      ]);
+    }
+  });
+
+  it("accepts a complete auth configuration", () => {
+    const env = parseServerEnv({
+      SUPABASE_URL: "http://127.0.0.1:54321",
+      SUPABASE_ANON_KEY: "anon",
+      SUPABASE_SERVICE_ROLE_KEY: "service",
+      AUTH_SECRET: "x".repeat(32),
+    });
+    expect(env.SUPABASE_URL).toBe("http://127.0.0.1:54321");
+  });
+
   it("rejects out-of-range report TTL values", () => {
     expect(() => parseServerEnv({ REPORT_TEMP_TTL_MINUTES: "0" })).toThrow(
       ServerEnvError,

@@ -24,6 +24,11 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  {
+    // Command-line scripts talk to the operator through the terminal.
+    files: ["scripts/**"],
+    rules: { "no-console": "off" },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

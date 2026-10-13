@@ -43,7 +43,7 @@ export default function HomePage() {
         className="mt-8"
         variant="info"
         title="Uygulama geliştirme aşamasında"
-        description="Hesap oluşturma, giriş ve veri kaydı henüz kullanılamıyor. Bu sürümde gerçek öğrenci bilgisi girilmemelidir."
+        description="Hesabına giriş yapabilirsin, ama çalışma ve deneme kaydı henüz kullanılamıyor. Bu sürümde gerçek öğrenci bilgisi girilmemelidir."
       />
 
       <div className="mt-6 flex flex-wrap gap-3">

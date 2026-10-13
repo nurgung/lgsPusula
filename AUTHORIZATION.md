@@ -34,6 +34,12 @@ Uygulamada iki hesap vardır ([docs/DECISIONS.md](docs/DECISIONS.md), 0.13): pro
 - Veli, öğrencinin kayıtlarını yalnızca okur; giremez ve değiştiremez.
 - Yetki testleri iki aile hesabıyla sınırlı kalmaz: kurgusal ek öğrenci/veli hesaplarıyla yatay erişim senaryoları da test edilir.
 
+### Uygulanan durum (Faz 3)
+
+- Oturum ve kullanıcı yalnızca sunucudaki veri erişim katmanından (`src/features/auth/session.ts`) okunur. `requireUser()` oturum yoksa `/giris`'e yönlendirir.
+- `profiles` tablosunda RLS açıktır: kullanıcı yalnızca kendi satırını okur; rolünü, geçici parola bayrağını veya başka bir profili değiştiremez (uçtan uca testle doğrulandı). `audit_events` ve oran sınırı tablolarına kullanıcıların hiç erişimi yoktur.
+- Rol bazlı sayfa erişimi, veli-öğrenci ilişkisi kontrolleri ve yönetici için MFA **henüz yoktur** (Faz 4). Şu an oturum açan herkes yalnızca kendi `/hesap` sayfasını görür.
+
 ## Veli-öğrenci ilişkilendirme akışı
 
 Karar ve gerekçe: [docs/DECISIONS.md](docs/DECISIONS.md) (0.4).

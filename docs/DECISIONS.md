@@ -33,6 +33,7 @@ Bu belge Faz 0'da proje sahibinin verdiği kararları ve gerekçelerini tutar. K
 | 12 Ekim 2026 | Negatif net kuralı belirlendi (0.7): ders neti eksi olabilir, toplam net eksiyse 0 alınır.                                                                                            |
 | 12 Ekim 2026 | Kullanıcı akışları onaylandı (0.3); LGS soru dağılımı proje sahibince doğrulandı (0.7); alan adı olmadığı için e-posta kapsam dışı (0.8); yapay zekâ sağlayıcısı Groq seçildi (0.12). |
 | 12 Ekim 2026 | Depo herkese açık yapıldı (0.11); GitHub özel güvenlik açığı bildirimi açıldı (0.10).                                                                                                 |
+| 12 Ekim 2026 | Faz 3 için: giriş kullanıcı adıyla yapılır, yerel geliştirme Docker'da yerel Supabase ile yapılır; `@supabase/supabase-js`, `@supabase/ssr` ve `supabase` CLI eklenmesi onaylandı (0.1). |
 
 ---
 
@@ -68,6 +69,8 @@ Bu belge Faz 0'da proje sahibinin verdiği kararları ve gerekçelerini tutar. K
 - RLS ek savunma katmanıdır; uygulama katmanındaki yetki kontrolünün yerine geçmez (`AUTHORIZATION.md`).
 - Sağlayıcıya özgü çağrılar `src/services` altındaki adaptörlerde tutulur; iş kuralları Supabase'e doğrudan bağlanmaz.
 - Migration'lar Supabase CLI ile depoda tutulur.
+- Giriş **kullanıcı adı + parola** ile yapılır (proje sahibi kararı, 12 Ekim 2026). E-posta gönderilmediği için (0.8) gerçek e-posta istenmez; Supabase Auth'un istediği adres, teslim edilemeyen `<kullanıcı_adı>@users.lgs-pusula.invalid` biçiminde iç bir değerdir.
+- Yerel geliştirme ve uçtan uca testler Docker'da çalışan yerel Supabase ile yapılır (proje sahibi kararı, 12 Ekim 2026); CI da aynı yerel ortamı kullanır.
 
 **Ücretsiz planın sınırları:**
 

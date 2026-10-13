@@ -23,6 +23,24 @@ Bu belge, LGS Pusula geliştirme ve işletim süreçlerinde uygulanması gereken
 - Yönetici hesaplarına daha güçlü kimlik doğrulama, mümkünse MFA uygulayın.
 - Oturum kimliklerini URL'lerde veya istemci loglarında taşımayın.
 
+### Uygulanan kontroller (Faz 3)
+
+Ayrıntı: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ("Veri tabanı ve kimlik doğrulama").
+
+- Kimlik doğrulama Supabase Auth ile yapılır; parolalar Supabase'de bcrypt ile saklanır. Uygulama parola saklamaz ve loglamaz.
+- Herkese açık kayıt kapalıdır. Hesapları yalnızca `service_role` anahtarıyla çalışan kurulum betiği oluşturur. Geçici parola ilk girişte değiştirilmek zorundadır.
+- Oturum çerezleri `HttpOnly`, `Secure`, `SameSite=Lax`; tarayıcıda Supabase istemcisi yoktur.
+- Her sayfa ve işlem oturumu Auth sunucusuna sorarak doğrular; başka cihazda kapatılan oturum bir sonraki istekte geçersiz olur.
+- Giriş ve parola değiştirmede IP, kullanıcı adı ve kullanıcı başına oran sınırlaması vardır; sınırlayıcıya ulaşılamazsa istek reddedilir. Hatalı girişte, kullanıcı adı yanlış da olsa parola yanlış da olsa aynı mesaj gösterilir (hesap varlığı sızdırılmaz).
+- Güvenlik olayları `audit_events` tablosuna parola, belirteç, açık kullanıcı adı veya IP olmadan yazılır.
+- Test kapsamı: `src/features/auth/*.test.ts` (birim), `tests/e2e/auth.spec.ts` (yerel Supabase'e karşı: kayıt kapalı, çerez özellikleri, oran sınırı, rol değiştirememe, RLS, oturum kapatma, loglarda gizli bilgi olmaması).
+
+**Bilinen sınırlar:**
+
+- Supabase Auth'un kendi IP sınırı (bulutta 5 dakikada 30 giriş) sunucunun IP'sine uygulanır, çünkü giriş istekleri Vercel'den gelir. Asıl koruma uygulamanın kendi sınırlarıdır.
+- Vercel dışında (ör. yerelde) `x-real-ip` başlığı taklit edilebilir; IP sınırı yalnızca Vercel arkasında güvenilirdir. Kullanıcı adı sınırı her ortamda geçerlidir.
+- Kullanıcı adı sınırı, başkasının yanlış denemeleriyle de dolabilir; bu durumda gerçek kullanıcı da 15 dakika giriş yapamaz. Sınır bu sürenin sonunda kendiliğinden kalkar.
+
 ## Yetkilendirme
 
 - Rol kontrollerini yalnızca arayüzde yapmayın. Sunucu ve veri tabanı katmanında da doğrulayın.
@@ -89,7 +107,7 @@ Bir uyarı düzeltilemiyorsa burada gerekçesi ve gözden geçirme koşuluyla ka
 
 | Uyarı | Paket ve yol | Neden kabul edildi | Ne zaman yeniden bakılır |
 |---|---|---|---|
-| [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) (yüksek, DoS) | `braces` ≤ 3.0.3, yalnızca geliştirme aracı: `eslint-config-next` → `@next/eslint-plugin-next` → `fast-glob` → `micromatch` → `braces` | Yamalı sürüm yok (12 Ekim 2026). `npm audit fix --force` ESLint yapılandırmasını Next 14'e düşürür. Paket production paketine girmez; yalnızca geliştiricinin kendi kodunu tarayan lint sırasında, depodaki glob desenleriyle çalışır. Saldırganın desen gönderebileceği bir yol yok. | `braces` veya `eslint-config-next` yamalı sürüm yayınladığında (Dependabot PR'ı) hemen güncellenir. |
+| [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) (yüksek, DoS) | `braces` ≤ 3.0.3, yalnızca geliştirme aracı: `eslint-config-next` → `@next/eslint-plugin-next` → `fast-glob` → `micromatch` → `braces` | Yamalı sürüm yok (13 Ekim 2026'da yeniden bakıldı; npm'deki son sürüm hâlâ 3.0.3). `npm audit fix --force` ESLint yapılandırmasını Next 14'e düşürür. Paket production paketine girmez; yalnızca geliştiricinin kendi kodunu tarayan lint sırasında, depodaki glob desenleriyle çalışır. Saldırganın desen gönderebileceği bir yol yok. | `braces` veya `eslint-config-next` yamalı sürüm yayınladığında (Dependabot PR'ı) hemen güncellenir. |
 
 ## Loglama ve izleme
 

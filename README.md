@@ -4,7 +4,7 @@ LGS Pusula; 8. sınıf öğrencilerinin günlük çalışmalarını, deneme sın
 
 > **Kullanım kapsamı:** Uygulama yalnızca aile içinde kullanılır: proje sahibi (veli + yönetici) ve çocuğu (öğrenci). Herkese açık kayıt yoktur. Ayrıntı: [docs/DECISIONS.md](docs/DECISIONS.md) (0.13).
 
-> **Proje durumu:** Faz 0 (ürün kararları) ve Faz 1 (proje altyapısı) tamamlandı; Faz 2 (tasarım sistemi ve CI) devam ediyor. İlerleme [roadmap.md](roadmap.md) içinde izlenir. Next.js iskeleti, lint/tip/test altyapısı, ortam değişkeni doğrulaması, ortak form/onay penceresi/bildirim bileşenleri, CI iş akışı ve örnek veriyle çalışan sayfa taslakları vardır. Kimlik doğrulama, yetkilendirme, veri tabanı ve iş özellikleri **henüz yoktur**; gerçek öğrenci verisi kullanılmamalıdır. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+> **Proje durumu:** Faz 0 (ürün kararları) ve Faz 1 (proje altyapısı) tamamlandı. Faz 2'de (tasarım sistemi ve CI) staging kurulumu bekliyor. Faz 3'te (veri tabanı ve kimlik doğrulama) kod ve yerel testler bitti; bulut Supabase projeleri kurulmadı. İlerleme [roadmap.md](roadmap.md) içinde izlenir. Kullanıcı adıyla giriş, çıkış, parola değiştirme, kurulum betiği, `profiles`/`audit_events` tabloları ve oran sınırlaması vardır. Roller arası yetkilendirme, veli-öğrenci ilişkisi ve iş özellikleri **henüz yoktur**; gerçek öğrenci verisi kullanılmamalıdır. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Ürün hedefleri
 
@@ -44,7 +44,7 @@ Teknoloji kararları uygulama başlamadan önce doğrulanmalı ve sürümler sab
 
 Sürümler ve sağlayıcı seçimi uygulama başlangıcında kararlaştırılmalı; Cursor tarafından rastgele veya gerekçesiz bağımlılık eklenmemelidir.
 
-Faz 0'da verilen servis kararları (Supabase, Vercel, Sentry; e-posta yok; yapay zekâ için Faz 13'te Groq) [docs/DECISIONS.md](docs/DECISIONS.md) içindedir. Bu servisler henüz projeye bağlanmamıştır.
+Faz 0'da verilen servis kararları (Supabase, Vercel, Sentry; e-posta yok; yapay zekâ için Faz 13'te Groq) [docs/DECISIONS.md](docs/DECISIONS.md) içindedir. Supabase kodda bağlıdır ve yerelde çalışır; bulut projeleri ile Vercel henüz kurulmamıştır.
 
 ## Başlangıç kurulumu
 
@@ -57,6 +57,25 @@ npm run dev
 ```
 
 Gerçek anahtarları yalnızca `.env.local` içine yazın; bu dosya Git'e eklenmez. Örnek veriyle çalışan rol taslaklarını görmek için `.env.local` içinde `UI_PREVIEW_ENABLED=true` yapın ve `http://localhost:3000/onizleme` adresini açın. Bu sayfalarda giriş veya yetkilendirme yoktur.
+
+### Yerel veri tabanı ve giriş
+
+Docker Desktop çalışıyor olmalıdır.
+
+```bash
+npm run db:start          # yerel Supabase (API: http://127.0.0.1:55321), migration'ları uygular
+npx supabase status       # API_URL, ANON_KEY, SERVICE_ROLE_KEY değerlerini gösterir
+```
+
+Bu üç değeri `.env.local` içinde `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` alanlarına yazın. `AUTH_SECRET` için en az 32 karakterlik rastgele bir değer üretin (`.env.example` içinde komut var). Ardından:
+
+```bash
+npm run accounts -- setup                          # kurgusal veli + öğrenci hesabı; geçici parolalar ekranda bir kez gösterilir
+npm run accounts -- reset-password <kullanici_adi> # yeni geçici parola, tüm oturumları kapatır
+npm run db:reset                                   # yerel veri tabanını sıfırlar
+```
+
+Betik hedef Supabase adresini gösterir ve "evet" yazılmadan işlem yapmaz. Yerelde yalnızca kurgusal ad kullanın.
 
 ## Önerilen depo yapısı
 
@@ -140,7 +159,11 @@ npm run lint          # ESLint
 npm run typecheck     # route tiplerini üretir + tsc --noEmit
 npm run test          # Vitest birim/bileşen testleri (tek sefer)
 npm run test:watch    # Vitest izleme modu
-npm run test:e2e      # Playwright (ilk sefer: npx playwright install chromium)
+npm run test:e2e      # Playwright (ilk sefer: npx playwright install chromium); giriş testleri yerel Supabase ister, yoksa atlanır
+npm run db:start      # yerel Supabase'i başlat (Docker)
+npm run db:reset      # yerel veri tabanını sıfırla ve migration'ları uygula
+npm run db:stop       # yerel Supabase'i durdur
+npm run accounts      # hesap kurulumu / parola sıfırlama betiği
 npm run format        # Prettier ile biçimlendir
 npm run format:check  # biçim kontrolü
 npm run build         # production build

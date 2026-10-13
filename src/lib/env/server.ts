@@ -18,6 +18,7 @@ export const serverEnvSchema = z
       .transform((value) => value === "true"),
 
     DATABASE_URL: optionalUrl,
+    // HMAC key for rate-limit bucket keys, so usernames/IPs are never stored in plain text.
     AUTH_SECRET: z.preprocess(emptyToUndefined, z.string().min(32).optional()),
     SUPABASE_URL: optionalUrl,
     SUPABASE_ANON_KEY: optionalText,
@@ -40,6 +41,25 @@ export const serverEnvSchema = z
         path: ["UI_PREVIEW_ENABLED"],
         message: "UI previews cannot be enabled when APP_ENV=production.",
       });
+    }
+    // Auth needs all three values together; a half-configured provider must fail loudly.
+    const supabaseKeys = [
+      "SUPABASE_URL",
+      "SUPABASE_ANON_KEY",
+      "SUPABASE_SERVICE_ROLE_KEY",
+      "AUTH_SECRET",
+    ] as const;
+    const configured = supabaseKeys.filter((key) => env[key] !== undefined);
+    if (configured.length > 0 && configured.length < supabaseKeys.length) {
+      for (const key of supabaseKeys) {
+        if (env[key] === undefined) {
+          ctx.addIssue({
+            code: "custom",
+            path: [key],
+            message: "Auth configuration is incomplete.",
+          });
+        }
+      }
     }
   });
 

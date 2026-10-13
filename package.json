@@ -14,11 +14,17 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "format": "prettier --write src tests *.config.* *.json",
-    "format:check": "prettier --check src tests *.config.* *.json",
-    "check": "npm run lint && npm run typecheck && npm run test && npm run build"
+    "format": "prettier --write src tests scripts *.config.* *.json",
+    "format:check": "prettier --check src tests scripts *.config.* *.json",
+    "check": "npm run lint && npm run typecheck && npm run test && npm run build",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "accounts": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file-if-exists=.env.local scripts/accounts.ts"
   },
   "dependencies": {
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.117.3",
     "next": "16.4.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -38,6 +44,7 @@
     "eslint-config-next": "16.4.0",
     "jsdom": "30.1.2",
     "prettier": "3.9.10",
+    "supabase": "2.120.0",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3",
     "vitest": "5.0.4"

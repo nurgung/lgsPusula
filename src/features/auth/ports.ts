@@ -1,0 +1,51 @@
+// Provider-independent contracts for the auth use cases. Implementations live in
+// `src/services/supabase`; tests use in-memory fakes.
+
+export type RateLimitPolicy = { maxAttempts: number; windowSeconds: number };
+export type RateLimitDecision = { allowed: boolean; retryAfterSeconds: number };
+
+export interface RateLimiter {
+  /** Counts one attempt for the bucket and reports whether it is still within the limit. */
+  consume(bucketKey: string, policy: RateLimitPolicy): Promise<RateLimitDecision>;
+  reset(bucketKey: string): Promise<void>;
+}
+
+export const AUDIT_EVENT_TYPES = [
+  "auth.login",
+  "auth.logout",
+  "auth.logout_all",
+  "auth.password_change",
+  "admin.account_create",
+  "admin.password_reset",
+] as const;
+export type AuditEventType = (typeof AUDIT_EVENT_TYPES)[number];
+
+export type AuditOutcome = "success" | "failure" | "blocked";
+
+/**
+ * Closed set of fields so a caller cannot accidentally log a password, token, raw username or
+ * IP address (SECURITY.md).
+ */
+export type AuditMetadata = {
+  reason?:
+    | "invalid_credentials"
+    | "rate_limited"
+    | "invalid_current_password"
+    | "weak_password"
+    | "provider_error";
+  rateLimitScope?: "ip" | "username" | "user";
+};
+
+export type AuditEvent = {
+  type: AuditEventType;
+  outcome: AuditOutcome;
+  actorId: string | null;
+  metadata?: AuditMetadata;
+};
+
+export interface AuditLog {
+  record(event: AuditEvent): Promise<void>;
+}
+
+export type CredentialResult =
+  { ok: true; userId: string } | { ok: false; reason: "invalid_credentials" };

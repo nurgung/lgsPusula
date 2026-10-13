@@ -59,9 +59,12 @@ src/app/                 sayfalar ve route dosyaları (Türkçe URL'ler)
 src/components/ui/       ortak arayüz bileşenleri (Button, Card, StateMessage, ProgressMeter, TableScroll,
                          form alanları, ConfirmDialog, Toast)
 src/components/layout/   ortak yerleşim parçaları (SkipLink, AppShell, AppNav)
-src/features/<feature>/  özellik modülleri; şu an `preview` ve `navigation` (rol bazlı menü)
+src/features/<feature>/  özellik modülleri: `auth` (Faz 3), `preview`, `navigation` (rol bazlı menü)
 src/lib/                 framework'ten bağımsız yardımcılar (env, güvenlik başlıkları, menü eşleşmesi)
-src/services/            sunucu servisleri (henüz boş)
+src/services/supabase/   Supabase adaptörü (sunucu istemcileri, çerez ayarları, oturum yenileme)
+src/proxy.ts             her istekte oturum yenileme (yetki kontrolü değildir)
+supabase/                yerel Supabase yapılandırması ve migration'lar
+scripts/                 hesap kurulum ve parola sıfırlama betiği (yalnızca yerelde çalışır)
 src/types/               ortak tipler (roller)
 tests/unit, tests/e2e    kaynağa bağlı olmayan birim testleri ve uçtan uca testler
 ```
@@ -91,7 +94,7 @@ Bileşenler `/onizleme/bilesenler` sayfasında örnek olarak görülebilir. Sat�
 `.github/workflows/ci.yml` her push ve PR'da, haftalık olarak (pazartesi 05:00 UTC) ve elle başlatıldığında üç iş çalıştırır:
 
 1. **Lint, tip, test ve build:** `lint`, `format:check`, `typecheck`, `test`, `build`.
-2. **Uçtan uca testler:** Playwright (Chromium, 320 px ve masaüstü). Başarısızlıkta izler 7 gün saklanır.
+2. **Uçtan uca testler:** Playwright (Chromium, 320 px ve masaüstü). İş, yerel Supabase'i başlatır (`supabase start`) ve `supabase/migrations` dosyalarını uygular; teste yalnızca veri tabanı, Auth, API ağ geçidi ve PostgREST gerekir. Başarısızlıkta izler 7 gün saklanır.
 3. **Bağımlılık ve gizli anahtar denetimi:** production bağımlılıkları için engelleyici `npm audit`, tüm bağımlılıklar için rapor amaçlı `npm audit`, Gitleaks ile gizli anahtar taraması (push/PR'da yeni commit'ler, haftalık ve elle çalıştırmada tüm geçmiş). Kabul edilen riskler `SECURITY.md` içindedir.
 
 Dependabot (`.github/dependabot.yml`) npm ve GitHub Actions güncellemelerini haftalık önerir.
@@ -108,18 +111,67 @@ Dependabot (`.github/dependabot.yml`) npm ve GitHub Actions güncellemelerini ha
    | `APP_ENV` | `staging` | `production` |
    | `UI_PREVIEW_ENABLED` | `false` (örnek veri sayfalarını görmek istersen `true`; bu sayfalarda giriş yok) | `false` (production'da zaten reddedilir) |
    | `NEXT_PUBLIC_APP_URL` | staging alan adı (ör. `https://lgs-pusula-git-staging-<hesap>.vercel.app`) | production alan adı |
-   | Supabase ve diğer gizli değerler | Faz 3'te, staging Supabase projesinin değerleri | Faz 3'te, production projesinin değerleri |
+   | `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `AUTH_SECRET` | staging Supabase projesinin değerleri; ayrı üretilmiş `AUTH_SECRET` | production projesinin değerleri; ayrı üretilmiş `AUTH_SECRET` |
 
    Gizli değerler yalnızca Vercel'de tutulur; depoya veya `NEXT_PUBLIC_` değişkenlerine konmaz. Preview ortamına production anahtarı verilmez.
 3. **Settings → Deployment Protection** içinde preview dağıtımları için **Vercel Authentication** açık kalmalı. Böylece staging adresini yalnızca Vercel hesabıyla giriş yapan kişi görür.
 4. Kalıcı bir staging adresi için `staging` dalını oluştur. Vercel bu dal için `...-git-staging-...vercel.app` adresini verir. İstersen **Settings → Domains** içinden bu dala ayrı bir alan adı bağlayabilirsin.
 5. Adresin HTTPS ile açıldığını ve güvenlik başlıklarının (`x-content-type-options`, `x-frame-options`, `strict-transport-security`) geldiğini kontrol et.
 
+## Veri tabanı ve kimlik doğrulama (Faz 3)
+
+### Katmanlar
+
+| Katman | Dosyalar | Görev |
+|---|---|---|
+| Alan (çatıdan bağımsız) | `src/features/auth/username.ts`, `schemas.ts`, `ports.ts`, `rate-limit.ts`, `login.ts`, `change-password.ts`, `client-ip.ts` | Kullanıcı adı kuralı, Zod şemaları (istemci ve sunucu aynı şemayı kullanır), oran sınırı politikaları, giriş ve parola değiştirme kullanım senaryoları. Supabase'i bilmez; testlerde sahte bağımlılık kullanılır. |
+| Veri erişim katmanı (DAL) | `src/features/auth/session.ts` (`server-only`) | `getCurrentUser()` her istekte oturumu Auth sunucusuna sorar (`getUser`), profili RLS altında kullanıcının kendi yetkisiyle okur. `requireUser()` oturum yoksa `/giris`'e, geçici parola varsa `/parola-degistir`'e yönlendirir. İstek içinde `React.cache` ile tekrar kullanılır; istekler veya kullanıcılar arasında önbelleğe alınmaz. |
+| Server Actions | `src/features/auth/actions.ts` | Giriş, çıkış, tüm cihazlarda çıkış, parola değiştirme. Her işlem oturumu sunucuda yeniden okur; istemciden kullanıcı kimliği, rol veya yönlendirme adresi alınmaz (açık yönlendirme yok). CSRF'e karşı Next.js Server Action'larının Origin denetimine dayanır. |
+| Sağlayıcı adaptörü | `src/services/supabase/` (`server-only`) | `createSessionClient` (çerezli, RLS altında), `createServiceClient` (`service_role`, yalnızca sunucu), `createEphemeralAuthClient` (mevcut parolayı oturuma dokunmadan doğrulamak için). `auth-adapters.ts` port'ların Supabase karşılıkları. |
+| Proxy | `src/proxy.ts` → `refresh-session.ts` | Süresi dolmak üzere olan oturumu Server Component'ler çizilmeden yeniler ve iptal edilmiş oturumun çerezlerini temizler. **Yetki kontrolü değildir.** |
+| Sayfalar | `/giris`, `/parola-degistir`, `/hesap` | Oturum okuyan kısımlar `<Suspense>` içinde ve `connection()` ile her zaman istek anında çalışır (build anındaki ortam değişkenlerine bağlı kalmaz). |
+| Betik | `scripts/accounts.ts`, `scripts/lib/account-admin.ts` | `npm run accounts -- setup` iki aile hesabını oluşturur; `npm run accounts -- reset-password <ad>` geçici parola verir, ilk girişte değiştirmeyi zorunlu kılar ve hesabın tüm oturumlarını kapatır. Geçici parola yalnızca terminalde bir kez gösterilir. |
+
+### Oturum ve çerezler
+
+- Tarayıcıda Supabase istemcisi **yoktur**; oturum çerezleri yalnızca sunucuda okunur. Bu yüzden tüm `sb-*` çerezleri `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/` ile yazılır (`cookie-options.ts`). `Secure` geliştirmede de açıktır: tarayıcılar bunu `http://localhost` için kabul eder, ama yerel ağ IP'siyle (telefondan) denemek için HTTPS gerekir.
+- Server Component'ler çerez yazamaz; oturum yenileme `proxy` içinde yapılır. Server Action'lar çerez yazabilen istemciyi kullanır.
+- Giriş kullanıcı adıyla yapılır. Supabase Auth e-posta istediği için her kullanıcı adı `<ad>@users.lgs-pusula.invalid` adresine eşlenir. `.invalid` alan adı ayrılmıştır ve hiçbir zaman e-posta teslim edilmez; gerçek e-posta tutulmaz (karar 0.8).
+- Parola kuralı: en az 10 karakter, en az bir harf ve bir rakam, en fazla 72 bayt (bcrypt sınırı). Aynı kural Supabase Auth ayarlarında da vardır.
+- Parola değiştirilince kullanıcının diğer oturumları kapatılır (`signOut({ scope: "others" })`). "Tüm cihazlarda çıkış" bütün oturumları kapatır (`scope: "global"`). Kapatılan oturumun erişim belirteci süresi dolmasa bile bir sonraki istekte reddedilir, çünkü DAL ve proxy oturumu Auth sunucusuna sorar.
+
+### Oran sınırlaması
+
+`public.consume_rate_limit` (sabit pencere, atomik `insert … on conflict`). Kova anahtarı `kapsam:HMAC-SHA256(AUTH_SECRET, kapsam + konu)` biçimindedir; kullanıcı adı ve IP açık hâliyle saklanmaz.
+
+| Kapsam | Sınır | Not |
+|---|---|---|
+| Giriş, IP başına | 15 dakikada 20 deneme | IP, Vercel'in üzerine yazdığı `x-real-ip` / `x-forwarded-for` başlığından okunur. Yerelde bu başlık taklit edilebilir; kullanıcı adı sınırı yine geçerlidir. |
+| Giriş, kullanıcı adı başına | 15 dakikada 5 deneme | Doğru parola da bu süre içinde reddedilir. Başarılı girişte sayaç sıfırlanır. |
+| Parola değiştirme, kullanıcı başına | 15 dakikada 5 deneme | Mevcut parolanın tahmin edilmesini sınırlar. |
+
+Sınırlayıcıya ulaşılamazsa istek reddedilir (fail closed). Parola sıfırlama uygulamada bir uç değildir; yalnızca kurulum betiğiyle yapılır (karar 0.8).
+
+### Yerel geliştirme ortamı
+
+- `npm run db:start` yerel Supabase'i Docker'da başlatır ve `supabase/migrations` içindeki migration'ları uygular. `npm run db:reset` veri tabanını sıfırlayıp migration'ları yeniden uygular. `npm run db:stop` durdurur.
+- Yerel portlar 553xx aralığındadır (API `55321`, veri tabanı `55322`, Studio `55323`); aynı bilgisayardaki başka bir Supabase projesinin varsayılan 543xx portlarıyla çakışmaz.
+- `supabase/config.toml` yalnızca yerel ortamı yönetir. Bulut projelerindeki Auth ayarları panelden ayrıca yapılır (aşağıda).
+- Uçtan uca testler her test için kurgusal `e2e_…` hesabı oluşturur. Test yardımcıları yalnızca `127.0.0.1`/`localhost` adresindeki Supabase'e bağlanır; staging veya production'a bağlanmayı reddeder.
+
+### Staging ve production Supabase projeleri — kurulum adımları (proje sahibi)
+
+1. Supabase'de iki ayrı proje oluştur: `lgs-pusula-staging` ve `lgs-pusula-prod`. Bölge: **Central EU (Frankfurt)**. Production verisi hiçbir zaman staging'e kopyalanmaz.
+2. Her projede **Authentication → Sign In / Providers**: "Allow new users to sign up" **kapalı**, Email sağlayıcısı **açık**, "Confirm email" **kapalı**. **Authentication → Policies (Passwords)**: en az 10 karakter, harf + rakam.
+3. Migration'ları uygula: `npx supabase link --project-ref <ref>` ve ardından `npx supabase db push`. Bu işlemi önce staging'de yap.
+4. Vercel ortam değişkenleri: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (projenin **Settings → API** sayfasından) ve her ortam için ayrı üretilmiş `AUTH_SECRET`. Preview'a staging, Production'a production değerleri girilir.
+5. Aile hesaplarını oluştur: production değerlerini geçici olarak yerel bir dosyaya koyup `node --env-file=<dosya> scripts/accounts.ts setup` komutunu çalıştır, ardından dosyayı sil. Betik hedef adresi gösterir ve "evet" yazılmadan bir şey yapmaz.
+
 ### Henüz uygulanmayanlar
 
-- Kimlik doğrulama, oturum, roller, veli-öğrenci ilişkisi ve tüm yetkilendirme kontrolleri (Faz 3 ve 4).
-- Veri tabanı, migration'lar ve RLS politikaları. Sağlayıcı olarak Supabase seçildi ([DECISIONS.md](DECISIONS.md)) ama henüz bağlanmadı.
+- Roller arası yetki yardımcıları, veli-öğrenci ilişkisi, MFA, gerçek rol sayfaları (Faz 4). `profiles.roles` alanı ve RLS şu an yalnızca "kullanıcı kendi profilini okur, rolünü değiştiremez" kuralını uygular.
+- `audit_events` ve süresi dolan oran sınırı kayıtlarının saklama süresine göre otomatik silinmesi (karar 0.5: 1 yıl). Silme işi Faz 12'deki yedekleme/veri betikleriyle birlikte planlanacak.
 - Net hesaplama kuralları, hedefler, günlük kayıt ve deneme formları, kazanım kataloğu.
 - Koçluk motoru, yapay zekâ adaptörü, karakter puanları, bildirimler, içe aktarma, PDF/DOCX raporlar.
-- PWA manifesti ve simgeler, nonce tabanlı CSP, oran sınırlama, hata izleme.
-- Vercel projesinin bağlanması ve staging ortamı (adımlar yukarıda; proje sahibinin hesabıyla yapılacak).
+- PWA manifesti ve simgeler, nonce tabanlı CSP, hata izleme.
+- Vercel projesinin ve bulut Supabase projelerinin bağlanması (adımlar yukarıda; proje sahibinin hesabıyla yapılacak).
