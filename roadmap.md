@@ -14,8 +14,8 @@
 |---|---|---|
 | 0 | Ürün ve servis kararları | Tamamlandı — 13/13 karar verildi ([docs/DECISIONS.md](docs/DECISIONS.md)) |
 | 1 | Proje altyapısı | Tamamlandı |
-| 2 | Tasarım sistemi ve CI | Devam ediyor — bileşenler ve CI bitti; Vercel staging kurulumu (proje sahibi) bekliyor. `braces` yaması 13 Ekim 2026'da yeniden bakıldı, hâlâ yok |
-| 3 | Veri tabanı ve kimlik doğrulama | Devam ediyor — kod, yerel testler ve CI yeşil ([çalışma 38355078745](https://github.com/nurgung/lgsPusula/actions/runs/38355078745)); bulut Supabase projeleri (proje sahibi) bekliyor |
+| 2 | Tasarım sistemi ve CI | Devam ediyor — Vercel production `https://lgs-pusula.vercel.app` HTTPS ve güvenlik başlıklarıyla açık; staging (ertelendi), Vercel–GitHub bağlantısı ve `braces` yaması (hâlâ yok) bekliyor |
+| 3 | Veri tabanı ve kimlik doğrulama | Devam ediyor — production Supabase (Frankfurt) kuruldu, kayıt kapalı, CI yeşil; staging projesi (ertelendi) ve production aile hesapları (proje sahibi) bekliyor |
 | 4 | Roller ve veli-öğrenci ilişkisi | Başlanmadı |
 | 5 | Müfredat kataloğu | Başlanmadı |
 | 6 | Günlük çalışma kayıtları ve hedefler | Başlanmadı |
@@ -113,8 +113,14 @@
   - [ ] 2.7.3 Yamalı sürüm çıkınca güncelle (Dependabot haber verir) — 13 Ekim 2026: npm'de son sürüm hâlâ 3.0.3, yama yok
 - [ ] 2.8 Staging ortamını kur ve ortam değişkenlerini platformun secret yönetimine taşı
   - [x] 2.8.1 `vercel.json` (Frankfurt, `fra1`) ve kurulum adımları ([docs/ARCHITECTURE.md](docs/ARCHITECTURE.md))
-  - [ ] 2.8.2 Proje sahibi Vercel projesini bağlar ve ortam değişkenlerini Preview/Production için ayrı girer
+  - [ ] 2.8.2 Vercel projesini bağla ve ortam değişkenlerini Preview/Production için ayrı gir
+    - [x] 2.8.2.a Vercel projesi `nurgung/lgs-pusula` oluşturuldu; Production değişkenleri girildi (gizli olanlar "Secret" türünde) — 13 Ekim 2026
+    - [ ] 2.8.2.b Preview (staging) değişkenleri — staging Supabase projesine bağlı (3.1.2.b)
+    - [ ] 2.8.2.c Vercel–GitHub bağlantısı (push sonrası otomatik dağıtım); `vercel git connect` şu an hata veriyor
   - [ ] 2.8.3 Preview dağıtımlarında Vercel Authentication açık; staging adresi HTTPS ve güvenlik başlıklarıyla açılır
+    - [x] 2.8.3.a Önizleme dağıtım adresi Vercel girişine yönleniyor (Vercel Authentication açık)
+    - [x] 2.8.3.b Production adresi `https://lgs-pusula.vercel.app` HTTPS ile açılıyor; HTTP→HTTPS yönlendirmesi, HSTS, `nosniff`, `X-Frame-Options: DENY`, referrer ve izin politikası doğrulandı; fonksiyonlar `fra1`'de
+    - [ ] 2.8.3.c Kalıcı staging adresi (staging dalı + staging değişkenleri) aynı kontrollerle açılır
 
 **Bitti sayılması için**
 - [x] Yeni bileşenlerin erişilebilirlik testleri geçer — 59 birim testi, 46 uçtan uca test (klavye, odak, canlı bölge, 44 px hedef, 320 px taşma)
@@ -132,7 +138,10 @@
 **İşler**
 - [ ] 3.1 Seçilen sağlayıcıyı bağla; geliştirme, staging ve production veri tabanlarını ayır
   - [x] 3.1.1 Supabase'i koda bağla (`@supabase/ssr`, `src/services/supabase`); yerel geliştirme ortamı Docker'da (`npm run db:start`, portlar 553xx)
-  - [ ] 3.1.2 Proje sahibi staging ve production Supabase projelerini Frankfurt'ta açar; kayıt kapalı, parola kuralı ayarlanır, `supabase db push` ile migration uygulanır, değerler Vercel'e girilir (adımlar [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md))
+  - [ ] 3.1.2 Staging ve production Supabase projelerini Frankfurt'ta aç; kayıt kapalı, parola kuralı ayarlanır, `supabase db push` ile migration uygulanır, değerler Vercel'e girilir (adımlar [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md))
+    - [x] 3.1.2.a Production: `lgs-pusula-prod` (Frankfurt) açıldı, migration uygulandı, parola kuralı (10 karakter, harf + rakam) ayarlandı, değerler Vercel Production'a girildi; canlı adreste giriş Supabase'e bağlanıyor (yanlış girişte doğru hata mesajı) — 13 Ekim 2026
+    - [ ] 3.1.2.b Staging: ücretsiz planın 2 proje sınırı nedeniyle proje sahibi kararıyla ertelendi ([docs/DECISIONS.md](docs/DECISIONS.md), 0.1)
+    - [ ] 3.1.2.c Production'da iki aile hesabını oluştur (`scripts/accounts.ts setup`; geçici parolalar yalnızca ekranda gösterildiği için proje sahibi çalıştırır)
 - [x] 3.2 Migration altyapısını kur
   - [x] 3.2.1 `supabase/migrations` + Supabase CLI; migration `supabase db reset` ile sıfırdan uygulandı
   - [x] 3.2.2 CI'daki uçtan uca iş yerel Supabase'i başlatıp migration'ları uygular; push sonrası GitHub'da yeşil olduğu doğrulanır — [çalışma 38355078745](https://github.com/nurgung/lgsPusula/actions/runs/38355078745)
@@ -140,6 +149,8 @@
 - [ ] 3.4 Herkese açık kaydı kapat; iki aile hesabını oluşturan kurulum betiği (geçici parola yalnızca ekranda gösterilir)
   - [x] 3.4.a Kurulum betiği `npm run accounts -- setup` (yerelde kurgusal hesaplarla denendi); yerel Supabase'de kayıt kapalı (uçtan uca test)
   - [ ] 3.4.b Staging ve production projelerinde kayıt kapatılır (3.1.2 ile birlikte)
+    - [x] 3.4.b.1 Production'da kayıt kapalı — dışarıdan kayıt isteği `422 signup_disabled` ile reddedildi (13 Ekim 2026)
+    - [ ] 3.4.b.2 Staging'de kayıt kapatılır (3.1.2.b ile birlikte)
 - [x] 3.4.1 Giriş, çıkış ve ilk girişte parola değiştirme akışları — kullanıcı adı + parola; geçici parolayla girişte `/parola-degistir` zorunlu
 - [x] 3.5 Parola sıfırlama (kurulum betiğiyle; e-posta yok, 0.8) ve tüm oturumları sonlandırma — `npm run accounts -- reset-password`, `/hesap` içinde "Tüm cihazlarda çıkış yap"; parola değişince diğer oturumlar kapanır
 - [x] 3.6 Oturumu sunucuda okuyan `server-only` veri erişim katmanı — `src/features/auth/session.ts`
@@ -150,7 +161,7 @@
 
 **Bitti sayılması için**
 - [x] Giriş, çıkış ve parola sıfırlama uçtan uca testlerle doğrulanır — `tests/e2e/auth.spec.ts`, yerel Supabase'e karşı, 320 px ve masaüstü
-- [x] Dışarıdan yeni hesap açılamaz (test) — yerel Supabase'de doğrulandı; bulut projelerindeki ayar 3.4.b
+- [x] Dışarıdan yeni hesap açılamaz (test) — yerel Supabase'de uçtan uca testle, production'da `signup_disabled` yanıtıyla doğrulandı; staging 3.4.b.2
 - [x] Çerezler Secure, HttpOnly ve SameSite özelliklidir — uçtan uca test + birim test
 - [x] Oran sınırlaması testle doğrulanır — birim testler + uçtan uca test
 - [x] Loglarda parola veya token bulunmadığı kontrol edilir — `audit_events` uçtan uca testi; uçtan uca çalıştırmanın çıktısı ve Next.js geliştirme logu tarandı (parola, JWT, oturum çerezi bulunmadı)

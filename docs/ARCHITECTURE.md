@@ -167,6 +167,19 @@ Sınırlayıcıya ulaşılamazsa istek reddedilir (fail closed). Parola sıfırl
 4. Vercel ortam değişkenleri: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (projenin **Settings → API** sayfasından) ve her ortam için ayrı üretilmiş `AUTH_SECRET`. Preview'a staging, Production'a production değerleri girilir.
 5. Aile hesaplarını oluştur: production değerlerini geçici olarak yerel bir dosyaya koyup `node --env-file=<dosya> scripts/accounts.ts setup` komutunu çalıştır, ardından dosyayı sil. Betik hedef adresi gösterir ve "evet" yazılmadan bir şey yapmaz.
 
+**Uyarı:** `supabase/config.toml` bulut projesine olduğu gibi `supabase config push` ile gönderilmemelidir. Dosyada yalnızca yerel ortam için olan değerler var (giriş oran sınırı 1000, TOTP MFA kapalı). Auth ayarları için yalnızca gereken anahtarları içeren geçici bir yapılandırma ile önce `supabase config diff`, sonra `supabase config push` kullanılır.
+
+### Bulut ortamlarının durumu (13 Ekim 2026)
+
+| Ortam | Supabase | Vercel | Durum |
+|---|---|---|---|
+| Production | `lgs-pusula-prod` (Frankfurt) | Production değişkenleri girildi; adres `https://lgs-pusula.vercel.app` (fonksiyonlar `fra1`) | Migration uygulandı; dışarıdan kayıt kapalı (doğrulandı: `signup_disabled`); parola kuralı 10 karakter, harf + rakam; HTTPS ve güvenlik başlıkları doğrulandı; giriş Supabase'e bağlanıyor |
+| Staging | Açılmadı | Preview için değişken yok | Ücretsiz planın 2 proje sınırı nedeniyle proje sahibi kararıyla ertelendi. Preview dağıtımlarında giriş "şu an kullanılamıyor" mesajı verir; production anahtarı Preview'a verilmez |
+
+- Önizleme dağıtım adresleri Vercel Authentication ile korunuyor (oturumsuz istek Vercel girişine yönlenir).
+- Vercel projesi GitHub deposuna henüz bağlanamadı (`vercel git connect` hata veriyor). Bu yüzden push sonrası otomatik dağıtım yok; dağıtım `npx vercel deploy --prod` ile elle yapılır. Bağlantı için Vercel hesabında GitHub bağlantısı ve Vercel GitHub uygulamasının depoya erişimi gerekir.
+- Aile hesapları production'da henüz oluşturulmadı (adım 5). Geçici parolalar yalnızca ekranda gösterildiği için bu adımı proje sahibi kendi bilgisayarında çalıştırır.
+
 ### Henüz uygulanmayanlar
 
 - Roller arası yetki yardımcıları, veli-öğrenci ilişkisi, MFA, gerçek rol sayfaları (Faz 4). `profiles.roles` alanı ve RLS şu an yalnızca "kullanıcı kendi profilini okur, rolünü değiştiremez" kuralını uygular.
@@ -174,4 +187,4 @@ Sınırlayıcıya ulaşılamazsa istek reddedilir (fail closed). Parola sıfırl
 - Net hesaplama kuralları, hedefler, günlük kayıt ve deneme formları, kazanım kataloğu.
 - Koçluk motoru, yapay zekâ adaptörü, karakter puanları, bildirimler, içe aktarma, PDF/DOCX raporlar.
 - PWA manifesti ve simgeler, nonce tabanlı CSP, hata izleme.
-- Vercel projesinin ve bulut Supabase projelerinin bağlanması (adımlar yukarıda; proje sahibinin hesabıyla yapılacak).
+- Staging Supabase projesi, Preview ortam değişkenleri ve Vercel–GitHub bağlantısı (durum yukarıda).

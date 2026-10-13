@@ -71,6 +71,7 @@ Bu belge Faz 0'da proje sahibinin verdiği kararları ve gerekçelerini tutar. K
 - Migration'lar Supabase CLI ile depoda tutulur.
 - Giriş **kullanıcı adı + parola** ile yapılır (proje sahibi kararı, 12 Ekim 2026). E-posta gönderilmediği için (0.8) gerçek e-posta istenmez; Supabase Auth'un istediği adres, teslim edilemeyen `<kullanıcı_adı>@users.lgs-pusula.invalid` biçiminde iç bir değerdir.
 - Yerel geliştirme ve uçtan uca testler Docker'da çalışan yerel Supabase ile yapılır (proje sahibi kararı, 12 Ekim 2026); CI da aynı yerel ortamı kullanır.
+- Staging projesi ertelendi (proje sahibi kararı, 13 Ekim 2026): ücretsiz planda hesap başına en fazla 2 aktif proje var. Önce yalnızca production açıldı; başka bir proje duraklatıldı. Staging, yer açıldığında ya da ücretli plana geçilince açılır. O zamana kadar Preview dağıtımlarına veri tabanı anahtarı verilmez.
 
 **Ücretsiz planın sınırları:**
 
