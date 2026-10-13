@@ -200,7 +200,7 @@ Yetki kuralları [AUTHORIZATION.md](../AUTHORIZATION.md) içindedir. Menüde bir
 - Girişten sonra öğrenci `/ogrenci`'ye, veli (yönetici olsa da) `/veli`'ye gider. Geçici parola hâlâ `/parola-degistir`'e gider.
 - Yönetici sayfası öğrenci kaydı göstermez. Katalog düzenleme Faz 5'tedir. Yönetici rolü, veli bağlantısının verdiğinden fazla öğrenci verisi açmaz.
 - Bekleyen istek 24 saat içinde yanıtlanmazsa `expired` olur (karar 0.4). Süresi dolan satırlar bir sonraki davet veya liste okumasında `expire_stale_family_links` ile güncellenir.
-- Production veri tabanına bu migration henüz uygulanmadı. Proje sahibi `npx supabase db push` çalıştırır; ajan bunu yapmaz.
+- Bu migration production veri tabanına proje sahibinin onayıyla 13 Ekim 2026'da uygulandı (`npx supabase db push`). Staging ertelendiği için orada henüz yok.
 
 ### Henüz uygulanmayanlar
 

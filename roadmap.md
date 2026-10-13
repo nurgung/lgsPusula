@@ -16,7 +16,7 @@
 | 1 | Proje altyapısı | Tamamlandı |
 | 2 | Tasarım sistemi ve CI | Devam ediyor — Vercel production `https://lgs-pusula.vercel.app` HTTPS ve güvenlik başlıklarıyla açık; staging (ertelendi), Vercel–GitHub bağlantısı ve `braces` yaması (hâlâ yok) bekliyor |
 | 3 | Veri tabanı ve kimlik doğrulama | Devam ediyor — production Supabase (Frankfurt) kuruldu, kayıt kapalı, CI yeşil; staging projesi (ertelendi) ve production aile hesapları (proje sahibi) bekliyor |
-| 4 | Roller ve veli-öğrenci ilişkisi | Tamamlandı — yerel testler geçti; production veri tabanına migration proje sahibinde |
+| 4 | Roller ve veli-öğrenci ilişkisi | Tamamlandı — yerel testler ve CI geçti; migration production'a uygulandı (13 Ekim 2026) |
 | 5 | Müfredat kataloğu | Başlanmadı |
 | 6 | Günlük çalışma kayıtları ve hedefler | Başlanmadı |
 | 7 | Deneme sınavları ve net hesabı | Başlanmadı |
@@ -176,7 +176,10 @@
 **İşler**
 - [x] 4.1 Öğrenci, veli ve yönetici rolleri; rol yalnızca sunucuda atanır; veli hesabı aynı zamanda yönetici olabilir (0.13)
 - [x] 4.2 Ortak yetki yardımcıları: sahiplik ve aktif ilişki kontrolü
-- [x] 4.3 `family_links` migration'ı (`pending`, `active`, `declined`, `expired`, `revoked`) — yerelde uygulandı; production için `supabase db push` proje sahibinde
+- [x] 4.3 `family_links` migration'ı (`pending`, `active`, `declined`, `expired`, `revoked`)
+  - [x] 4.3.1 Yerelde `supabase db reset` ile uygulandı; CI'da yeşil — [çalışma 38384209054](https://github.com/nurgung/lgsPusula/actions/runs/38384209054)
+  - [x] 4.3.2 Production'a `supabase db push` ile uygulandı; `supabase migration list --linked` iki migration'ı da eşit gösteriyor (13 Ekim 2026)
+  - [ ] 4.3.3 Staging'e uygulanır (3.1.2.b ile birlikte, ertelendi)
 - [x] 4.4 Veli daveti: kısa ömürlü, tek kullanımlık belirteç
 - [x] 4.5 Davet kabul, ret ve ilişkiyi sonlandırma ekranları
 - [x] 4.6 RLS politikaları (her tablo için okuma/yazma ayrı)
@@ -191,6 +194,7 @@
 - [x] Normal kullanıcı kendini yönetici yapamaz (test) — aynı dosya
 - [x] Yönetici işlemleri normal oturumla yapılamaz (test) — aynı dosya; TOTP sonrası `/yonetici` açılır
 - [x] RLS politikaları gerçek rollerle test edilir — aynı dosya
+- [x] 13 Ekim 2026 yeniden doğrulama: lint, tip kontrolü, 124 birim testi ve 72 uçtan uca test yerelde geçti
 
 ---
 
