@@ -14,8 +14,8 @@
 |---|---|---|
 | 0 | Ürün ve servis kararları | Tamamlandı — 13/13 karar verildi ([docs/DECISIONS.md](docs/DECISIONS.md)) |
 | 1 | Proje altyapısı | Tamamlandı |
-| 2 | Tasarım sistemi ve CI | Devam ediyor — bileşenler ve CI bitti; Vercel staging kurulumu (proje sahibi) ve `braces` yaması bekliyor |
-| 3 | Veri tabanı ve kimlik doğrulama | Devam ediyor — kod ve yerel testler bitti (107 birim, 70 uçtan uca test); bulut Supabase projeleri (proje sahibi) ve CI'da ilk yeşil çalışma bekliyor |
+| 2 | Tasarım sistemi ve CI | Devam ediyor — bileşenler ve CI bitti; Vercel staging kurulumu (proje sahibi) bekliyor. `braces` yaması 13 Ekim 2026'da yeniden bakıldı, hâlâ yok |
+| 3 | Veri tabanı ve kimlik doğrulama | Devam ediyor — kod, yerel testler ve CI yeşil ([çalışma 38355078745](https://github.com/nurgung/lgsPusula/actions/runs/38355078745)); bulut Supabase projeleri (proje sahibi) bekliyor |
 | 4 | Roller ve veli-öğrenci ilişkisi | Başlanmadı |
 | 5 | Müfredat kataloğu | Başlanmadı |
 | 6 | Günlük çalışma kayıtları ve hedefler | Başlanmadı |
@@ -133,9 +133,9 @@
 - [ ] 3.1 Seçilen sağlayıcıyı bağla; geliştirme, staging ve production veri tabanlarını ayır
   - [x] 3.1.1 Supabase'i koda bağla (`@supabase/ssr`, `src/services/supabase`); yerel geliştirme ortamı Docker'da (`npm run db:start`, portlar 553xx)
   - [ ] 3.1.2 Proje sahibi staging ve production Supabase projelerini Frankfurt'ta açar; kayıt kapalı, parola kuralı ayarlanır, `supabase db push` ile migration uygulanır, değerler Vercel'e girilir (adımlar [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md))
-- [ ] 3.2 Migration altyapısını kur
+- [x] 3.2 Migration altyapısını kur
   - [x] 3.2.1 `supabase/migrations` + Supabase CLI; migration `supabase db reset` ile sıfırdan uygulandı
-  - [ ] 3.2.2 CI'daki uçtan uca iş yerel Supabase'i başlatıp migration'ları uygular; push sonrası GitHub'da yeşil olduğu doğrulanır
+  - [x] 3.2.2 CI'daki uçtan uca iş yerel Supabase'i başlatıp migration'ları uygular; push sonrası GitHub'da yeşil olduğu doğrulanır — [çalışma 38355078745](https://github.com/nurgung/lgsPusula/actions/runs/38355078745)
 - [x] 3.3 `profiles` tablosu migration'ı (rol kullanıcı tarafından değiştirilemez) — RLS: yalnızca kendi satırını okur; güncelleme/ekleme yetkisi yok (uçtan uca test)
 - [ ] 3.4 Herkese açık kaydı kapat; iki aile hesabını oluşturan kurulum betiği (geçici parola yalnızca ekranda gösterilir)
   - [x] 3.4.a Kurulum betiği `npm run accounts -- setup` (yerelde kurgusal hesaplarla denendi); yerel Supabase'de kayıt kapalı (uçtan uca test)
