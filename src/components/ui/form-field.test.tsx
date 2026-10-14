@@ -1,6 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { FormErrorSummary, NumberField, SelectField, TextField } from "./form-field";
+import {
+  FormErrorSummary,
+  NumberField,
+  SelectField,
+  TextAreaField,
+  TextField,
+} from "./form-field";
 
 describe("TextField", () => {
   it("has a visible label linked to the input", () => {
@@ -33,6 +39,16 @@ describe("TextField", () => {
   it("marks optional fields in the label text", () => {
     render(<TextField label="Not" optional />);
     expect(screen.getByRole("textbox", { name: "Not (isteğe bağlı)" })).toBeDefined();
+  });
+});
+
+describe("TextAreaField", () => {
+  it("has a visible label and links its error", () => {
+    render(<TextAreaField id="aciklama" label="Açıklama" error="Açıklamayı yaz." />);
+    const textarea = screen.getByRole("textbox", { name: "Açıklama" });
+    expect(textarea.tagName).toBe("TEXTAREA");
+    expect(textarea.getAttribute("aria-invalid")).toBe("true");
+    expect(textarea.getAttribute("aria-describedby")).toBe("aciklama-hata");
   });
 });
 

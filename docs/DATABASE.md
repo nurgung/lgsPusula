@@ -31,11 +31,21 @@ Migration: `supabase/migrations/20261013120000_family_links.sql`. Yazmalar `serv
 
 Bitmiş bağlantı satırları 1 yıl saklanır (karar 0.5). Otomatik silme Faz 12'dedir; henüz yoktur.
 
+## Uygulanan şema (Faz 5)
+
+Migration: `supabase/migrations/20261013130000_curriculum_catalog.sql`. Her satırda kaynak adı, kaynak sürümü ve giriş tarihi (`created_at`) vardır (karar 0.6). `updated_at` tetikleyiciyle güncellenir. Satırlar silinmez; eskiyen satır `archived_at` ile işaretlenir.
+
+| Tablo / fonksiyon     | Alanlar                                                                                                                                                         | Erişim (`authenticated`)                                                                                                                                                       | Erişim (`service_role`)                                  |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
+| `subjects`            | `code` (benzersiz, `^[a-z][a-z0-9_]{1,31}$`), `name` (1–80), `sort_order` (0–9999), `source_name`, `source_version`, `created_at`, `updated_at`, `archived_at` | Herkes **okur**. Ekleme ve güncelleme yalnızca `is_catalog_admin()` doğruysa. `code` güncellenemez.                                                                            | Okur/yazar/siler (betik ve test temizliği)               |
+| `topics`              | `subject_id` (silmeye karşı korumalı), `name` (1–160), `sort_order`, kaynak alanları, zaman alanları; (ders, ad, kaynak sürümü) benzersiz                      | Herkes **okur**. Ekleme ve güncelleme yalnızca `is_catalog_admin()` doğruysa. `subject_id` güncellenemez (konu taşınamaz).                                                     | Okur/yazar/siler                                         |
+| `learning_outcomes`   | `topic_id` (silmeye karşı korumalı), `code` (`^[A-Za-z0-9][A-Za-z0-9._-]{0,39}$`), `description` (1–500), `sort_order`, kaynak ve zaman alanları; (kod, kaynak sürümü) benzersiz | Herkes **okur**. Ekleme ve güncelleme yalnızca `is_catalog_admin()` doğruysa. `topic_id` güncellenemez (kazanım taşınamaz).                                                    | Okur/yazar/siler                                         |
+| `is_catalog_admin()`  | JWT'deki `aal` değeri `aal2` **ve** profilde `admin` rolü                                                                                                       | Çalıştırır                                                                                                                                                                     | Çalıştırır                                               |
+
+Kullanıcılara silme yetkisi verilmez. `anon` rolünün katalogda hiçbir yetkisi yoktur. Okuma ve yazma politikaları ayrıdır; sütun düzeyindeki `grant` ifadeleri `id`, üst kayıt kimliği ve zaman alanlarının kullanıcı tarafından yazılmasını engeller.
+
 ## Önerilen tablolar
 
-- `subjects`: ders kataloğu.
-- `topics`: dersle ilişkili konu kataloğu.
-- `learning_outcomes`: kazanım kodu, açıklama, ders/konu ilişkisi, kaynak sürümü.
 - `study_logs`: öğrenci kimliği, tarih, ders, konu/kazanım opsiyonu, soru sayıları, süre, oluşturma/güncelleme zamanı.
 - `study_goals`: öğrenci, dönem, ders veya genel hedef, hedef değeri.
 - `exams`: öğrenci, deneme adı, tarih, tür ve net kuralı referansı.

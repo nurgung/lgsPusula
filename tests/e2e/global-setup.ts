@@ -1,5 +1,6 @@
 import { AUTH_EMAIL_DOMAIN } from "../../src/features/auth/username.ts";
 import { admin, E2E_USERNAME_PREFIX, isAuthConfigured } from "./support/auth.ts";
+import { deleteE2eCatalog } from "./support/catalog.ts";
 
 /** Removes fictional e2e accounts and rate-limit counters left over from earlier runs. */
 export default async function globalSetup() {
@@ -34,4 +35,6 @@ export default async function globalSetup() {
 
   const { error } = await client.from("auth_rate_limits").delete().neq("bucket_key", "");
   if (error) throw new Error(`clearing rate limits failed (${error.code})`);
+
+  await deleteE2eCatalog();
 }

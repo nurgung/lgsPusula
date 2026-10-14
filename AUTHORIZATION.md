@@ -53,6 +53,14 @@ Uygulamada iki hesap vardır ([docs/DECISIONS.md](docs/DECISIONS.md), 0.13): pro
 - Ekranlar: `/ogrenci`, `/veli`, `/veli/ogrenci/[studentId]`, `/yonetici`, `/mfa`. Menü yalnızca var olan sayfaları gösterir ve erişim kontrolü değildir. `/onizleme` altındaki rol taslakları kaldırıldı. Bileşen galerisi (`/onizleme/bilesenler`, `/onizleme/durumlar`) `UI_PREVIEW_ENABLED` ile durur; bu bir erişim kontrolü değildir.
 - Doğrulama: `tests/e2e/access.spec.ts` (yerel Supabase, 320 px ve masaüstü) ve `src/features/access/student-access.test.ts`.
 
+**Faz 5**
+
+- Müfredat kataloğunu (`subjects`, `topics`, `learning_outcomes`) giriş yapmış her kullanıcı okur; girişsiz ziyaretçi okuyamaz. Öğrenciye ve veliye "eski sürüm" satırlar gösterilmez (yalnızca ekranda; satırlar gizli bilgi değildir).
+- Ekleme ve düzenleme iki katmanda denetlenir: sunucu işlemi `canChangeCatalog` ile yönetici rolü + `aal2` ister (`src/features/curriculum/catalog-change.ts`); veri tabanı da aynı koşulu `is_catalog_admin()` RLS politikasıyla ister. Yazma oturumdaki kullanıcıyla yapılır, `service_role` ile değil.
+- Kimse uygulamadan katalog satırı silemez; konu başka derse, kazanım başka konuya taşınamaz. Yükleme betiği `service_role` ile yalnızca proje sahibinin bilgisayarında çalışır.
+- Her değişiklik `admin.catalog_change` olarak denetim kaydına yazılır (yalnızca varlık türü ve işlem; ad veya metin yazılmaz). Yetkisiz deneme `blocked` kaydı bırakır.
+- Doğrulama: `tests/e2e/catalog.spec.ts` (girişsiz, öğrenci, veli, TOTP'siz yönetici ve TOTP'li yönetici; 320 px ve masaüstü), `src/features/curriculum/catalog-change.test.ts`.
+
 ## Veli-öğrenci ilişkilendirme akışı
 
 Karar ve gerekçe: [docs/DECISIONS.md](docs/DECISIONS.md) (0.4).

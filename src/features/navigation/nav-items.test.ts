@@ -5,8 +5,8 @@ const hrefs = (roles: Parameters<typeof getNavItems>[0]) =>
   getNavItems(roles).map((item) => item.href);
 
 describe("getNavItems", () => {
-  it("gives a student the home page and account page", () => {
-    expect(hrefs(["student"])).toEqual(["/ogrenci", "/hesap"]);
+  it("gives a student the home page, topic list and account page", () => {
+    expect(hrefs(["student"])).toEqual(["/ogrenci", "/ogrenci/konular", "/hesap"]);
   });
 
   it("does not show the admin page to a parent without the admin role", () => {

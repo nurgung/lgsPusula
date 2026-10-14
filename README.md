@@ -73,9 +73,10 @@ Bu üç değeri `.env.local` içinde `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPAB
 npm run accounts -- setup                          # kurgusal veli + öğrenci hesabı; geçici parolalar ekranda bir kez gösterilir
 npm run accounts -- reset-password <kullanici_adi> # yeni geçici parola, tüm oturumları kapatır
 npm run db:reset                                   # yerel veri tabanını sıfırlar
+npm run catalog -- import data/catalog/ornek-katalog.json   # kurgusal ÖRNEK müfredatı yükler (yalnızca yerelde)
 ```
 
-Betik hedef Supabase adresini gösterir ve "evet" yazılmadan işlem yapmaz. Yerelde yalnızca kurgusal ad kullanın.
+Betikler hedef Supabase adresini gösterir ve "evet" yazılmadan yazma yapmaz. Yerelde yalnızca kurgusal ad kullanın. `data/catalog/ornek-katalog.json` gerçek MEB programı değildir; betik bu dosyayı yerel Supabase dışına yüklemeyi reddeder. Gerçek katalog dosyasının biçimi [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) içinde ("Müfredat kataloğu").
 
 ## Önerilen depo yapısı
 
@@ -165,6 +166,7 @@ npm run db:start      # yerel Supabase'i başlat (Docker)
 npm run db:reset      # yerel veri tabanını sıfırla ve migration'ları uygula
 npm run db:stop       # yerel Supabase'i durdur
 npm run accounts      # hesap kurulumu / parola sıfırlama betiği
+npm run catalog       # müfredat kataloğu yükleme betiği (import <dosya.json> [--dry-run])
 npm run format        # Prettier ile biçimlendir
 npm run format:check  # biçim kontrolü
 npm run build         # production build

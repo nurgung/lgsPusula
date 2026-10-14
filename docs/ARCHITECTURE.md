@@ -198,14 +198,57 @@ Yetki kuralları [AUTHORIZATION.md](../AUTHORIZATION.md) içindedir. Menüde bir
 | Sayfalar | `src/app/(panel)/`                                   | `/ogrenci`, `/veli`, `/veli/ogrenci/[studentId]`, `/yonetici`, `/mfa`, `/hesap`. Ortak yerleşim oturumu `<Suspense>` içinde okur ve `instant = false` ile anlık önizleme doğrulamasının dışındadır; oturum istekler arasında önbelleğe alınmaz. |
 
 - Girişten sonra öğrenci `/ogrenci`'ye, veli (yönetici olsa da) `/veli`'ye gider. Geçici parola hâlâ `/parola-degistir`'e gider.
-- Yönetici sayfası öğrenci kaydı göstermez. Katalog düzenleme Faz 5'tedir. Yönetici rolü, veli bağlantısının verdiğinden fazla öğrenci verisi açmaz.
+- Yönetici sayfası öğrenci kaydı göstermez. Yönetici rolü, veli bağlantısının verdiğinden fazla öğrenci verisi açmaz.
 - Bekleyen istek 24 saat içinde yanıtlanmazsa `expired` olur (karar 0.4). Süresi dolan satırlar bir sonraki davet veya liste okumasında `expire_stale_family_links` ile güncellenir.
 - Bu migration production veri tabanına proje sahibinin onayıyla 13 Ekim 2026'da uygulandı (`npx supabase db push`). Staging ertelendiği için orada henüz yok.
+
+## Müfredat kataloğu (Faz 5)
+
+Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje sahibi girer. Depoda gerçek kazanım verisi yoktur.
+
+| Katman   | Dosyalar                                                            | Görev                                                                                                                                                                                                            |
+| -------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Şemalar  | `src/features/curriculum/schemas.ts`                                | Form, sunucu işlemi ve yükleme dosyası için tek doğrulama kaynağı. Yol takma adı ve `server-only` içermez; betik de doğrudan yükler.                                                                             |
+| Kurallar | `catalog.ts`, `catalog-change.ts`                                   | Ağaç kurma (öğrenciye eski sürüm gösterilmez), Türkçe karaktere duyarsız arama, "kim değiştirebilir" kuralı ve denetim kaydı. Supabase'i bilmez.                                                                 |
+| Adaptör  | `src/services/supabase/catalog-store.ts`                            | Okuma ve yazma **oturumdaki kullanıcı** olarak yapılır (`service_role` değil), böylece RLS ikinci savunma katmanı olur. Okuma 1000 satırlık sayfalarla yapılır (PostgREST `max_rows`).                           |
+| Sayfalar | `/yonetici/mufredat`, `/yonetici/mufredat/[subjectId]`, `/ogrenci/konular` | Yönetici: ekleme, düzenleme, eski sürüm işaretleme. Öğrenci: `CurriculumPicker` ile arama (yalnızca okuma).                                                                                                     |
+| Betik    | `scripts/catalog.ts`, `scripts/lib/catalog-import.ts`               | JSON dosyasından yükleme; önce plan gösterir, "evet" ister, `--dry-run` ile yazmaz.                                                                                                                              |
+
+- **Silme yok.** Eskiyen ders, konu veya kazanım `archived_at` ile "eski sürüm" olur; geçmiş kayıtlar ona bağlı kalır. Konu başka derse, kazanım başka konuya taşınamaz (sütun yetkisi verilmedi). Ders kodu sonradan değişmez.
+- **Seçici bileşeni** (`CurriculumPicker`): ders seçimi + arama + yerleşik radyo düğmeleri; klavye ve ekran okuyucu için ek kod gerekmez. Seçim gizli alanda `topic:<id>` veya `outcome:<id>` olarak tutulur. Faz 6'daki günlük kayıt formu bunu kullanacak; sunucu, seçilen kaydın var olduğunu ve eski sürüm olmadığını ayrıca doğrulamalıdır.
+
+### Katalog dosyası biçimi
+
+```json
+{
+  "example": false,
+  "source": { "name": "MEB 8. sınıf öğretim programları", "version": "2025-2026" },
+  "subjects": [
+    {
+      "code": "matematik",
+      "name": "Matematik",
+      "sortOrder": 2,
+      "topics": [
+        {
+          "name": "Konu adı",
+          "outcomes": [{ "code": "M.8.1.1.1", "description": "Kazanım metni" }]
+        }
+      ]
+    }
+  ]
+}
+```
+
+- Bir dosyadaki her satır aynı kaynak adı ve sürümünü alır. `sortOrder` verilmezse dosyadaki sıra kullanılır.
+- Eşleştirme anahtarları: ders `code`; konu (ders, ad, kaynak sürümü); kazanım (`code`, kaynak sürümü). Aynı dosyayı tekrar yüklemek yeni satır eklemez. Yeni kaynak sürümü yeni konu/kazanım satırları ekler; eskileri yöneticide "eski sürüm" yapılır.
+- Var olan bir kazanım dosyada başka bir konunun altındaysa yükleme hiçbir şey yazmadan durur.
+- Bilinmeyen alanlar, tekrar eden kodlar ve 2 MB'tan büyük dosyalar reddedilir. `"example": true` dosyalar yalnızca yerel Supabase'e yüklenir.
+- Satırlar tek tek yazılır; ağ hatasında yükleme yarıda kalabilir. Aynı dosyayı yeniden çalıştırmak tamamlar.
 
 ### Henüz uygulanmayanlar
 
 - Bitmiş bağlantı, `audit_events` ve süresi dolan oran sınırı kayıtlarının saklama süresine göre otomatik silinmesi (karar 0.5: 1 yıl). Silme işi Faz 12'deki yedekleme betikleriyle birlikte planlanacak.
-- Net hesaplama kuralları, hedefler, günlük kayıt ve deneme formları, kazanım kataloğu.
+- Gerçek müfredat verisi (proje sahibi yükleyecek), net hesaplama kuralları, hedefler, günlük kayıt ve deneme formları.
 - Koçluk motoru, yapay zekâ adaptörü, karakter puanları, bildirimler, içe aktarma, PDF/DOCX raporlar.
 - PWA manifesti ve simgeler, nonce tabanlı CSP, hata izleme.
 - Staging Supabase projesi, Preview ortam değişkenleri ve Vercel–GitHub bağlantısı (durum yukarıda).

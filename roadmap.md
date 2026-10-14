@@ -17,7 +17,7 @@
 | 2 | Tasarım sistemi ve CI | Devam ediyor — Vercel production `https://lgs-pusula.vercel.app` HTTPS ve güvenlik başlıklarıyla açık; staging (ertelendi), Vercel–GitHub bağlantısı ve `braces` yaması (hâlâ yok) bekliyor |
 | 3 | Veri tabanı ve kimlik doğrulama | Devam ediyor — production Supabase (Frankfurt) kuruldu, kayıt kapalı, CI yeşil; staging projesi (ertelendi) ve production aile hesapları (proje sahibi) bekliyor |
 | 4 | Roller ve veli-öğrenci ilişkisi | Tamamlandı — yerel testler ve CI geçti; migration production'a uygulandı (13 Ekim 2026) |
-| 5 | Müfredat kataloğu | Başlanmadı |
+| 5 | Müfredat kataloğu | Devam ediyor — kod ve yerel testler tamam; commit/CI, production migration'ı ve gerçek katalog verisi (proje sahibi) bekliyor |
 | 6 | Günlük çalışma kayıtları ve hedefler | Başlanmadı |
 | 7 | Deneme sınavları ve net hesabı | Başlanmadı |
 | 8 | Kazanım analizi ve grafikler | Başlanmadı |
@@ -203,15 +203,22 @@
 **Amaç:** Ders, konu ve kazanım listesinin sistemde bulunması.
 **Ön koşul:** Faz 4, karar 0.6
 
+**Not:** Proje sahibinin onayıyla 13 Ekim 2026'da başlandı. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ("Müfredat kataloğu"), [docs/DATABASE.md](docs/DATABASE.md), [AUTHORIZATION.md](AUTHORIZATION.md).
+
 **İşler**
 - [ ] 5.1 `subjects`, `topics`, `learning_outcomes` migration'ları (kaynak sürümü dahil)
-- [ ] 5.2 Katalog verisini yükleme betiği
-- [ ] 5.3 Yönetici için katalog ekleme/düzenleme ekranı
-- [ ] 5.4 Öğrenci için aranabilir konu/kazanım seçici bileşeni
+  - [x] 5.1.1 `20261013130000_curriculum_catalog.sql`: kaynak adı/sürümü ve giriş tarihi her satırda; silme yok, `archived_at` ile "eski sürüm"; konu/kazanım taşınamaz; RLS okuma/yazma ayrı, yazma yalnızca yönetici + TOTP (`is_catalog_admin()`). Yerelde uygulandı ve testlendi
+  - [ ] 5.1.2 Push sonrası CI'da yeşil çalışma
+  - [ ] 5.1.3 Production'a `supabase db push` (proje sahibinin onayıyla)
+- [x] 5.2 Katalog verisini yükleme betiği — `npm run catalog -- import <dosya.json> [--dry-run]`; ortak şemayla doğrulama, plan + "evet" onayı, tekrar yüklemede çift kayıt yok (yerelde 6/9/11 satırla iki kez denendi), kazanım taşınmaya çalışılırsa hiçbir şey yazmadan durur; `"example": true` dosyalar yalnızca yerel Supabase'e yüklenir
+  - [ ] 5.2.1 Gerçek MEB 8. sınıf / LGS katalog dosyasını hazırla ve yükle (proje sahibi, karar 0.6). Depodaki `data/catalog/ornek-katalog.json` kurgusaldır
+- [x] 5.3 Yönetici için katalog ekleme/düzenleme ekranı — `/yonetici/mufredat` ve `/yonetici/mufredat/[subjectId]`: ekleme, düzenleme, eski sürüm yapma/geri alma; her değişiklik `audit_events`'e yazılır
+- [x] 5.4 Öğrenci için aranabilir konu/kazanım seçici bileşeni — `CurriculumPicker` (Türkçe karaktere duyarsız arama, yerleşik radyo düğmeleriyle klavye erişimi, eski sürümler gösterilmez); `/ogrenci/konular` sayfasında kullanılıyor, Faz 6 formunda da kullanılacak
 
 **Bitti sayılması için**
-- [ ] Katalog yalnızca yönetici tarafından değiştirilebilir (test)
-- [ ] Öğrenci ve veli kataloğu yalnızca okuyabilir (test)
+- [x] Katalog yalnızca yönetici tarafından değiştirilebilir (test) — `tests/e2e/catalog.spec.ts`: TOTP'siz yönetici yazamaz, TOTP'li yönetici yazar ama silemez/taşıyamaz; `catalog-change.test.ts`. Yerel Supabase, 320 px ve masaüstü
+- [x] Öğrenci ve veli kataloğu yalnızca okuyabilir (test) — aynı dosya: okuma var; ekleme, güncelleme, eski sürüm yapma ve silme reddedilir; girişsiz ziyaretçi okuyamaz
+- [x] 13 Ekim 2026 doğrulama: lint, tip kontrolü, 182 birim testi, production build ve 80 uçtan uca test yerelde geçti
 
 ---
 

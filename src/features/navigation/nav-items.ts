@@ -7,7 +7,10 @@ import type { UserRole } from "@/types/roles";
  * Study, exam and report links are added in the phases that build those pages.
  */
 const ROLE_NAV_ITEMS: Record<UserRole, readonly NavItem[]> = {
-  student: [{ href: "/ogrenci", label: "Ana sayfa" }],
+  student: [
+    { href: "/ogrenci", label: "Ana sayfa" },
+    { href: "/ogrenci/konular", label: "Konular" },
+  ],
   parent: [{ href: "/veli", label: "Özet" }],
   admin: [{ href: "/yonetici", label: "Yönetim" }],
 };

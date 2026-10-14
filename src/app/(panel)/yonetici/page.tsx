@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { StateMessage } from "@/components/ui/state-message";
@@ -31,10 +32,11 @@ async function AdminHome() {
           title="Bu oturumda doğrulama tamam."
           description={`${user.displayName}, yönetim sayfasındasın. Yönetici olmak öğrenci kayıtlarını görmeyi sağlamaz.`}
         />
-        <Card title="Müfredat">
-          <p className="text-ink-700">
-            Ders, konu ve kazanım ekleme sonraki aşamada bu sayfaya eklenecek.
-          </p>
+        <Card
+          title="Müfredat"
+          description="Ders, konu ve kazanımları ekle, düzenle veya eski sürüm olarak işaretle."
+        >
+          <ButtonLink href="/yonetici/mufredat">Müfredatı aç</ButtonLink>
         </Card>
       </div>
     </>

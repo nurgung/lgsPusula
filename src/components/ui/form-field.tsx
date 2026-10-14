@@ -116,6 +116,35 @@ export function TextField({
   );
 }
 
+type TextAreaFieldProps = FieldOwnProps &
+  Omit<ComponentProps<"textarea">, "className" | "children">;
+
+export function TextAreaField({
+  id,
+  label,
+  hint,
+  error,
+  optional,
+  className,
+  rows = 3,
+  "aria-describedby": externalDescribedBy,
+  ...textareaProps
+}: TextAreaFieldProps) {
+  const ids = useFieldIds(id, hint, error);
+  return (
+    <FieldShell {...{ ids, label, hint, error, optional, className }}>
+      <textarea
+        id={ids.controlId}
+        rows={rows}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy(ids, externalDescribedBy)}
+        className={cn(controlClassName, controlState(error), "resize-y")}
+        {...textareaProps}
+      />
+    </FieldShell>
+  );
+}
+
 type NumberFieldProps = FieldOwnProps &
   Omit<ComponentProps<"input">, "className" | "children" | "type" | "inputMode"> & {
     /** Unit shown after the input, e.g. "soru" or "dk". Read with the label. */

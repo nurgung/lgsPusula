@@ -19,6 +19,8 @@ export const AUDIT_EVENT_TYPES = [
   "auth.mfa_verify",
   "admin.account_create",
   "admin.password_reset",
+  "admin.catalog_change",
+  "admin.catalog_import",
   "family.invite_create",
   "family.invite_redeem",
   "family.link_respond",
@@ -44,8 +46,12 @@ export type AuditMetadata = {
     | "already_linked"
     | "pending_exists"
     | "not_allowed"
-    | "invalid_mfa_code";
+    | "invalid_mfa_code"
+    | "duplicate"
+    | "not_found";
   rateLimitScope?: "ip" | "username" | "user";
+  catalogEntity?: "subject" | "topic" | "learning_outcome";
+  catalogAction?: "create" | "update" | "archive" | "restore";
 };
 
 export type AuditEvent = {

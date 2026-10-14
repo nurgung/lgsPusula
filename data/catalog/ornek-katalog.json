@@ -1,0 +1,101 @@
+{
+  "example": true,
+  "source": {
+    "name": "ÖRNEK veri — gerçek MEB programı değildir",
+    "version": "ornek-1"
+  },
+  "subjects": [
+    {
+      "code": "turkce",
+      "name": "Türkçe",
+      "topics": [
+        {
+          "name": "Örnek konu: Sözcükte anlam",
+          "outcomes": [
+            { "code": "ORNEK.TR.1.1", "description": "Örnek kazanım: Sözcüğün metindeki anlamını bulur." },
+            { "code": "ORNEK.TR.1.2", "description": "Örnek kazanım: Eş ve zıt anlamlı sözcükleri ayırt eder." }
+          ]
+        },
+        {
+          "name": "Örnek konu: Paragraf",
+          "outcomes": [
+            { "code": "ORNEK.TR.2.1", "description": "Örnek kazanım: Paragrafın ana fikrini belirler." }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "matematik",
+      "name": "Matematik",
+      "topics": [
+        {
+          "name": "Örnek konu: Çarpanlar ve katlar",
+          "outcomes": [
+            { "code": "ORNEK.MAT.1.1", "description": "Örnek kazanım: Bir sayının çarpanlarını bulur." },
+            { "code": "ORNEK.MAT.1.2", "description": "Örnek kazanım: İki sayının ortak bölenlerini bulur." }
+          ]
+        },
+        {
+          "name": "Örnek konu: Üslü ifadeler",
+          "outcomes": [
+            { "code": "ORNEK.MAT.2.1", "description": "Örnek kazanım: Üslü ifadelerle işlem yapar." }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "fen_bilimleri",
+      "name": "Fen Bilimleri",
+      "topics": [
+        {
+          "name": "Örnek konu: Mevsimler ve iklim",
+          "outcomes": [
+            { "code": "ORNEK.FEN.1.1", "description": "Örnek kazanım: Mevsimlerin oluşumunu açıklar." }
+          ]
+        },
+        {
+          "name": "Örnek konu: Basınç ve ışık",
+          "outcomes": [
+            { "code": "ORNEK.FEN.2.1", "description": "Örnek kazanım: Işığın yansımasını örneklerle açıklar." }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "inkilap_tarihi",
+      "name": "T.C. İnkılap Tarihi ve Atatürkçülük",
+      "topics": [
+        {
+          "name": "Örnek konu: Bir kahraman doğuyor",
+          "outcomes": [
+            { "code": "ORNEK.INK.1.1", "description": "Örnek kazanım: Dönemin önemli olaylarını sıralar." }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "din_kulturu",
+      "name": "Din Kültürü ve Ahlak Bilgisi",
+      "topics": [
+        {
+          "name": "Örnek konu: Kader inancı",
+          "outcomes": [
+            { "code": "ORNEK.DIN.1.1", "description": "Örnek kazanım: Konuyla ilgili temel kavramları açıklar." }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "ingilizce",
+      "name": "Yabancı Dil (İngilizce)",
+      "topics": [
+        {
+          "name": "Örnek konu: Friendship",
+          "outcomes": [
+            { "code": "ORNEK.ING.1.1", "description": "Örnek kazanım: Basit davet ve kabul cümlelerini anlar." }
+          ]
+        }
+      ]
+    }
+  ]
+}
