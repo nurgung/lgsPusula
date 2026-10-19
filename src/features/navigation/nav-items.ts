@@ -4,11 +4,13 @@ import type { UserRole } from "@/types/roles";
 /**
  * Menu entries per role. A menu only decides what is SHOWN; every page and server action
  * must still check the session and resource access on the server (AUTHORIZATION.md).
- * Study, exam and report links are added in the phases that build those pages.
+ * Exam and report links are added in the phases that build those pages.
  */
 const ROLE_NAV_ITEMS: Record<UserRole, readonly NavItem[]> = {
   student: [
     { href: "/ogrenci", label: "Ana sayfa" },
+    { href: "/ogrenci/calisma", label: "Çalışma" },
+    { href: "/ogrenci/hedefler", label: "Hedefler" },
     { href: "/ogrenci/konular", label: "Konular" },
   ],
   parent: [{ href: "/veli", label: "Özet" }],

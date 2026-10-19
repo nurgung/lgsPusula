@@ -6,6 +6,7 @@ export const E2E_SUBJECT_PREFIX = "e2e_";
 
 export type SeededCatalog = {
   subjectId: string;
+  subjectName: string;
   topicId: string;
   outcomeId: string;
   topicName: string;
@@ -16,9 +17,10 @@ export type SeededCatalog = {
 export async function seedCatalog(): Promise<SeededCatalog> {
   const tag = randomBytes(4).toString("hex");
   const source = { source_name: "Kurgusal test kaynağı", source_version: "e2e" };
+  const subjectName = `E2E Ders ${tag}`;
   const { data: subject, error: subjectError } = await admin()
     .from("subjects")
-    .insert({ code: `${E2E_SUBJECT_PREFIX}${tag}`, name: `E2E Ders ${tag}`, ...source })
+    .insert({ code: `${E2E_SUBJECT_PREFIX}${tag}`, name: subjectName, ...source })
     .select("id")
     .single<{ id: string }>();
   if (subjectError || !subject)
@@ -48,6 +50,7 @@ export async function seedCatalog(): Promise<SeededCatalog> {
 
   return {
     subjectId: subject.id,
+    subjectName,
     topicId: topic.id,
     outcomeId: outcome.id,
     topicName,
@@ -65,6 +68,21 @@ export async function deleteE2eCatalog() {
   if (error) throw new Error(`reading e2e subjects failed (${error.code})`);
   const subjectIds = (subjects ?? []).map((row: { id: string }) => row.id);
   if (subjectIds.length === 0) return;
+
+  const removedLogs = await client
+    .from("study_logs")
+    .delete()
+    .in("subject_id", subjectIds);
+  if (removedLogs.error) {
+    throw new Error(`deleting e2e study logs failed (${removedLogs.error.code})`);
+  }
+  const removedGoals = await client
+    .from("study_goals")
+    .delete()
+    .in("subject_id", subjectIds);
+  if (removedGoals.error) {
+    throw new Error(`deleting e2e study goals failed (${removedGoals.error.code})`);
+  }
 
   const { data: topics, error: topicError } = await client
     .from("topics")

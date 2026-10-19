@@ -99,4 +99,11 @@ describe("CurriculumPicker", () => {
     expect(screen.getByText("Konu listesi henüz hazır değil.")).toBeDefined();
     expect(screen.queryByRole("searchbox")).toBeNull();
   });
+
+  it("lists one subject's topics when the subject is already chosen", () => {
+    render(<CurriculumPicker catalog={catalog} fixedSubjectId={uuid(1)} optional />);
+    expect(screen.queryByRole("combobox", { name: "Ders (isteğe bağlı)" })).toBeNull();
+    expect(screen.getByRole("radio", { name: /Işık ve ses/ })).toBeDefined();
+    expect(screen.queryByRole("radio", { name: /Üslü ifadeler/ })).toBeNull();
+  });
 });

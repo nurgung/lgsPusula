@@ -204,15 +204,15 @@ Yetki kuralları [AUTHORIZATION.md](../AUTHORIZATION.md) içindedir. Menüde bir
 
 ## Müfredat kataloğu (Faz 5)
 
-Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje sahibi girer. Depoda gerçek kazanım verisi yoktur.
+Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje sahibi girer. Gerçek katalog `data/catalog/meb-8-sinif-2026-2027.json`, kurgusal örnek `data/catalog/ornek-katalog.json` dosyasındadır.
 
-| Katman   | Dosyalar                                                            | Görev                                                                                                                                                                                                            |
-| -------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Şemalar  | `src/features/curriculum/schemas.ts`                                | Form, sunucu işlemi ve yükleme dosyası için tek doğrulama kaynağı. Yol takma adı ve `server-only` içermez; betik de doğrudan yükler.                                                                             |
-| Kurallar | `catalog.ts`, `catalog-change.ts`                                   | Ağaç kurma (öğrenciye eski sürüm gösterilmez), Türkçe karaktere duyarsız arama, "kim değiştirebilir" kuralı ve denetim kaydı. Supabase'i bilmez.                                                                 |
-| Adaptör  | `src/services/supabase/catalog-store.ts`                            | Okuma ve yazma **oturumdaki kullanıcı** olarak yapılır (`service_role` değil), böylece RLS ikinci savunma katmanı olur. Okuma 1000 satırlık sayfalarla yapılır (PostgREST `max_rows`).                           |
-| Sayfalar | `/yonetici/mufredat`, `/yonetici/mufredat/[subjectId]`, `/ogrenci/konular` | Yönetici: ekleme, düzenleme, eski sürüm işaretleme. Öğrenci: `CurriculumPicker` ile arama (yalnızca okuma).                                                                                                     |
-| Betik    | `scripts/catalog.ts`, `scripts/lib/catalog-import.ts`               | JSON dosyasından yükleme; önce plan gösterir, "evet" ister, `--dry-run` ile yazmaz.                                                                                                                              |
+| Katman   | Dosyalar                                                                   | Görev                                                                                                                                                                                  |
+| -------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Şemalar  | `src/features/curriculum/schemas.ts`                                       | Form, sunucu işlemi ve yükleme dosyası için tek doğrulama kaynağı. Yol takma adı ve `server-only` içermez; betik de doğrudan yükler.                                                   |
+| Kurallar | `catalog.ts`, `catalog-change.ts`                                          | Ağaç kurma (öğrenciye eski sürüm gösterilmez), Türkçe karaktere duyarsız arama, "kim değiştirebilir" kuralı ve denetim kaydı. Supabase'i bilmez.                                       |
+| Adaptör  | `src/services/supabase/catalog-store.ts`                                   | Okuma ve yazma **oturumdaki kullanıcı** olarak yapılır (`service_role` değil), böylece RLS ikinci savunma katmanı olur. Okuma 1000 satırlık sayfalarla yapılır (PostgREST `max_rows`). |
+| Sayfalar | `/yonetici/mufredat`, `/yonetici/mufredat/[subjectId]`, `/ogrenci/konular` | Yönetici: ekleme, düzenleme, eski sürüm işaretleme. Öğrenci: `CurriculumPicker` ile arama (yalnızca okuma).                                                                            |
+| Betik    | `scripts/catalog.ts`, `scripts/lib/catalog-import.ts`                      | JSON dosyasından yükleme; önce plan gösterir, "evet" ister, `--dry-run` ile yazmaz.                                                                                                    |
 
 - **Silme yok.** Eskiyen ders, konu veya kazanım `archived_at` ile "eski sürüm" olur; geçmiş kayıtlar ona bağlı kalır. Konu başka derse, kazanım başka konuya taşınamaz (sütun yetkisi verilmedi). Ders kodu sonradan değişmez.
 - **Seçici bileşeni** (`CurriculumPicker`): ders seçimi + arama + yerleşik radyo düğmeleri; klavye ve ekran okuyucu için ek kod gerekmez. Seçim gizli alanda `topic:<id>` veya `outcome:<id>` olarak tutulur. Faz 6'daki günlük kayıt formu bunu kullanacak; sunucu, seçilen kaydın var olduğunu ve eski sürüm olmadığını ayrıca doğrulamalıdır.
@@ -245,10 +245,49 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 - Bilinmeyen alanlar, tekrar eden kodlar ve 2 MB'tan büyük dosyalar reddedilir. `"example": true` dosyalar yalnızca yerel Supabase'e yüklenir.
 - Satırlar tek tek yazılır; ağ hatasında yükleme yarıda kalabilir. Aynı dosyayı yeniden çalıştırmak tamamlar.
 
+### 2026-2027 katalog dosyası (`meb-8-sinif-2026-2027.json`)
+
+2026-2027'de 8. sınıfta Türkiye Yüzyılı Maarif Modeli değil, önceki programlar uygulanır (MEB TEGM, Eylül 2026); 2027 LGS bu programların kazanımlarını esas alır. Kazanım metinleri `mufredat.meb.gov.tr` üzerindeki resmî PDF'lerden alındı (14 Ekim 2026):
+
+| Ders                                | Program (PID)                      | Konu düzeyi                    | Kazanım |
+| ----------------------------------- | ---------------------------------- | ------------------------------ | ------- |
+| Türkçe                              | Türkçe 1-8, 2019 (663)             | Dil becerisi (dinleme … yazma) | 76      |
+| Matematik                           | Matematik 1-8, 2018 (329)          | Alt öğrenme alanı (M.8.x.y)    | 52      |
+| Fen Bilimleri                       | Fen Bilimleri 3-8, 2018 (325)      | Ünite (F.8.x)                  | 61      |
+| T.C. İnkılap Tarihi ve Atatürkçülük | İnkılap Tarihi 8, 2018 (355)       | Ünite                          | 39      |
+| Din Kültürü ve Ahlak Bilgisi        | DKAB 4-8, 2018, 2022 baskısı (318) | Ünite                          | 28      |
+| Yabancı Dil (İngilizce)             | İngilizce 2-8, 2018 (327)          | Ünite (Unit 1–10)              | 70      |
+
+- Sayılar programların ünite/kazanım tablolarıyla aynıdır ve birim testle korunur. Matematik konuları programdaki ders sırasıyla dizildi.
+- Kod uyarlamaları (kod alanı yalnızca ASCII kabul eder): `İTA.8.1.1` → `ITA.8.1.1`; Din Kültürü kodları ders öneki almadığı için `8.1.1` → `DKAB.8.1.1`. Diğer kodlar programdaki gibidir.
+- Metin düzeltmeleri yalnızca PDF'ten çıkarma hatalarıdır (kaybolan √ işareti, bölünmüş kelimeler) ve `F.8.7.3.2`'deki "Elektirik" yazım hatası. İngilizce kazanımlar programdaki gibi İngilizcedir. Açıklama satırları (a, b, c…) alınmadı.
+- MEB yeni bir 8. sınıf programı veya LGS kapsam değişikliği yayımlarsa yeni sürümlü bir dosya hazırlanır; eski kazanımlar yöneticide "eski sürüm" yapılır.
+
+## Günlük çalışma ve hedefler (Faz 6)
+
+Öğrenci kendi çalışmasını kaydeder ve hedefini seçer. Veli, aktif bağlantısı varsa bunları okur; yazamaz. Yönetici rolü ek erişim vermez.
+
+| Katman | Dosyalar | Görev |
+| --- | --- | --- |
+| Takvim | `src/features/study/calendar.ts` | Europe/Istanbul sivil günü, pazartesi başlangıçlı hafta, karşılaştırma aralıkları. |
+| Kurallar | `schemas.ts`, `placement.ts`, `summary.ts`, `commit-log.ts`, `access.ts` | Soru sayısı kuralları, katalog yerleşimi, özet, tek gönderim, kim yazabilir. Supabase'i bilmez. |
+| Adaptör | `src/services/supabase/study-store.ts` | Okuma ve yazma oturumdaki kullanıcı olarak yapılır, böylece RLS ikinci savunma katmanı olur. |
+| Sayfalar | `/ogrenci`, `/ogrenci/calisma`, `/ogrenci/calisma/yeni`, `/ogrenci/calisma/[logId]`, `/ogrenci/hedefler`, `/veli/ogrenci/[studentId]` | Hızlı kayıt, ayrıntılı form, düzenleme/silme, hedef, iki aralığın karşılaştırması. Veli ekranı salt okunur. |
+
+- **Gün.** `studied_on` öğrencinin seçtiği İstanbul takvim günüdür. Varsayılan bugündür. İleri tarih ve 1 Eylül 2024'ten eski tarih hem şemada hem tetikleyicide reddedilir. Hesap `Europe/Istanbul` kuşağıyla yapılır; bugün bu kuşak UTC+3 olduğu için gece yarısı 21:00 UTC'dir.
+- **Sayılar.** Doğru, yanlış ve boş eksi olamaz; toplamları soru sayısına eşittir. Bir kayıtta en az 1, en fazla 500 soru vardır. Süre 0–1440 dakikadır. Ölçülmemiş süre 0 yazılabilir.
+- **Konu.** İsteğe bağlıdır. Seçilen konu veya kazanım dersle eşleşmeli ve yeni seçimde eski sürüm olmamalıdır. Kayıt zaten eski bir sürüme bağlıysa, sayılar değişirken o bağ kalabilir.
+- **Tek gönderim.** Form, sayfa açılınca bir `request_id` üretir. Aynı kimlik ve aynı içerik ikinci kez gelirse yeni satır açılmaz. İçerik farklıysa kayıt reddedilir; sessizce üzerine yazılmaz.
+- **Hedef.** Birimi soru sayısıdır, dakika değil. Günlük hedef o İstanbul gününü, haftalık hedef pazartesiden pazara kadar olan günleri sayar. `subject_id` boşsa tüm dersler birlikte sayılır. Aynı dönem ve ders yeniden kaydedilince satır güncellenir. İlerleme çubuğunun yanında tarih aralığı ve "soru" birimi yazılır.
+- **Karşılaştırma.** Varsayılan, bu haftanın bugüne kadarki günleri ile bir önceki tam haftadır. Aralıklar ve birim (soru ve dakika) ekranda yazılıdır. Özel aralık en fazla 370 gündür ve bugünden ileri gidemez.
+- **Veli.** Bağlı öğrencinin bu haftaki kayıtlarını ve hedeflerini görür. Değiştiremez. Haftalık PDF ve aylık özet Faz 11'dedir.
+- Bu migration yerelde uygulandı. Production'a `supabase db push` proje sahibi onayından sonra yapılır. Yeni tablolardır; mevcut satırlar değişmez. Staging ertelendiği için orada henüz yoktur.
+
 ### Henüz uygulanmayanlar
 
 - Bitmiş bağlantı, `audit_events` ve süresi dolan oran sınırı kayıtlarının saklama süresine göre otomatik silinmesi (karar 0.5: 1 yıl). Silme işi Faz 12'deki yedekleme betikleriyle birlikte planlanacak.
-- Gerçek müfredat verisi (proje sahibi yükleyecek), net hesaplama kuralları, hedefler, günlük kayıt ve deneme formları.
+- Net hesaplama kuralları ve deneme formları.
 - Koçluk motoru, yapay zekâ adaptörü, karakter puanları, bildirimler, içe aktarma, PDF/DOCX raporlar.
 - PWA manifesti ve simgeler, nonce tabanlı CSP, hata izleme.
 - Staging Supabase projesi, Preview ortam değişkenleri ve Vercel–GitHub bağlantısı (durum yukarıda).
+- Faz 6 migration'ının production'a uygulanması (proje sahibi onayı).

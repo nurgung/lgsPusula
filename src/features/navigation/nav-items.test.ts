@@ -6,7 +6,13 @@ const hrefs = (roles: Parameters<typeof getNavItems>[0]) =>
 
 describe("getNavItems", () => {
   it("gives a student the home page, topic list and account page", () => {
-    expect(hrefs(["student"])).toEqual(["/ogrenci", "/ogrenci/konular", "/hesap"]);
+    expect(hrefs(["student"])).toEqual([
+      "/ogrenci",
+      "/ogrenci/calisma",
+      "/ogrenci/hedefler",
+      "/ogrenci/konular",
+      "/hesap",
+    ]);
   });
 
   it("does not show the admin page to a parent without the admin role", () => {
@@ -39,8 +45,6 @@ describe("getNavItems", () => {
 
   it("still refuses a menu that would not fit on a 320 px screen", () => {
     expect(MAX_NAV_ITEMS).toBe(5);
-    expect(getNavItems(["student", "parent", "admin"]).length).toBeLessThanOrEqual(
-      MAX_NAV_ITEMS,
-    );
+    expect(() => getNavItems(["student", "parent", "admin"])).toThrow(/at most 5/);
   });
 });

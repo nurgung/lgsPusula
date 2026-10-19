@@ -14,7 +14,7 @@ Migration: `supabase/migrations/20261012120000_auth_foundation.sql`. Yerel yapı
 | `consume_rate_limit(key, max, window)` | Bir denemeyi atomik sayar; `allowed`, `retry_after_seconds` döner                                                                                                          | Çalıştıramaz                                                                                                                                     | Çalıştırır                                  |
 | `reset_rate_limit(key)`                | Başarılı girişten sonra kullanıcı adı sayacını siler                                                                                                                       | Çalıştıramaz                                                                                                                                     | Çalıştırır                                  |
 
-Rol kısıtları veri tabanında da vardır: öğrenci rolü başka bir rolle birleşemez; `admin` yalnızca `parent` ile birlikte verilir (karar 0.13). Zaman alanları `timestamptz` (UTC) tutulur; gün sınırı hesapları Faz 6'da Europe/Istanbul'a göre yapılacak.
+Rol kısıtları veri tabanında da vardır: öğrenci rolü başka bir rolle birleşemez; `admin` yalnızca `parent` ile birlikte verilir (karar 0.13). Zaman alanları `timestamptz` (UTC) tutulur. Günlük çalışma kaydının günü ayrıca `studied_on date` alanındadır ve Europe/Istanbul sivil günüdür (Faz 6).
 
 `audit_events` içine parola, belirteç, davet kodu, açık kullanıcı adı veya IP yazılmaz. Uygulama tarafında olay tipleri ve `metadata` alanları kapalı bir listeyle sınırlıdır (`src/features/auth/ports.ts`).
 
@@ -44,10 +44,20 @@ Migration: `supabase/migrations/20261013130000_curriculum_catalog.sql`. Her sat�
 
 Kullanıcılara silme yetkisi verilmez. `anon` rolünün katalogda hiçbir yetkisi yoktur. Okuma ve yazma politikaları ayrıdır; sütun düzeyindeki `grant` ifadeleri `id`, üst kayıt kimliği ve zaman alanlarının kullanıcı tarafından yazılmasını engeller.
 
+## Uygulanan şema (Faz 6)
+
+Migration: `supabase/migrations/20261019150000_study_records.sql`. `studied_on` bir `date` alanıdır ve Europe/Istanbul sivil gününü tutar. Diğer zaman alanları `timestamptz` (UTC) kalır. Hafta pazartesi başlar, pazar biter. Hedef birimi soru sayısıdır.
+
+| Tablo | Alanlar | Erişim (`authenticated`) | Erişim (`service_role`) |
+| --- | --- | --- | --- |
+| `study_logs` | `student_id`, `studied_on`, `subject_id`, isteğe bağlı `topic_id` / `learning_outcome_id`, soru sayıları, `duration_minutes` (0–1440), `request_id`, zamanlar | Öğrenci kendi satırını ekler, okur, günceller ve siler. Aktif bağlantısı olan veli yalnızca okur. `student_id` ve `request_id` güncellenemez. | Okur/yazar/siler |
+| `study_goals` | `student_id`, `period` (`day`/`week`), isteğe bağlı `subject_id` (boş = tüm dersler), `target_questions` (1–2000) | Aynı okuma/yazma kuralı. Öğrenci başına bir dönem ve ders için tek satır (`unique nulls not distinct`). | Okur/yazar/siler |
+
+Soru sayıları eksi olamaz; doğru + yanlış + boş, soru sayısına eşittir ve en az 1'dir. İleri tarih ve 1 Eylül 2024'ten eski tarih tetikleyiciyle reddedilir. Konu seçilen derse, kazanım o konuya ait olmalıdır. Aynı `(student_id, request_id)` ikinci satır açmaz. Katalog satırı silinemez (`on delete restrict`); hesap silinince öğrencinin kayıtları silinir (`on delete cascade`). Yönetici rolü bu tablolara ek erişim vermez.
+
 ## Önerilen tablolar
 
-- `study_logs`: öğrenci kimliği, tarih, ders, konu/kazanım opsiyonu, soru sayıları, süre, oluşturma/güncelleme zamanı.
-- `study_goals`: öğrenci, dönem, ders veya genel hedef, hedef değeri.
+- `study_logs` ve `study_goals`: Faz 6'da uygulandı (yukarıya bakın).
 - `exams`: öğrenci, deneme adı, tarih, tür ve net kuralı referansı.
 - `exam_subject_results`: deneme, ders, doğru/yanlış/boş, hesaplanan net.
 - `exam_mistakes`: deneme sonucu, kazanım, yanlış/boş türü; veri kaynağı ve güven düzeyi.

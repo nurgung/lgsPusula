@@ -17,8 +17,8 @@
 | 2 | Tasarım sistemi ve CI | Devam ediyor — Vercel production `https://lgs-pusula.vercel.app` HTTPS ve güvenlik başlıklarıyla açık; staging (ertelendi), Vercel–GitHub bağlantısı ve `braces` yaması (hâlâ yok) bekliyor |
 | 3 | Veri tabanı ve kimlik doğrulama | Devam ediyor — production Supabase (Frankfurt) kuruldu, kayıt kapalı, CI yeşil; staging projesi (ertelendi) ve production aile hesapları (proje sahibi) bekliyor |
 | 4 | Roller ve veli-öğrenci ilişkisi | Tamamlandı — yerel testler ve CI geçti; migration production'a uygulandı (13 Ekim 2026) |
-| 5 | Müfredat kataloğu | Devam ediyor — kod, yerel testler ve CI tamam; production migration'ı ve gerçek katalog verisi (proje sahibi) bekliyor |
-| 6 | Günlük çalışma kayıtları ve hedefler | Başlanmadı |
+| 5 | Müfredat kataloğu | Tamamlandı — kod, yerel testler ve CI tamam; migration ve MEB 8. sınıf kataloğu (326 kazanım) production'da (14 Ekim 2026) |
+| 6 | Günlük çalışma kayıtları ve hedefler | Devam ediyor — kod, yerel testler ve yerel migration tamam (19 Ekim 2026); production migration proje sahibi onayı bekliyor |
 | 7 | Deneme sınavları ve net hesabı | Başlanmadı |
 | 8 | Kazanım analizi ve grafikler | Başlanmadı |
 | 9 | Kural tabanlı koçluk | Başlanmadı |
@@ -206,12 +206,14 @@
 **Not:** Proje sahibinin onayıyla 13 Ekim 2026'da başlandı. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ("Müfredat kataloğu"), [docs/DATABASE.md](docs/DATABASE.md), [AUTHORIZATION.md](AUTHORIZATION.md).
 
 **İşler**
-- [ ] 5.1 `subjects`, `topics`, `learning_outcomes` migration'ları (kaynak sürümü dahil)
+- [x] 5.1 `subjects`, `topics`, `learning_outcomes` migration'ları (kaynak sürümü dahil)
   - [x] 5.1.1 `20261013130000_curriculum_catalog.sql`: kaynak adı/sürümü ve giriş tarihi her satırda; silme yok, `archived_at` ile "eski sürüm"; konu/kazanım taşınamaz; RLS okuma/yazma ayrı, yazma yalnızca yönetici + TOTP (`is_catalog_admin()`). Yerelde uygulandı ve testlendi
   - [x] 5.1.2 Push sonrası CI'da yeşil çalışma — `c189cc5`, [çalışma 38538837112](https://github.com/nurgung/lgsPusula/actions/runs/38538837112)
-  - [ ] 5.1.3 Production'a `supabase db push` (proje sahibinin onayıyla)
+  - [x] 5.1.3 Production'a `supabase db push` (proje sahibinin onayıyla) — önce `--dry-run` ile yalnızca bu migration'ın gideceği görüldü; uygulandı, `supabase migration list --linked` üç migration'ı da eşit gösteriyor (14 Ekim 2026)
 - [x] 5.2 Katalog verisini yükleme betiği — `npm run catalog -- import <dosya.json> [--dry-run]`; ortak şemayla doğrulama, plan + "evet" onayı, tekrar yüklemede çift kayıt yok (yerelde 6/9/11 satırla iki kez denendi), kazanım taşınmaya çalışılırsa hiçbir şey yazmadan durur; `"example": true` dosyalar yalnızca yerel Supabase'e yüklenir
-  - [ ] 5.2.1 Gerçek MEB 8. sınıf / LGS katalog dosyasını hazırla ve yükle (proje sahibi, karar 0.6). Depodaki `data/catalog/ornek-katalog.json` kurgusaldır
+  - [x] 5.2.1 Gerçek MEB 8. sınıf / LGS katalog dosyasını hazırla ve yükle (proje sahibi, karar 0.6). Depodaki `data/catalog/ornek-katalog.json` kurgusaldır
+    - [x] 5.2.1.a `data/catalog/meb-8-sinif-2026-2027.json`: 2026-2027'de 8. sınıfta geçerli MEB programlarının resmî PDF'lerinden 6 ders, 45 konu, 326 kazanım; ders başına sayılar program tablolarıyla aynı (birim test). Yerel Supabase'e yüklendi, ikinci yüklemede yeni satır oluşmadı (14 Ekim 2026). Kaynaklar ve kod uyarlamaları: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+    - [x] 5.2.1.b Proje sahibinin onayıyla production'a yüklendi: 6 ders, 45 konu, 326 kazanım; ikinci deneme çalıştırması 0 yeni satır gösterdi (14 Ekim 2026). İçerik düzeltmeleri `/yonetici/mufredat` ekranından yapılabilir
 - [x] 5.3 Yönetici için katalog ekleme/düzenleme ekranı — `/yonetici/mufredat` ve `/yonetici/mufredat/[subjectId]`: ekleme, düzenleme, eski sürüm yapma/geri alma; her değişiklik `audit_events`'e yazılır
 - [x] 5.4 Öğrenci için aranabilir konu/kazanım seçici bileşeni — `CurriculumPicker` (Türkçe karaktere duyarsız arama, yerleşik radyo düğmeleriyle klavye erişimi, eski sürümler gösterilmez); `/ogrenci/konular` sayfasında kullanılıyor, Faz 6 formunda da kullanılacak
 
@@ -227,22 +229,29 @@
 **Amaç:** Öğrencinin günlük çalışmasını kaydedip hedefini takip etmesi.
 **Ön koşul:** Faz 5
 
+**Not:** Proje sahibinin onayıyla 19 Ekim 2026'da başlandı. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ("Günlük çalışma ve hedefler"), [docs/DATABASE.md](docs/DATABASE.md), [AUTHORIZATION.md](AUTHORIZATION.md).
+
+**Kararlar (bu fazda, güvenli varsayım):** Hedef birimi soru sayısıdır. Süre dakika olarak kaydedilir ama hedefe sayılmaz. Hafta pazartesi başlar, pazar biter. Gün sınırı Europe/Istanbul gece yarısıdır. `studied_on` öğrencinin seçtiği İstanbul takvim günüdür; ileri tarih ve 1 Eylül 2024'ten eski tarih yazılamaz.
+
 **İşler**
-- [ ] 6.1 Saat dilimi kararını uygula (Europe/Istanbul) ve gün sınırı yardımcılarını yaz
-- [ ] 6.2 Ortak doğrulama şeması: negatif değer yok, doğru + yanlış + boş = soru sayısı
-- [ ] 6.3 `study_logs` migration'ı
-- [ ] 6.4 Günlük kayıt formu (ders, isteğe bağlı konu/kazanım, soru, doğru, yanlış, boş, süre)
-- [ ] 6.5 Kayıt düzenleme ve silme (onaylı)
-- [ ] 6.6 `study_goals` migration'ı; günlük/haftalık hedef belirleme
-- [ ] 6.7 Öğrenci ana sayfası: bugünün hedefi, ilerleme, hızlı kayıt
-- [ ] 6.8 Geçmiş dönemle karşılaştırma (tarih aralığı ve birim gösterilir)
+- [x] 6.1 Saat dilimi kararını uygula (Europe/Istanbul) ve gün sınırı yardımcılarını yaz — `src/features/study/calendar.ts`; 20:59 UTC aynı gün, 21:00 UTC ertesi gün
+- [x] 6.2 Ortak doğrulama şeması: negatif değer yok, doğru + yanlış + boş = soru sayısı — `src/features/study/schemas.ts`; en az 1 soru, süre 0–1440 dakika
+- [x] 6.3 `study_logs` migration'ı
+  - [x] 6.3.1 `20261019150000_study_records.sql` yerelde uygulandı ve test edildi (19 Ekim 2026). Yeni tablolar; mevcut satırlar değişmez
+  - [ ] 6.3.2 Production'a `supabase db push` (proje sahibi onayı). Staging 3.1.2.b ile birlikte ertelendi
+- [x] 6.4 Günlük kayıt formu (ders, isteğe bağlı konu/kazanım, soru, doğru, yanlış, boş, süre) — `/ogrenci/calisma/yeni` ve ana sayfadaki hızlı kayıt
+- [x] 6.5 Kayıt düzenleme ve silme (onaylı) — `/ogrenci/calisma/[logId]`
+- [x] 6.6 `study_goals` migration'ı; günlük/haftalık hedef belirleme — aynı migration; `/ogrenci/hedefler`. Aynı dönem ve ders için yeniden kaydetmek hedefi günceller, ikinci satır açmaz
+- [x] 6.7 Öğrenci ana sayfası: bugünün hedefi, ilerleme, hızlı kayıt
+- [x] 6.8 Geçmiş dönemle karşılaştırma (tarih aralığı ve birim gösterilir) — `/ogrenci/calisma` içinde; varsayılan bu haftanın bugüne kadarki günleri ve geçen hafta; birim soru ve dakika
 
 **Bitti sayılması için**
-- [ ] Negatif ve tutarsız toplamlar sunucuda reddedilir (birim test)
-- [ ] Gece yarısı ve saat dilimi sınırları test edilir
-- [ ] Günlük özet, kayıtlarla aynı sonucu verir (test)
-- [ ] Çift tıklama çift kayıt oluşturmaz
-- [ ] Tüm kayıt uçlarında yetki testleri geçer
+- [x] Negatif ve tutarsız toplamlar sunucuda reddedilir (birim test) — `schemas.test.ts`; veri tabanı kısıtı `tests/e2e/study.spec.ts`
+- [x] Gece yarısı ve saat dilimi sınırları test edilir — `calendar.test.ts`
+- [x] Günlük özet, kayıtlarla aynı sonucu verir (test) — `summary.test.ts`
+- [x] Çift tıklama çift kayıt oluşturmaz — `commit-log.test.ts` ve aynı `request_id` ile ikinci eklemenin reddi (uçtan uca)
+- [x] Tüm kayıt uçlarında yetki testleri geçer — `access.test.ts` ve `tests/e2e/study.spec.ts` (öğrenci A/B, velisiz, aktif veli, iptal, yönetici rolü ek erişim vermez; 320 px ve masaüstü)
+- [x] 19 Ekim 2026 doğrulama: 206 birim testi geçti. Çalışma uçtan uca testleri ve erişim testleri yerelde geçti. Lint ve tip kontrolü geçti. Production migration uygulanmadı
 
 ---
 

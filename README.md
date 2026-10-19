@@ -4,7 +4,7 @@ LGS Pusula; 8. sınıf öğrencilerinin günlük çalışmalarını, deneme sın
 
 > **Kullanım kapsamı:** Uygulama yalnızca aile içinde kullanılır: proje sahibi (veli + yönetici) ve çocuğu (öğrenci). Herkese açık kayıt yoktur. Ayrıntı: [docs/DECISIONS.md](docs/DECISIONS.md) (0.13).
 
-> **Proje durumu:** Faz 0 ve Faz 1 tamamlandı. Faz 2'de staging (ertelendi) ve Vercel–GitHub bağlantısı bekliyor. Faz 3'te kimlik doğrulama yerelde ve production'da var; aile hesapları production'da henüz oluşturulmadı. Faz 4'te roller, veli-öğrenci bağlantısı ve yönetici MFA'sı yerelde uygulandı; production veri tabanına yeni migration proje sahibi tarafından uygulanacak. Günlük çalışma, deneme ve koçluk henüz yoktur. İlerleme [roadmap.md](roadmap.md) içinde izlenir. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+> **Proje durumu:** Faz 0, 1, 4 ve 5 tamamlandı. Faz 2'de staging ve Vercel–GitHub bağlantısı, Faz 3'te production aile hesapları bekliyor. Faz 6'da günlük çalışma ve hedefler yerelde hazır; production migration proje sahibi onayı bekliyor. Deneme ve koçluk henüz yoktur. İlerleme [roadmap.md](roadmap.md) içinde izlenir. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Ürün hedefleri
 
@@ -74,9 +74,10 @@ npm run accounts -- setup                          # kurgusal veli + öğrenci h
 npm run accounts -- reset-password <kullanici_adi> # yeni geçici parola, tüm oturumları kapatır
 npm run db:reset                                   # yerel veri tabanını sıfırlar
 npm run catalog -- import data/catalog/ornek-katalog.json   # kurgusal ÖRNEK müfredatı yükler (yalnızca yerelde)
+npm run catalog -- import data/catalog/meb-8-sinif-2026-2027.json   # MEB 8. sınıf kazanımları (2026-2027)
 ```
 
-Betikler hedef Supabase adresini gösterir ve "evet" yazılmadan yazma yapmaz. Yerelde yalnızca kurgusal ad kullanın. `data/catalog/ornek-katalog.json` gerçek MEB programı değildir; betik bu dosyayı yerel Supabase dışına yüklemeyi reddeder. Gerçek katalog dosyasının biçimi [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) içinde ("Müfredat kataloğu").
+Betikler hedef Supabase adresini gösterir ve "evet" yazılmadan yazma yapmaz. Yerelde yalnızca kurgusal ad kullanın. `data/catalog/ornek-katalog.json` gerçek MEB programı değildir; betik bu dosyayı yerel Supabase dışına yüklemeyi reddeder. Gerçek katalog `data/catalog/meb-8-sinif-2026-2027.json`; kaynakları ve dosya biçimi [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) içinde ("Müfredat kataloğu").
 
 ## Önerilen depo yapısı
 

@@ -24,6 +24,7 @@ export function CurriculumPicker({
   legend = "Konu veya kazanım",
   optional = false,
   defaultValue = "",
+  fixedSubjectId,
   onChange,
 }: {
   /** Pass only rows that are not archived. */
@@ -32,6 +33,11 @@ export function CurriculumPicker({
   legend?: string;
   optional?: boolean;
   defaultValue?: string;
+  /**
+   * When the page already asked for a subject, lock the search to it and hide the
+   * second subject field. An empty query then lists that subject's topics.
+   */
+  fixedSubjectId?: string;
   onChange?: (selection: CatalogSelection | null) => void;
 }) {
   const prefix = useId();
@@ -41,9 +47,10 @@ export function CurriculumPicker({
     decodeSelection(defaultValue) ? defaultValue : "",
   );
 
+  const activeSubjectId = fixedSubjectId || subjectId;
   const { results, total } = useMemo(
-    () => searchCatalog(catalog, { query, subjectId: subjectId || undefined }),
-    [catalog, query, subjectId],
+    () => searchCatalog(catalog, { query, subjectId: activeSubjectId || undefined }),
+    [catalog, query, activeSubjectId],
   );
   const selection = decodeSelection(selected);
   const selectedItem = selection ? describeSelection(catalog, selection) : null;
@@ -53,7 +60,7 @@ export function CurriculumPicker({
     onChange?.(decodeSelection(value));
   };
 
-  const idle = !subjectId && query.trim() === "";
+  const idle = !activeSubjectId && query.trim() === "";
   const status = idle
     ? "Bir ders seç ya da aramaya başla."
     : total === 0
@@ -83,18 +90,20 @@ export function CurriculumPicker({
         />
       ) : (
         <>
-          <SelectField
-            id={`${prefix}-ders`}
-            label="Ders"
-            optional
-            placeholder="Tüm dersler"
-            options={catalog.map((subject) => ({
-              value: subject.id,
-              label: subject.name,
-            }))}
-            value={subjectId}
-            onChange={(event) => setSubjectId(event.target.value)}
-          />
+          {fixedSubjectId ? null : (
+            <SelectField
+              id={`${prefix}-ders`}
+              label="Ders"
+              optional
+              placeholder="Tüm dersler"
+              options={catalog.map((subject) => ({
+                value: subject.id,
+                label: subject.name,
+              }))}
+              value={subjectId}
+              onChange={(event) => setSubjectId(event.target.value)}
+            />
+          )}
           <TextField
             id={`${prefix}-ara`}
             type="search"

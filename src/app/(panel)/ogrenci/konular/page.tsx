@@ -25,7 +25,7 @@ async function StudentTopics() {
     <>
       <PageHeader
         title="Konular"
-        description="Derslerin konularını ve kazanımlarını burada bulabilirsin. Çalışma kaydı ekleme sonraki aşamada gelecek; orada da bu listeden seçeceksin."
+        description="Derslerin konularını ve kazanımlarını burada bulabilirsin. Çalışma kaydına konu eklerken de bu listeden seçersin."
       />
       <TopicBrowser catalog={catalog} />
     </>

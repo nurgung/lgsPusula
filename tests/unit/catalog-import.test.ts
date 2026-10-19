@@ -58,6 +58,27 @@ describe("parseCatalogFile", () => {
     expect(result.ok).toBe(true);
     expect(result.ok && result.file.example).toBe(true);
   });
+
+  it("accepts the MEB 8th grade catalog with the outcome counts from the programme tables", async () => {
+    const text = await readFile("data/catalog/meb-8-sinif-2026-2027.json", "utf8");
+    const result = parseCatalogFile(text);
+    if (!result.ok) throw new Error(result.errors.join("\n"));
+    expect(result.file.example).toBe(false);
+    const counts = Object.fromEntries(
+      result.file.subjects.map((subject) => [
+        subject.code,
+        subject.topics.reduce((sum, topic) => sum + topic.outcomes.length, 0),
+      ]),
+    );
+    expect(counts).toEqual({
+      turkce: 76,
+      matematik: 52,
+      fen_bilimleri: 61,
+      inkilap_tarihi: 39,
+      din_kulturu: 28,
+      ingilizce: 70,
+    });
+  });
 });
 
 describe("isLocalSupabase", () => {

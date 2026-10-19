@@ -61,6 +61,13 @@ Uygulamada iki hesap vardır ([docs/DECISIONS.md](docs/DECISIONS.md), 0.13): pro
 - Her değişiklik `admin.catalog_change` olarak denetim kaydına yazılır (yalnızca varlık türü ve işlem; ad veya metin yazılmaz). Yetkisiz deneme `blocked` kaydı bırakır.
 - Doğrulama: `tests/e2e/catalog.spec.ts` (girişsiz, öğrenci, veli, TOTP'siz yönetici ve TOTP'li yönetici; 320 px ve masaüstü), `src/features/curriculum/catalog-change.test.ts`.
 
+**Faz 6**
+
+- Günlük kayıt ve hedef (`study_logs`, `study_goals`) yazması yalnızca öğrenci hesabınadır. Öğrenci kimliği oturumdan alınır; formdan gelen bir öğrenci kimliğine güvenilmez (`canWriteStudyRecord`).
+- Okuma, diğer öğrenci kayıtlarıyla aynı kuraldır (`canReadStudyRecord` / `canReadStudentRecord`): öğrenci yalnız kendini, veli yalnız aktif bağlantısındaki öğrenciyi okur. Yönetici rolü bu erişimi genişletmez. Veli yazamaz.
+- Veri tabanı aynı kuralı RLS ile tekrarlar. Yazma oturumdaki kullanıcıyla yapılır, `service_role` ile değil. Veli sayfası (`/veli/ogrenci/[studentId]`) bu haftanın kayıtlarını ve hedeflerini salt okunur gösterir.
+- Doğrulama: `tests/e2e/study.spec.ts` (öğrenci A başka öğrencinin satırını okuyamaz ve onun adına yazamaz; bağlantısız veli ve yönetici okuyamaz; aktif veli okur ama yazamaz; ilişki kalkınca okuma biter; 320 px ve masaüstü), `src/features/study/access.test.ts`.
+
 ## Veli-öğrenci ilişkilendirme akışı
 
 Karar ve gerekçe: [docs/DECISIONS.md](docs/DECISIONS.md) (0.4).
