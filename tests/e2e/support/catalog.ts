@@ -83,6 +83,31 @@ export async function deleteE2eCatalog() {
   if (removedGoals.error) {
     throw new Error(`deleting e2e study goals failed (${removedGoals.error.code})`);
   }
+  const { data: examSubjects, error: examSubjectError } = await client
+    .from("exam_subject_results")
+    .select("exam_id")
+    .in("subject_id", subjectIds);
+  if (examSubjectError) {
+    throw new Error(`reading e2e exam subjects failed (${examSubjectError.code})`);
+  }
+  const examIds = [
+    ...new Set((examSubjects ?? []).map((row: { exam_id: string }) => row.exam_id)),
+  ];
+  if (examIds.length > 0) {
+    const removedExamSubjects = await client
+      .from("exam_subject_results")
+      .delete()
+      .in("exam_id", examIds);
+    if (removedExamSubjects.error) {
+      throw new Error(
+        `deleting e2e exam subjects failed (${removedExamSubjects.error.code})`,
+      );
+    }
+    const removedExams = await client.from("exams").delete().in("id", examIds);
+    if (removedExams.error) {
+      throw new Error(`deleting e2e exams failed (${removedExams.error.code})`);
+    }
+  }
 
   const { data: topics, error: topicError } = await client
     .from("topics")

@@ -55,11 +55,20 @@ Migration: `supabase/migrations/20261019150000_study_records.sql`. `studied_on` 
 
 Soru sayıları eksi olamaz; doğru + yanlış + boş, soru sayısına eşittir ve en az 1'dir. İleri tarih ve 1 Eylül 2024'ten eski tarih tetikleyiciyle reddedilir. Konu seçilen derse, kazanım o konuya ait olmalıdır. Aynı `(student_id, request_id)` ikinci satır açmaz. Katalog satırı silinemez (`on delete restrict`); hesap silinince öğrencinin kayıtları silinir (`on delete cascade`). Yönetici rolü bu tablolara ek erişim vermez.
 
+## Uygulanan şema (Faz 7)
+
+Migration: `supabase/migrations/20261019160000_exams.sql`. `taken_on` Europe/Istanbul sivil günüdür. Net değerleri uygulamada hesaplanır ve satıra yazılır; `rule_version` hangi kuralın kullanıldığını tutar.
+
+| Tablo | Alanlar | Erişim (`authenticated`) | Erişim (`service_role`) |
+| --- | --- | --- | --- |
+| `exams` | `student_id`, `title` (1–80), `taken_on`, `exam_type` (`lgs_full`/`branch`), `rule_version`, `total_net` (≥ 0), `request_id`, zamanlar | Öğrenci kendi satırını ekler, okur, günceller ve siler. Aktif bağlantısı olan veli yalnızca okur. `student_id` ve `request_id` güncellenemez. | Okur/yazar/siler |
+| `exam_subject_results` | `exam_id`, `subject_id`, soru sayıları (1–100 / 0–100), `net` (eksi olabilir) | Aynı sahiplik kuralı; satırlar üst denemeye bağlıdır. Ders başına bir satır. | Okur/yazar/siler |
+
+Doğru + yanlış + boş = soru sayısı. Aynı `(student_id, request_id)` ikinci deneme açmaz. Katalog satırı silinemez (`on delete restrict`); deneme silinince ders satırları silinir (`on delete cascade`).
+
 ## Önerilen tablolar
 
-- `study_logs` ve `study_goals`: Faz 6'da uygulandı (yukarıya bakın).
-- `exams`: öğrenci, deneme adı, tarih, tür ve net kuralı referansı.
-- `exam_subject_results`: deneme, ders, doğru/yanlış/boş, hesaplanan net.
+- `study_logs`, `study_goals`, `exams`, `exam_subject_results`: uygulandı (yukarıya bakın).
 - `exam_mistakes`: deneme sonucu, kazanım, yanlış/boş türü; veri kaynağı ve güven düzeyi.
 - `mascot_profiles`: öğrenci, seçilen karakter ve aşama.
 - `reward_events`: öğrenci, olay türü, puan ve idempotency anahtarı.

@@ -5,12 +5,12 @@ const hrefs = (roles: Parameters<typeof getNavItems>[0]) =>
   getNavItems(roles).map((item) => item.href);
 
 describe("getNavItems", () => {
-  it("gives a student the home page, topic list and account page", () => {
+  it("gives a student the home page, exams, goals and account page", () => {
     expect(hrefs(["student"])).toEqual([
       "/ogrenci",
       "/ogrenci/calisma",
+      "/ogrenci/denemeler",
       "/ogrenci/hedefler",
-      "/ogrenci/konular",
       "/hesap",
     ]);
   });

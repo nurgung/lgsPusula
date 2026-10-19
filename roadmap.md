@@ -19,7 +19,7 @@
 | 4 | Roller ve veli-öğrenci ilişkisi | Tamamlandı — yerel testler ve CI geçti; migration production'a uygulandı (13 Ekim 2026) |
 | 5 | Müfredat kataloğu | Tamamlandı — kod, yerel testler ve CI tamam; migration ve MEB 8. sınıf kataloğu (326 kazanım) production'da (14 Ekim 2026) |
 | 6 | Günlük çalışma kayıtları ve hedefler | Tamamlandı — kod, yerel testler ve CI; migration production'a uygulandı (19 Ekim 2026) |
-| 7 | Deneme sınavları ve net hesabı | Başlanmadı |
+| 7 | Deneme sınavları ve net hesabı | Devam ediyor — kod, yerel testler ve yerel migration tamam (19 Ekim 2026); production migration proje sahibi onayı bekliyor |
 | 8 | Kazanım analizi ve grafikler | Başlanmadı |
 | 9 | Kural tabanlı koçluk | Başlanmadı |
 | 10 | Karakter, görev ve bildirimler | Başlanmadı |
@@ -261,17 +261,20 @@
 **Ön koşul:** Faz 6, karar 0.7
 
 **İşler**
-- [ ] 7.1 Net hesabını tek merkezi fonksiyonda, deneme türüne bağlı yaz; kural sürümünü kaydet
-- [ ] 7.2 `exams` ve `exam_subject_results` migration'ları
-- [ ] 7.3 Deneme oluşturma ve ders bazında sonuç girişi formu
-- [ ] 7.4 Deneme listesi ve detay sayfası (mobilde kart görünümü)
-- [ ] 7.5 Deneme düzenlendiğinde netin yeniden hesaplanması
+- [x] 7.1 Net hesabını tek merkezi fonksiyonda, deneme türüne bağlı yaz; kural sürümünü kaydet — `src/features/exams/net-rules.ts` (`lgs-v1`); `computeExamNets`
+- [x] 7.2 `exams` ve `exam_subject_results` migration'ları
+  - [x] 7.2.1 `20261019160000_exams.sql` yerelde uygulandı ve test edildi (19 Ekim 2026). Yeni tablolar; mevcut satırlar değişmez
+  - [ ] 7.2.2 Production'a `supabase db push` (proje sahibi onayı). Staging 3.1.2.b ile birlikte ertelendi
+- [x] 7.3 Deneme oluşturma ve ders bazında sonuç girişi formu — `/ogrenci/denemeler/yeni` (`lgs_full` ve `branch`)
+- [x] 7.4 Deneme listesi ve detay sayfası (mobilde kart görünümü) — `/ogrenci/denemeler`, `/ogrenci/denemeler/[examId]`; ders netleri tablosu + kart liste
+- [x] 7.5 Deneme düzenlendiğinde netin yeniden hesaplanması — düzenleme `buildExamPayload` / `computeExamNets` ile yeniden hesaplar; kural sürümü korunur
 
 **Bitti sayılması için**
-- [ ] Net hesabı her deneme türü için birim testlerle doğrulanır
-- [ ] Eksi ders netinin toplama katıldığı ve eksi toplam netin 0 alındığı birim testlerle doğrulanır
-- [ ] Deneme düzenleme, özetleri tutarlı günceller (test)
-- [ ] Yetki testleri geçer
+- [x] Net hesabı her deneme türü için birim testlerle doğrulanır — `net-rules.test.ts`
+- [x] Eksi ders netinin toplama katıldığı ve eksi toplam netin 0 alındığı birim testlerle doğrulanır — aynı dosya + karar 0.7 örneği
+- [x] Deneme düzenleme, özetleri tutarlı günceller (test) — `tests/e2e/exams.spec.ts` (0 → 5 net)
+- [x] Yetki testleri geçer — `access.test.ts` ve `tests/e2e/exams.spec.ts` (öğrenci A/B, aktif veli okur yazamaz, iptal sonrası erişim biter; 320 px ve masaüstü)
+- [x] 19 Ekim 2026 doğrulama: exam birim testleri, lint, tip kontrolü ve `tests/e2e/exams.spec.ts` yerelde geçti. Production migration uygulanmadı
 
 ---
 

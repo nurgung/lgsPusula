@@ -68,6 +68,13 @@ Uygulamada iki hesap vardır ([docs/DECISIONS.md](docs/DECISIONS.md), 0.13): pro
 - Veri tabanı aynı kuralı RLS ile tekrarlar. Yazma oturumdaki kullanıcıyla yapılır, `service_role` ile değil. Veli sayfası (`/veli/ogrenci/[studentId]`) bu haftanın kayıtlarını ve hedeflerini salt okunur gösterir.
 - Doğrulama: `tests/e2e/study.spec.ts` (öğrenci A başka öğrencinin satırını okuyamaz ve onun adına yazamaz; bağlantısız veli ve yönetici okuyamaz; aktif veli okur ama yazamaz; ilişki kalkınca okuma biter; 320 px ve masaüstü), `src/features/study/access.test.ts`.
 
+**Faz 7**
+
+- Deneme (`exams`, `exam_subject_results`) yazması yalnızca öğrenci hesabınadır (`canWriteExam`). Öğrenci kimliği oturumdan alınır.
+- Okuma `canReadExam` / `canReadStudentRecord` ile aynıdır. Yönetici rolü ek erişim vermez. Veli yazamaz.
+- RLS aynı kuralı tekrarlar. Veli sayfası bu haftanın denemelerini salt okunur listeler; düzenleme bağlantısı yoktur.
+- Doğrulama: `tests/e2e/exams.spec.ts`, `src/features/exams/access.test.ts`, net birim testleri (`net-rules.test.ts`).
+
 ## Veli-öğrenci ilişkilendirme akışı
 
 Karar ve gerekçe: [docs/DECISIONS.md](docs/DECISIONS.md) (0.4).

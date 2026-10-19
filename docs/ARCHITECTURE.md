@@ -283,10 +283,27 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 - **Veli.** Bağlı öğrencinin bu haftaki kayıtlarını ve hedeflerini görür. Değiştiremez. Haftalık PDF ve aylık özet Faz 11'dedir.
 - Bu migration yerelde uygulandı. Production'a proje sahibinin onayıyla 19 Ekim 2026'da uygulandı (`npx supabase db push`; önce `--dry-run`). Yeni tablolardır; mevcut satırlar değişmedi. Staging ertelendiği için orada henüz yoktur.
 
+## Deneme sınavları ve net hesabı (Faz 7)
+
+Öğrenci deneme sonucunu girer; net tek fonksiyonda hesaplanır (karar 0.7). Veli aktif bağlantıyla okur; yazamaz. Yönetici rolü ek erişim vermez.
+
+| Katman | Dosyalar | Görev |
+| --- | --- | --- |
+| Kural | `src/features/exams/net-rules.ts` | `lgs-v1` dağılımı ve net = doğru − (yanlış ÷ 3); ders neti eksi olabilir, toplam net eksiyse 0. |
+| Kurallar | `schemas.ts`, `commit-exam.ts`, `access.ts` | Form doğrulama, tek gönderim, kim yazabilir. Supabase'i bilmez. |
+| Adaptör | `src/services/supabase/exam-store.ts` | Okuma/yazma oturumdaki kullanıcıyla; düzenlemede ders satırları silinip yeniden yazılır ve net yeniden hesaplanır. |
+| Sayfalar | `/ogrenci/denemeler`, `/yeni`, `/[examId]`, `/veli/ogrenci/[studentId]` | Liste (mobil kart), oluşturma, detay tablosu + düzenleme. Veli salt okunur. |
+
+- **Türler.** `lgs_full` (6 ders, toplam 90 soru) ve `branch` (tek ders, 1–100 soru). Soru sayıları yalnızca `net-rules.ts` içindedir.
+- **Kural sürümü.** Her denemede `rule_version` saklanır (şimdilik `lgs-v1`). Düzenleme eski sürümü korur.
+- **Tarih.** `taken_on` İstanbul sivil günüdür; ileri tarih ve 1 Eylül 2024'ten eski tarih reddedilir.
+- **Tek gönderim.** Form bir `request_id` üretir; aynı kimlik + aynı içerik ikinci satır açmaz.
+- **Menü.** Öğrenci alt gezinmesinde Denemeler, Konular'ın yerini alır (5 öğe sınırı). `/ogrenci/konular` adresi durur.
+- Migration: `20261019160000_exams.sql`. Yerelde uygulanır; production için proje sahibi onayı gerekir.
+
 ### Henüz uygulanmayanlar
 
 - Bitmiş bağlantı, `audit_events` ve süresi dolan oran sınırı kayıtlarının saklama süresine göre otomatik silinmesi (karar 0.5: 1 yıl). Silme işi Faz 12'deki yedekleme betikleriyle birlikte planlanacak.
-- Net hesaplama kuralları ve deneme formları.
 - Koçluk motoru, yapay zekâ adaptörü, karakter puanları, bildirimler, içe aktarma, PDF/DOCX raporlar.
 - PWA manifesti ve simgeler, nonce tabanlı CSP, hata izleme.
 - Staging Supabase projesi, Preview ortam değişkenleri ve Vercel–GitHub bağlantısı (durum yukarıda).

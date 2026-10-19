@@ -14,6 +14,8 @@ import {
   goalWindow,
   istanbulToday,
 } from "@/features/study/calendar";
+import { ExamList } from "@/features/exams/components/exam-list";
+import { loadExamList } from "@/features/exams/load-exams";
 import { GoalProgressList } from "@/features/study/components/goal-progress-list";
 import { StudyLogList } from "@/features/study/components/study-log-list";
 import { loadStudyRecords } from "@/features/study/load-study";
@@ -52,7 +54,9 @@ async function ParentStudent({
 
   const today = istanbulToday();
   const week = goalWindow("week", today);
-  const study = await loadStudyRecords(studentId, { from: week.from, to: today });
+  const weekRange = { from: week.from, to: today };
+  const study = await loadStudyRecords(studentId, weekRange);
+  const exams = await loadExamList(studentId, weekRange);
   const weekLogs = study.logs.filter(
     (item) => item.studiedOn >= week.from && item.studiedOn <= today,
   );
@@ -67,11 +71,11 @@ async function ParentStudent({
         <StateMessage
           variant="info"
           title="Kayıtları değiştiremezsin."
-          description="Çalışma kayıtlarını ve hedeflerini okuyabilirsin. Deneme özeti sonra eklenecek."
+          description="Çalışma, hedef ve deneme özetlerini okuyabilirsin. Değiştirme yalnızca öğrenci hesabındadır."
         />
         <Card
           title="Bu haftanın hedefi"
-          description={`${formatTurkishDateRange({ from: week.from, to: today })} · birim: soru. Hafta pazartesi başlar, pazar biter.`}
+          description={`${formatTurkishDateRange(weekRange)} · birim: soru. Hafta pazartesi başlar, pazar biter.`}
         >
           <GoalProgressList
             goals={study.goals}
@@ -83,9 +87,15 @@ async function ParentStudent({
         </Card>
         <Card
           title="Bu haftanın kayıtları"
-          description={`${formatTurkishDateRange({ from: week.from, to: today })} · birim: soru ve dakika`}
+          description={`${formatTurkishDateRange(weekRange)} · birim: soru ve dakika`}
         >
           <StudyLogList logs={weekLogs} editable={false} />
+        </Card>
+        <Card
+          title="Bu haftanın denemeleri"
+          description={`${formatTurkishDateRange(weekRange)} · birim: net (doğru − yanlış ÷ 3)`}
+        >
+          <ExamList exams={exams} editable={false} />
         </Card>
         <Card title="Bağlantı">
           <RevokeLinkButton
