@@ -281,7 +281,7 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 - **Hedef.** Birimi soru sayısıdır, dakika değil. Günlük hedef o İstanbul gününü, haftalık hedef pazartesiden pazara kadar olan günleri sayar. `subject_id` boşsa tüm dersler birlikte sayılır. Aynı dönem ve ders yeniden kaydedilince satır güncellenir. İlerleme çubuğunun yanında tarih aralığı ve "soru" birimi yazılır.
 - **Karşılaştırma.** Varsayılan, bu haftanın bugüne kadarki günleri ile bir önceki tam haftadır. Aralıklar ve birim (soru ve dakika) ekranda yazılıdır. Özel aralık en fazla 370 gündür ve bugünden ileri gidemez.
 - **Veli.** Bağlı öğrencinin bu haftaki kayıtlarını ve hedeflerini görür. Değiştiremez. Haftalık PDF ve aylık özet Faz 11'dedir.
-- Bu migration yerelde uygulandı. Production'a `supabase db push` proje sahibi onayından sonra yapılır. Yeni tablolardır; mevcut satırlar değişmez. Staging ertelendiği için orada henüz yoktur.
+- Bu migration yerelde uygulandı. Production'a proje sahibinin onayıyla 19 Ekim 2026'da uygulandı (`npx supabase db push`; önce `--dry-run`). Yeni tablolardır; mevcut satırlar değişmedi. Staging ertelendiği için orada henüz yoktur.
 
 ### Henüz uygulanmayanlar
 
@@ -290,4 +290,3 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 - Koçluk motoru, yapay zekâ adaptörü, karakter puanları, bildirimler, içe aktarma, PDF/DOCX raporlar.
 - PWA manifesti ve simgeler, nonce tabanlı CSP, hata izleme.
 - Staging Supabase projesi, Preview ortam değişkenleri ve Vercel–GitHub bağlantısı (durum yukarıda).
-- Faz 6 migration'ının production'a uygulanması (proje sahibi onayı).

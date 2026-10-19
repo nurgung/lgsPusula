@@ -18,7 +18,7 @@
 | 3 | Veri tabanı ve kimlik doğrulama | Devam ediyor — production Supabase (Frankfurt) kuruldu, kayıt kapalı, CI yeşil; staging projesi (ertelendi) ve production aile hesapları (proje sahibi) bekliyor |
 | 4 | Roller ve veli-öğrenci ilişkisi | Tamamlandı — yerel testler ve CI geçti; migration production'a uygulandı (13 Ekim 2026) |
 | 5 | Müfredat kataloğu | Tamamlandı — kod, yerel testler ve CI tamam; migration ve MEB 8. sınıf kataloğu (326 kazanım) production'da (14 Ekim 2026) |
-| 6 | Günlük çalışma kayıtları ve hedefler | Devam ediyor — kod, yerel testler ve yerel migration tamam (19 Ekim 2026); production migration proje sahibi onayı bekliyor |
+| 6 | Günlük çalışma kayıtları ve hedefler | Tamamlandı — kod, yerel testler ve CI; migration production'a uygulandı (19 Ekim 2026) |
 | 7 | Deneme sınavları ve net hesabı | Başlanmadı |
 | 8 | Kazanım analizi ve grafikler | Başlanmadı |
 | 9 | Kural tabanlı koçluk | Başlanmadı |
@@ -238,7 +238,7 @@
 - [x] 6.2 Ortak doğrulama şeması: negatif değer yok, doğru + yanlış + boş = soru sayısı — `src/features/study/schemas.ts`; en az 1 soru, süre 0–1440 dakika
 - [x] 6.3 `study_logs` migration'ı
   - [x] 6.3.1 `20261019150000_study_records.sql` yerelde uygulandı ve test edildi (19 Ekim 2026). Yeni tablolar; mevcut satırlar değişmez
-  - [ ] 6.3.2 Production'a `supabase db push` (proje sahibi onayı). Staging 3.1.2.b ile birlikte ertelendi
+  - [x] 6.3.2 Production'a `supabase db push` (proje sahibi onayıyla) — önce `--dry-run` ile yalnızca bu migration'ın gideceği görüldü; uygulandı, `supabase migration list --linked` dört migration'ı da eşit gösteriyor (19 Ekim 2026). Staging 3.1.2.b ile birlikte ertelendi
 - [x] 6.4 Günlük kayıt formu (ders, isteğe bağlı konu/kazanım, soru, doğru, yanlış, boş, süre) — `/ogrenci/calisma/yeni` ve ana sayfadaki hızlı kayıt
 - [x] 6.5 Kayıt düzenleme ve silme (onaylı) — `/ogrenci/calisma/[logId]`
 - [x] 6.6 `study_goals` migration'ı; günlük/haftalık hedef belirleme — aynı migration; `/ogrenci/hedefler`. Aynı dönem ve ders için yeniden kaydetmek hedefi günceller, ikinci satır açmaz
@@ -251,7 +251,7 @@
 - [x] Günlük özet, kayıtlarla aynı sonucu verir (test) — `summary.test.ts`
 - [x] Çift tıklama çift kayıt oluşturmaz — `commit-log.test.ts` ve aynı `request_id` ile ikinci eklemenin reddi (uçtan uca)
 - [x] Tüm kayıt uçlarında yetki testleri geçer — `access.test.ts` ve `tests/e2e/study.spec.ts` (öğrenci A/B, velisiz, aktif veli, iptal, yönetici rolü ek erişim vermez; 320 px ve masaüstü)
-- [x] 19 Ekim 2026 doğrulama: 206 birim testi geçti. Çalışma uçtan uca testleri ve erişim testleri yerelde geçti. Lint ve tip kontrolü geçti. Production migration uygulanmadı
+- [x] 19 Ekim 2026 doğrulama: 206 birim testi geçti. Çalışma uçtan uca testleri ve erişim testleri yerelde geçti. Lint ve tip kontrolü geçti. Production migration uygulandı (6.3.2)
 
 ---
 
