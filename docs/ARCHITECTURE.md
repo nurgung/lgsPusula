@@ -299,7 +299,7 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 - **Tarih.** `taken_on` İstanbul sivil günüdür; ileri tarih ve 1 Eylül 2024'ten eski tarih reddedilir.
 - **Tek gönderim.** Form bir `request_id` üretir; aynı kimlik + aynı içerik ikinci satır açmaz.
 - **Menü.** Öğrenci alt gezinmesinde Denemeler, Konular'ın yerini alır (5 öğe sınırı). `/ogrenci/konular` adresi durur.
-- Migration: `20261019160000_exams.sql`. Yerelde uygulanır; production için proje sahibi onayı gerekir.
+- Migration: `20261019160000_exams.sql`. Yerelde ve production'da uygulandı (20 Ekim 2026). Staging ertelendiği için orada henüz yoktur.
 
 ## Kazanım analizi ve grafikler (Faz 8)
 
@@ -316,7 +316,7 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 - **Kaynak / güven.** Faz 8 yalnızca `manual` / `high` yazar. İleride içe aktarma veya yapay zekâ ayrı kaynak ve güven düzeyleri ekleyebilir.
 - **Boş durum.** Eşleştirme yoksa öncelik listesi “tespit yapılmış” gibi davranmaz. Net grafiği için en az iki deneme gerekir.
 - **Pencere.** Öncelik ve grafik varsayılan 90 gün (Europe/Istanbul, bugün dahil).
-- Migration: `20261020120000_exam_mistakes.sql`. Yerelde uygulanır; production için proje sahibi onayı gerekir.
+- Migration: `20261020120000_exam_mistakes.sql`. Yerelde ve production'da uygulandı (20 Ekim 2026). Staging ertelendiği için orada henüz yoktur.
 
 ### Henüz uygulanmayanlar
 
