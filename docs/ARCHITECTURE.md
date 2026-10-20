@@ -318,9 +318,29 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 - **Pencere.** Öncelik ve grafik varsayılan 90 gün (Europe/Istanbul, bugün dahil).
 - Migration: `20261020120000_exam_mistakes.sql`. Yerelde ve production'da uygulandı (20 Ekim 2026). Staging ertelendiği için orada henüz yoktur.
 
+## Kural tabanlı koçluk (Faz 9)
+
+Öğrenci ana sayfası her istekte tek bir öneri üretir. Öneri yazılmaz; neden ve kanıt, sonuç nesnesinde durur. Böylece eski bir cümle yeni kaydın önüne geçmez.
+
+| Katman | Dosyalar | Görev |
+| --- | --- | --- |
+| Metrik | `src/features/coaching/metrics.ts` | Hedef tamamlama, ders doğruluğu, tam LGS net farkı, tekrar kazanımları. |
+| Kural | `src/features/coaching/rules.ts` | `coaching-v1`. İlk uyan kural tek kart olur. Supabase'i bilmez. |
+| Metin | `messages.ts` | Gözden geçirilmiş cümleler. Utandırma, korkutma ve kıyas yok. |
+| Adaptör | `load-coaching.ts` | Oturum istemcisiyle öğrencinin zaten okuyabildiği satırları okur. Yazmaz. |
+| Sayfa | `/ogrenci` | `RecommendationCard`: mesaj, "Neden?" ve kanıt listesi. |
+
+- **Sıra.** Bağlı kazanım, sonra düşük doğru sayısı, sonra son iki tam LGS netinin azalması, sonra bugünkü hedefin kalanı, sonra hedef daveti. Hiçbiri uymazsa kart sonuç çıkarmaz.
+- **Örneklem.** Bir derste 14 günde 10 sorudan az kayıt varsa doğru oranı saklanmaz ve söylenmez. Oran, doğru ÷ soru yarının altındaysa o ders önerilir. Tam yarı sorun sayılmaz.
+- **Deneme.** Yalnızca son iki `lgs_full` karşılaştırılır. Branş denemeleri karışmaz. Hangi dersin neti değiştiği bu kartta söylenmez. Pencere 90 gündür.
+- **Kazanım.** `outcome-priority-v1` ile aynı 90 gün. Bağlanmamış yanlıştan kazanım adı üretilmez.
+- **Hedef.** Kart yalnızca günlük hedefi kullanır. Haftalık hedef ana sayfadaki hedef kartında kalır. Birim soru. Gün sınırı Europe/Istanbul.
+- **Yetki.** Öğrenci kimliği oturumdan gelir. Veli ekranına bu kart Faz 11'de gelir. Yeni tablo ve yeni yazma yoktur.
+- **Durumlar.** Sayfa yüklenirken mevcut `Suspense` metni görünür. Kural uymazsa kart bunu "Neden?" altında söyler. Okuma hatası sayfa hata durumuna düşer.
+
 ### Henüz uygulanmayanlar
 
 - Bitmiş bağlantı, `audit_events` ve süresi dolan oran sınırı kayıtlarının saklama süresine göre otomatik silinmesi (karar 0.5: 1 yıl). Silme işi Faz 12'deki yedekleme betikleriyle birlikte planlanacak.
-- Koçluk motoru, yapay zekâ adaptörü, karakter puanları, bildirimler, içe aktarma, PDF/DOCX raporlar.
+- Yapay zekâ adaptörü, karakter puanları, bildirimler, içe aktarma, PDF/DOCX raporlar.
 - PWA manifesti ve simgeler, nonce tabanlı CSP, hata izleme.
 - Staging Supabase projesi, Preview ortam değişkenleri ve Vercel–GitHub bağlantısı (durum yukarıda).

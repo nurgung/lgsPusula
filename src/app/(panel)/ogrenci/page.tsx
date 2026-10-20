@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { StateMessage } from "@/components/ui/state-message";
 import { requireStudent } from "@/features/access/guards";
+import { RecommendationCard } from "@/features/coaching/components/recommendation-card";
+import { loadCoachingReport } from "@/features/coaching/load-coaching";
 import { loadCatalog } from "@/features/curriculum/load-catalog";
 import { CreateInviteForm } from "@/features/family/components/create-invite-form";
 import { RespondLinkForms } from "@/features/family/components/respond-link-forms";
@@ -31,10 +33,11 @@ async function StudentHome() {
   const user = await requireStudent();
   const today = istanbulToday();
   const week = goalWindow("week", today);
-  const [links, catalog, study] = await Promise.all([
+  const [links, catalog, study, coaching] = await Promise.all([
     loadOwnFamilyLinks(),
     loadCatalog({ includeArchived: false }),
     loadStudyRecords(user.id, { from: week.from, to: today }),
+    loadCoachingReport(user.id, today),
   ]);
   const subjects = catalog.map((subject) => ({ id: subject.id, name: subject.name }));
   const todayLogs = study.logs.filter((log) => log.studiedOn === today);
@@ -48,6 +51,8 @@ async function StudentHome() {
         description={`Bugün ${formatTurkishDate(today)}. Gün, Türkiye saatiyle (İstanbul) gece yarısı değişir.`}
       />
       <div className="grid gap-6">
+        <RecommendationCard report={coaching} />
+
         <Card
           title="Bugünün hedefi"
           description={`${formatTurkishDate(today)} · birim: soru`}

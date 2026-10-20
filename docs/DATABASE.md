@@ -76,6 +76,10 @@ Migration: `supabase/migrations/20261020120000_exam_mistakes.sql`. Her satır bi
 
 Kazanım, ders satırının dersiyle aynı olmalıdır. Aynı türde eşleştirme sayısı, o dersin `wrong_count` / `blank_count` değerini aşamaz. Manuel kaynakta güven her zaman `high` olmalıdır. Ders satırı silinince eşleştirmeler silinir (`on delete cascade`); kazanım silinemez (`on delete restrict`). Deneme düzenlemede ders satırları `subject_id` ile yerinde güncellenir; böylece eşleştirmeler korunur. Yanlış/boş sayısı düşerse fazla eşleştirmeler budanır.
 
+## Türetilen koçluk (Faz 9)
+
+Öneri tablosu yoktur. `coaching-v1` her istekte `study_logs`, `study_goals`, `exams` ve `exam_mistakes` satırlarından hesaplanır. Neden, kural sürümü ve kanıt yalnızca o yanıtın nesnesinde durur. Yeni okuma veya yazma politikası yoktur.
+
 ## Önerilen tablolar
 
 - `study_logs`, `study_goals`, `exams`, `exam_subject_results`, `exam_mistakes`: uygulandı (yukarıya bakın).

@@ -82,6 +82,13 @@ Uygulamada iki hesap vardır ([docs/DECISIONS.md](docs/DECISIONS.md), 0.13): pro
 - RLS aynı kuralı tekrarlar. Bağlanmamış yanlış/boş sorular için kazanım tespiti yapılmış gibi gösterilmez.
 - Doğrulama: `tests/e2e/outcomes.spec.ts`, `src/features/outcomes/access.test.ts`, `prioritize.test.ts`, `schemas.test.ts`.
 
+**Faz 9**
+
+- Koçluk ayrı bir tabloya yazılmaz. Öneri, öğrencinin zaten okuyabildiği çalışma, hedef, deneme ve kazanım satırlarından sunucuda hesaplanır (`loadCoachingReport`).
+- Öğrenci kimliği oturumdan alınır. Yükleyici oturum istemcisini kullanır; `service_role` kullanmaz. RLS ikinci savunmadır.
+- Kart yalnızca `/ogrenci` ana sayfasındadır. Veli ekranı bu öneriyi Faz 11'e kadar göstermez. Yönetici rolü ek erişim vermez.
+- Doğrulama: `src/features/coaching/rules.test.ts`. Uçtan uca kart: `tests/e2e/coaching.spec.ts`.
+
 ## Veli-öğrenci ilişkilendirme akışı
 
 Karar ve gerekçe: [docs/DECISIONS.md](docs/DECISIONS.md) (0.4).

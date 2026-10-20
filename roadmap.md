@@ -21,7 +21,7 @@
 | 6 | Günlük çalışma kayıtları ve hedefler | Tamamlandı — kod, yerel testler ve CI; migration production'a uygulandı (19 Ekim 2026) |
 | 7 | Deneme sınavları ve net hesabı | Tamamlandı — kod, yerel testler ve CI; migration production'a uygulandı (20 Ekim 2026) |
 | 8 | Kazanım analizi ve grafikler | Tamamlandı — kod, yerel testler ve CI; migration production'a uygulandı (20 Ekim 2026) |
-| 9 | Kural tabanlı koçluk | Başlanmadı |
+| 9 | Kural tabanlı koçluk | Tamamlandı — kod, birim testler ve uçtan uca kart; öneri tablosu yok (20 Ekim 2026) |
 | 10 | Karakter, görev ve bildirimler | Başlanmadı |
 | 11 | Veli paneli ve PDF rapor | Başlanmadı |
 | 12 | PWA, erişilebilirlik ve yayın hazırlığı | Başlanmadı |
@@ -309,16 +309,21 @@
 **Amaç:** Veriye dayalı, nedeni açıklanan çalışma önerileri.
 **Ön koşul:** Faz 8
 
+**Not:** Proje sahibinin onayıyla 20 Ekim 2026'da başlandı. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ("Kural tabanlı koçluk"), [docs/DATABASE.md](docs/DATABASE.md), [AUTHORIZATION.md](AUTHORIZATION.md).
+
+**Kararlar (bu fazda, güvenli varsayım):** Öneri her istekte yeniden hesaplanır; ayrı tablo yoktur. Neden, kural sürümü ve kanıt öneri nesnesinde durur. Çalışma penceresi son 14 gün, deneme ve kazanım penceresi son 90 gündür (Europe/Istanbul, bugün dahil). Bir derste 10 sorudan az kayıtta doğru oranı söylenmez. Doğru sayısı soru sayısının yarısından azsa o ders önerilir. Deneme farkı yalnızca son iki tam LGS içindir; branş denemeleri karışmaz. Kart sırası: bağlı kazanım, düşük doğru sayısı, azalan toplam net, bugünkü hedefin kalanı, hedef daveti. Hiçbiri uymazsa kart sonuç çıkarmaz.
+
 **İşler**
-- [ ] 9.1 Metrikler: hedef tamamlama, ders bazında doğruluk, denemeler arası değişim, tekrar gereken kazanımlar
-- [ ] 9.2 Öneri kuralları ve her önerinin nedenini saklama
-- [ ] 9.3 Öğrenci ana sayfasında öncelikli öneri kartı ("Neden?" açıklamasıyla)
-- [ ] 9.4 Destekleyici mesaj metinlerinin gözden geçirilmesi
+- [x] 9.1 Metrikler: hedef tamamlama, ders bazında doğruluk, denemeler arası değişim, tekrar gereken kazanımlar — `src/features/coaching/metrics.ts`
+- [x] 9.2 Öneri kuralları ve her önerinin nedenini saklama — `coaching-v1` (`rules.ts`); neden ve kanıt öneriyle birlikte tutulur, tabloya yazılmaz
+- [x] 9.3 Öğrenci ana sayfasında öncelikli öneri kartı ("Neden?" açıklamasıyla) — `/ogrenci`, `RecommendationCard`
+- [x] 9.4 Destekleyici mesaj metinlerinin gözden geçirilmesi — `messages.ts`; yasak ifade testi
 
 **Bitti sayılması için**
-- [ ] Her öneri kaynak veriye ve kurala dayanır (birim test)
-- [ ] Veri yetersizken kesin çıkarım yapılmaz (test)
-- [ ] Mesajlar utandırıcı, korkutucu veya kıyaslayıcı değildir
+- [x] Her öneri kaynak veriye ve kurala dayanır (birim test) — `rules.test.ts`
+- [x] Veri yetersizken kesin çıkarım yapılmaz (test) — aynı dosya: 10 sorudan az oran yok, bağlanmamış yanlıştan kazanım yok, tek denemeden net farkı yok
+- [x] Mesajlar utandırıcı, korkutucu veya kıyaslayıcı değildir — `supportiveCopyIssues` ve şablon testi
+- [x] 20 Ekim 2026 doğrulama: lint, `tsc --noEmit`, 18 koçluk birim testi ve `tests/e2e/coaching.spec.ts` (320 px + masaüstü) yerelde geçti. Tüm test paketi bu turda yeniden çalıştırılmadı
 
 ---
 
