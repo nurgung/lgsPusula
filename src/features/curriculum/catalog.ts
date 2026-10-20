@@ -151,7 +151,11 @@ export const SEARCH_RESULT_LIMIT = 30;
  */
 export function searchCatalog(
   catalog: readonly CatalogSubject[],
-  { query, subjectId }: { query: string; subjectId?: string },
+  {
+    query,
+    subjectId,
+    outcomesOnly = false,
+  }: { query: string; subjectId?: string; outcomesOnly?: boolean },
   limit = SEARCH_RESULT_LIMIT,
 ): { results: CatalogSearchResult[]; total: number } {
   const words = foldTurkish(query).split(" ").filter(Boolean);
@@ -165,12 +169,25 @@ export function searchCatalog(
     for (const topic of subject.topics) {
       const topicText = foldTurkish(`${subject.name} ${topic.name}`);
       if (words.length === 0) {
-        if (subjectId) {
+        if (subjectId && !outcomesOnly) {
           results.push(topicResult(subject, topic));
+        }
+        if (subjectId && outcomesOnly) {
+          for (const outcome of topic.outcomes) {
+            results.push({
+              value: encodeSelection({ kind: "outcome", id: outcome.id }),
+              kind: "outcome",
+              id: outcome.id,
+              subjectName: subject.name,
+              topicName: topic.name,
+              outcomeCode: outcome.code,
+              outcomeDescription: outcome.description,
+            });
+          }
         }
         continue;
       }
-      if (matches(topicText)) results.push(topicResult(subject, topic));
+      if (!outcomesOnly && matches(topicText)) results.push(topicResult(subject, topic));
       for (const outcome of topic.outcomes) {
         const text = `${topicText} ${foldTurkish(`${outcome.code} ${outcome.description}`)}`;
         if (matches(text)) {

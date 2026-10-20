@@ -20,7 +20,7 @@
 | 5 | Müfredat kataloğu | Tamamlandı — kod, yerel testler ve CI tamam; migration ve MEB 8. sınıf kataloğu (326 kazanım) production'da (14 Ekim 2026) |
 | 6 | Günlük çalışma kayıtları ve hedefler | Tamamlandı — kod, yerel testler ve CI; migration production'a uygulandı (19 Ekim 2026) |
 | 7 | Deneme sınavları ve net hesabı | Devam ediyor — kod, yerel testler ve yerel migration tamam (19 Ekim 2026); production migration proje sahibi onayı bekliyor |
-| 8 | Kazanım analizi ve grafikler | Başlanmadı |
+| 8 | Kazanım analizi ve grafikler | Devam ediyor — kod, yerel testler ve yerel migration tamam (20 Ekim 2026); production migration proje sahibi onayı bekliyor |
 | 9 | Kural tabanlı koçluk | Başlanmadı |
 | 10 | Karakter, görev ve bildirimler | Başlanmadı |
 | 11 | Veli paneli ve PDF rapor | Başlanmadı |
@@ -283,17 +283,24 @@
 **Amaç:** Yanlış/boş soruların kazanımlarla eşleşmesi ve gelişimin görülmesi.
 **Ön koşul:** Faz 7
 
+**Not:** Proje sahibinin onayıyla 20 Ekim 2026'da başlandı. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ("Kazanım analizi ve grafikler"), [docs/DATABASE.md](docs/DATABASE.md), [AUTHORIZATION.md](AUTHORIZATION.md).
+
+**Kararlar (bu fazda, güvenli varsayım):** Eşleştirme isteğe bağlıdır. Kaynak şimdilik yalnızca `manual`, güven `high`. Öncelik kuralı `outcome-priority-v1` (yanlış 2, boş 1); bağlanmamış satırdan sıralama üretilmez. Analiz penceresi 90 gün. Grafik için üçüncü taraf paket yok; yerleşik SVG + zorunlu tablo.
+
 **İşler**
-- [ ] 8.1 `exam_mistakes` migration'ı (kaynak ve güven düzeyi dahil)
-- [ ] 8.2 Yanlış/boş soruları kazanımla manuel eşleştirme ekranı
-- [ ] 8.3 Kazanım önceliklendirme kuralını yaz ve belgele
-- [ ] 8.4 Erişilebilir grafik kütüphanesini seç ve ekle
-- [ ] 8.5 Denemeler arası değişim grafiği + aynı verinin tablosu
-- [ ] 8.6 Veri yetersiz olduğunda açıklayıcı boş durum
+- [x] 8.1 `exam_mistakes` migration'ı (kaynak ve güven düzeyi dahil)
+  - [x] 8.1.1 `20261020120000_exam_mistakes.sql` yerelde uygulandı ve test edildi (20 Ekim 2026). Yeni tablo; mevcut satırlar değişmez. Deneme düzenlemede ders satırları yerinde güncellenir (eşleştirmeler korunur)
+  - [ ] 8.1.2 Production'a `supabase db push` (proje sahibi onayı). Staging 3.1.2.b ile birlikte ertelendi
+- [x] 8.2 Yanlış/boş soruları kazanımla manuel eşleştirme ekranı — `/ogrenci/denemeler/[examId]/kazanimlar`
+- [x] 8.3 Kazanım önceliklendirme kuralını yaz ve belgele — `outcome-priority-v1` (`prioritize.ts`); `/ogrenci/kazanimlar`
+- [x] 8.4 Erişilebilir grafik yaklaşımını seç — yerleşik SVG `NetTrendChart` (üçüncü taraf paket yok; gerekçe ARCHITECTURE); her grafik zorunlu tablo alternatifi sunar
+- [x] 8.5 Denemeler arası değişim grafiği + aynı verinin tablosu — `/ogrenci/denemeler/gelisim`
+- [x] 8.6 Veri yetersiz olduğunda açıklayıcı boş durum — eşleştirme yok / tek deneme
 
 **Bitti sayılması için**
-- [ ] Kazanım verisi girilmemişse kazanım tespiti yapılmış gibi gösterilmez (test)
-- [ ] Her grafiğin tablo alternatifi vardır; başlık, birim ve tarih aralığı gösterilir
+- [x] Kazanım verisi girilmemişse kazanım tespiti yapılmış gibi gösterilmez (test) — `prioritize.test.ts`, `tests/e2e/outcomes.spec.ts`
+- [x] Her grafiğin tablo alternatifi vardır; başlık, birim ve tarih aralığı gösterilir — aynı e2e
+- [x] 20 Ekim 2026 doğrulama: lint, tip kontrolü, 232 birim testi ve `tests/e2e/outcomes.spec.ts` (320 px + masaüstü) yerelde geçti. Production migration uygulanmadı
 
 ---
 

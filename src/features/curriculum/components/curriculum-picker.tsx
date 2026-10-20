@@ -25,6 +25,7 @@ export function CurriculumPicker({
   optional = false,
   defaultValue = "",
   fixedSubjectId,
+  outcomesOnly = false,
   onChange,
 }: {
   /** Pass only rows that are not archived. */
@@ -35,9 +36,12 @@ export function CurriculumPicker({
   defaultValue?: string;
   /**
    * When the page already asked for a subject, lock the search to it and hide the
-   * second subject field. An empty query then lists that subject's topics.
+   * second subject field. An empty query then lists that subject's topics
+   * (or outcomes when `outcomesOnly` is set).
    */
   fixedSubjectId?: string;
+  /** Deneme yanlış/boş eşleştirmesinde yalnızca kazanım seçilir. */
+  outcomesOnly?: boolean;
   onChange?: (selection: CatalogSelection | null) => void;
 }) {
   const prefix = useId();
@@ -49,8 +53,13 @@ export function CurriculumPicker({
 
   const activeSubjectId = fixedSubjectId || subjectId;
   const { results, total } = useMemo(
-    () => searchCatalog(catalog, { query, subjectId: activeSubjectId || undefined }),
-    [catalog, query, activeSubjectId],
+    () =>
+      searchCatalog(catalog, {
+        query,
+        subjectId: activeSubjectId || undefined,
+        outcomesOnly,
+      }),
+    [catalog, query, activeSubjectId, outcomesOnly],
   );
   const selection = decodeSelection(selected);
   const selectedItem = selection ? describeSelection(catalog, selection) : null;

@@ -301,6 +301,23 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 - **Menü.** Öğrenci alt gezinmesinde Denemeler, Konular'ın yerini alır (5 öğe sınırı). `/ogrenci/konular` adresi durur.
 - Migration: `20261019160000_exams.sql`. Yerelde uygulanır; production için proje sahibi onayı gerekir.
 
+## Kazanım analizi ve grafikler (Faz 8)
+
+Öğrenci yanlış/boş soruları kazanıma elle bağlar. Öncelik yalnızca bağlanan satırlardan hesaplanır. Denemeler arası net grafiği her zaman tablo alternatifiyle birlikte gösterilir.
+
+| Katman | Dosyalar | Görev |
+| --- | --- | --- |
+| Kural | `src/features/outcomes/prioritize.ts` | `outcome-priority-v1`: yanlış 2, boş 1; bağlanmamış satırdan sıralama üretilmez. |
+| Kurallar | `schemas.ts`, `access.ts` | Eşleştirme doğrulama, yetki. Supabase'i bilmez. |
+| Adaptör | `src/services/supabase/mistake-store.ts` | Okuma/yazma oturumdaki kullanıcıyla; deneme düzenlemede ders satırları yerinde güncellenir (`exam-store`). |
+| Grafik | `components/net-trend-chart.tsx` | Yerleşik SVG çubuk grafik + aynı verinin tablosu. Üçüncü taraf grafik paketi yok (tek seri; tablo zaten zorunlu). |
+| Sayfalar | `/ogrenci/denemeler/[examId]/kazanimlar`, `/ogrenci/kazanimlar`, `/ogrenci/denemeler/gelisim` | Eşleştirme, öncelik listesi, net değişimi. |
+
+- **Kaynak / güven.** Faz 8 yalnızca `manual` / `high` yazar. İleride içe aktarma veya yapay zekâ ayrı kaynak ve güven düzeyleri ekleyebilir.
+- **Boş durum.** Eşleştirme yoksa öncelik listesi “tespit yapılmış” gibi davranmaz. Net grafiği için en az iki deneme gerekir.
+- **Pencere.** Öncelik ve grafik varsayılan 90 gün (Europe/Istanbul, bugün dahil).
+- Migration: `20261020120000_exam_mistakes.sql`. Yerelde uygulanır; production için proje sahibi onayı gerekir.
+
 ### Henüz uygulanmayanlar
 
 - Bitmiş bağlantı, `audit_events` ve süresi dolan oran sınırı kayıtlarının saklama süresine göre otomatik silinmesi (karar 0.5: 1 yıl). Silme işi Faz 12'deki yedekleme betikleriyle birlikte planlanacak.

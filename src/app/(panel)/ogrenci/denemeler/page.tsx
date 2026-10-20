@@ -54,8 +54,14 @@ async function ExamsContent({
         description={`Son ${formatTurkishDateRange(listWindow)} arası denemelerin. Net = doğru − (yanlış ÷ 3). Toplam net eksi olursa 0 alınır.`}
       />
       {status ? <StateMessage variant="success" title={status} /> : null}
-      <div className="mb-4">
+      <div className="mb-4 flex flex-wrap gap-2">
         <ButtonLink href="/ogrenci/denemeler/yeni">Yeni deneme</ButtonLink>
+        <ButtonLink href="/ogrenci/denemeler/gelisim" variant="secondary">
+          Net değişimi
+        </ButtonLink>
+        <ButtonLink href="/ogrenci/kazanimlar" variant="secondary">
+          Kazanım öncelikleri
+        </ButtonLink>
       </div>
       <Card>
         <ExamList exams={exams} editable />

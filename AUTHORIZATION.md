@@ -75,6 +75,13 @@ Uygulamada iki hesap vardır ([docs/DECISIONS.md](docs/DECISIONS.md), 0.13): pro
 - RLS aynı kuralı tekrarlar. Veli sayfası bu haftanın denemelerini salt okunur listeler; düzenleme bağlantısı yoktur.
 - Doğrulama: `tests/e2e/exams.spec.ts`, `src/features/exams/access.test.ts`, net birim testleri (`net-rules.test.ts`).
 
+**Faz 8**
+
+- Kazanım eşleştirmesi (`exam_mistakes`) yazması yalnızca öğrenci hesabınadır (`canWriteExamMistake`). Öğrenci kimliği oturumdan alınır.
+- Okuma `canReadExamMistake` / `canReadStudentRecord` ile aynıdır. Yönetici rolü ek erişim vermez. Veli yazamaz.
+- RLS aynı kuralı tekrarlar. Bağlanmamış yanlış/boş sorular için kazanım tespiti yapılmış gibi gösterilmez.
+- Doğrulama: `tests/e2e/outcomes.spec.ts`, `src/features/outcomes/access.test.ts`, `prioritize.test.ts`, `schemas.test.ts`.
+
 ## Veli-öğrenci ilişkilendirme akışı
 
 Karar ve gerekçe: [docs/DECISIONS.md](docs/DECISIONS.md) (0.4).

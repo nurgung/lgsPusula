@@ -66,10 +66,19 @@ Migration: `supabase/migrations/20261019160000_exams.sql`. `taken_on` Europe/Ist
 
 Doğru + yanlış + boş = soru sayısı. Aynı `(student_id, request_id)` ikinci deneme açmaz. Katalog satırı silinemez (`on delete restrict`); deneme silinince ders satırları silinir (`on delete cascade`).
 
+## Uygulanan şema (Faz 8)
+
+Migration: `supabase/migrations/20261020120000_exam_mistakes.sql`. Her satır bir yanlış veya boş cevabın kazanıma bağlanmasıdır. Kaynak ve güven düzeyi kayda yazılır; Faz 8 yalnızca `source=manual` ve `confidence=high` yazar.
+
+| Tablo | Alanlar | Erişim (`authenticated`) | Erişim (`service_role`) |
+| --- | --- | --- | --- |
+| `exam_mistakes` | `exam_subject_result_id`, `learning_outcome_id`, `mistake_kind` (`wrong`/`blank`), `source` (`manual`), `confidence` (`high`/`medium`/`low`), `sort_order` | Öğrenci kendi denemesine ekler, okur, günceller, siler. Aktif bağlantılı veli yalnızca okur. | Okur/yazar/siler |
+
+Kazanım, ders satırının dersiyle aynı olmalıdır. Aynı türde eşleştirme sayısı, o dersin `wrong_count` / `blank_count` değerini aşamaz. Manuel kaynakta güven her zaman `high` olmalıdır. Ders satırı silinince eşleştirmeler silinir (`on delete cascade`); kazanım silinemez (`on delete restrict`). Deneme düzenlemede ders satırları `subject_id` ile yerinde güncellenir; böylece eşleştirmeler korunur. Yanlış/boş sayısı düşerse fazla eşleştirmeler budanır.
+
 ## Önerilen tablolar
 
-- `study_logs`, `study_goals`, `exams`, `exam_subject_results`: uygulandı (yukarıya bakın).
-- `exam_mistakes`: deneme sonucu, kazanım, yanlış/boş türü; veri kaynağı ve güven düzeyi.
+- `study_logs`, `study_goals`, `exams`, `exam_subject_results`, `exam_mistakes`: uygulandı (yukarıya bakın).
 - `mascot_profiles`: öğrenci, seçilen karakter ve aşama.
 - `reward_events`: öğrenci, olay türü, puan ve idempotency anahtarı.
 - `notification_preferences`: kanal, sıklık, sessiz saatler ve izinler.

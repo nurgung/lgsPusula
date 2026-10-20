@@ -59,6 +59,7 @@ const examRowSchema = z.object({
 });
 
 const subjectRowSchema = z.object({
+  id: z.uuid(),
   subject_id: z.uuid(),
   question_count: z.number().int(),
   correct_count: z.number().int(),
@@ -69,6 +70,7 @@ const subjectRowSchema = z.object({
 });
 
 export type ExamSubjectView = ExamSubjectRow & {
+  resultId: string;
   subjectName: string;
 };
 
@@ -91,12 +93,11 @@ function fail(operation: string, error: PostgrestError | null): never {
   throw new ExamStoreError(operation, error?.code);
 }
 
-function toSubjectRow(
-  row: z.infer<typeof subjectRowSchema>,
-): ExamSubjectView {
+function toSubjectRow(row: z.infer<typeof subjectRowSchema>): ExamSubjectView {
   const subject = firstSubject(row.subjects);
   if (!subject) throw new ExamStoreError("read_exam_subject");
   return {
+    resultId: row.id,
     subjectId: row.subject_id,
     subjectCode: subject.code,
     subjectName: subject.name,
@@ -115,7 +116,7 @@ async function loadSubjects(
   const { data, error } = await client
     .from("exam_subject_results")
     .select(
-      "subject_id, question_count, correct_count, wrong_count, blank_count, net, subjects(name, code)",
+      "id, subject_id, question_count, correct_count, wrong_count, blank_count, net, subjects(name, code)",
     )
     .eq("exam_id", examId)
     .order("created_at", { ascending: true })
@@ -177,7 +178,9 @@ export async function listExams(
 ): Promise<ExamListItem[]> {
   const { data, error } = await client
     .from("exams")
-    .select("id, student_id, title, taken_on, exam_type, rule_version, total_net, request_id")
+    .select(
+      "id, student_id, title, taken_on, exam_type, rule_version, total_net, request_id",
+    )
     .eq("student_id", studentId)
     .gte("taken_on", window.from)
     .lte("taken_on", window.to)
@@ -195,7 +198,9 @@ export async function getExam(
 ): Promise<ExamDetail | null> {
   const { data, error } = await client
     .from("exams")
-    .select("id, student_id, title, taken_on, exam_type, rule_version, total_net, request_id")
+    .select(
+      "id, student_id, title, taken_on, exam_type, rule_version, total_net, request_id",
+    )
     .eq("student_id", studentId)
     .eq("id", examId)
     .maybeSingle();
@@ -219,7 +224,9 @@ export async function findExamByRequestId(
 ): Promise<StoredExam | null> {
   const { data, error } = await client
     .from("exams")
-    .select("id, student_id, title, taken_on, exam_type, rule_version, total_net, request_id")
+    .select(
+      "id, student_id, title, taken_on, exam_type, rule_version, total_net, request_id",
+    )
     .eq("student_id", studentId)
     .eq("request_id", requestId)
     .maybeSingle();
@@ -264,7 +271,9 @@ export async function insertExam(
       total_net: payload.totalNet,
       request_id: payload.requestId,
     })
-    .select("id, student_id, title, taken_on, exam_type, rule_version, total_net, request_id")
+    .select(
+      "id, student_id, title, taken_on, exam_type, rule_version, total_net, request_id",
+    )
     .single();
   if (error || !data) fail("insert_exam", error);
   const exam = examRowSchema.parse(data);
@@ -277,6 +286,11 @@ export async function insertExam(
   return toStored(exam, payload.subjects);
 }
 
+/**
+ * Updates subject rows in place by subject_id so exam_mistakes stay attached.
+ * Subjects removed from the exam are deleted (their mistakes cascade). After a
+ * wrong/blank count drop, excess mistake rows for that result are pruned.
+ */
 export async function updateExam(
   client: SupabaseClient,
   studentId: string,
@@ -294,17 +308,69 @@ export async function updateExam(
     })
     .eq("id", examId)
     .eq("student_id", studentId)
-    .select("id, student_id, title, taken_on, exam_type, rule_version, total_net, request_id")
+    .select(
+      "id, student_id, title, taken_on, exam_type, rule_version, total_net, request_id",
+    )
     .maybeSingle();
   if (error) fail("update_exam", error);
   if (!data) throw new ExamStoreError("update_exam_missing");
 
-  const { error: deleteError } = await client
-    .from("exam_subject_results")
-    .delete()
-    .eq("exam_id", examId);
-  if (deleteError) fail("replace_exam_subjects_delete", deleteError);
-  await insertSubjectRows(client, examId, payload.subjects);
+  const existing = await loadSubjects(client, examId);
+  const bySubject = new Map(existing.map((row) => [row.subjectId, row]));
+  const keptIds = new Set<string>();
+
+  for (const subject of payload.subjects) {
+    const previous = bySubject.get(subject.subjectId);
+    if (previous) {
+      const { error: updateError } = await client
+        .from("exam_subject_results")
+        .update({
+          question_count: subject.questionCount,
+          correct_count: subject.correctCount,
+          wrong_count: subject.wrongCount,
+          blank_count: subject.blankCount,
+          net: subject.net,
+        })
+        .eq("id", previous.resultId)
+        .eq("exam_id", examId);
+      if (updateError) fail("update_exam_subject", updateError);
+      keptIds.add(previous.resultId);
+      await pruneExcessMistakes(
+        client,
+        previous.resultId,
+        subject.wrongCount,
+        subject.blankCount,
+      );
+    } else {
+      const { data: inserted, error: insertError } = await client
+        .from("exam_subject_results")
+        .insert({
+          exam_id: examId,
+          subject_id: subject.subjectId,
+          question_count: subject.questionCount,
+          correct_count: subject.correctCount,
+          wrong_count: subject.wrongCount,
+          blank_count: subject.blankCount,
+          net: subject.net,
+        })
+        .select("id")
+        .single();
+      if (insertError || !inserted) fail("insert_exam_subject", insertError);
+      keptIds.add(z.object({ id: z.uuid() }).parse(inserted).id);
+    }
+  }
+
+  const removed = existing.filter((row) => !keptIds.has(row.resultId));
+  if (removed.length > 0) {
+    const { error: deleteError } = await client
+      .from("exam_subject_results")
+      .delete()
+      .in(
+        "id",
+        removed.map((row) => row.resultId),
+      );
+    if (deleteError) fail("delete_exam_subjects", deleteError);
+  }
 
   const exam = examRowSchema.parse(data);
   const subjects = await loadSubjects(client, exam.id);
@@ -315,6 +381,38 @@ export async function updateExam(
     requestId: exam.request_id,
     subjects,
   };
+}
+
+async function pruneExcessMistakes(
+  client: SupabaseClient,
+  resultId: string,
+  wrongLimit: number,
+  blankLimit: number,
+): Promise<void> {
+  for (const [kind, limit] of [
+    ["wrong", wrongLimit],
+    ["blank", blankLimit],
+  ] as const) {
+    const { data, error } = await client
+      .from("exam_mistakes")
+      .select("id")
+      .eq("exam_subject_result_id", resultId)
+      .eq("mistake_kind", kind)
+      .order("sort_order", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(PAGE_SIZE);
+    if (error) fail("list_mistakes_for_prune", error);
+    const rows = data ?? [];
+    if (rows.length <= limit) continue;
+    const excess = rows
+      .slice(limit)
+      .map((row) => z.object({ id: z.uuid() }).parse(row).id);
+    const { error: deleteError } = await client
+      .from("exam_mistakes")
+      .delete()
+      .in("id", excess);
+    if (deleteError) fail("prune_mistakes", deleteError);
+  }
 }
 
 export async function deleteExam(

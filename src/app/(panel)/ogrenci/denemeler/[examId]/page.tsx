@@ -28,9 +28,7 @@ export default function ExamDetailPage({
   searchParams,
 }: PageProps<"/ogrenci/denemeler/[examId]">) {
   return (
-    <Suspense
-      fallback={<StateMessage variant="loading" title="Deneme yükleniyor..." />}
-    >
+    <Suspense fallback={<StateMessage variant="loading" title="Deneme yükleniyor..." />}>
       <ExamDetail params={params} searchParams={searchParams} />
     </Suspense>
   );
@@ -137,6 +135,14 @@ async function ExamDetail({
         <p className="mt-3 text-ink-900">
           Toplam net: <strong>{formatNet(exam.totalNet)}</strong> (eksi toplam 0 alınır)
         </p>
+        <div className="mt-4">
+          <ButtonLink
+            href={`/ogrenci/denemeler/${exam.id}/kazanimlar`}
+            variant="secondary"
+          >
+            Yanlış / boş → kazanım
+          </ButtonLink>
+        </div>
       </Card>
 
       <Card className="mb-4">
