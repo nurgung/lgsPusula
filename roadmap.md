@@ -23,7 +23,7 @@
 | 8 | Kazanım analizi ve grafikler | Tamamlandı — kod, yerel testler ve CI; migration production'a uygulandı (20 Ekim 2026) |
 | 9 | Kural tabanlı koçluk | Tamamlandı — kod, birim testler ve uçtan uca kart; öneri tablosu yok (20 Ekim 2026) |
 | 10 | Karakter, görev ve bildirimler | Tamamlandı — kod ve yerel testler; migration production'a uygulandı (20 Ekim 2026). Tüm uçtan uca paket bu turda yeniden çalıştırılmadı |
-| 11 | Veli paneli ve PDF rapor | Başlanmadı |
+| 11 | Veli paneli ve PDF rapor | Tamamlandı — kod, yerel testler ve production migration (21 Ekim 2026). Tüm uçtan uca paket bu turda yeniden çalıştırılmadı |
 | 12 | PWA, erişilebilirlik ve yayın hazırlığı | Başlanmadı |
 | 13 | MVP sonrası: yapay zekâ, içe aktarma, DOCX | Başlanmadı |
 
@@ -359,18 +359,25 @@
 **Amaç:** Velinin bağlı öğrencinin gelişimini görmesi ve haftalık rapor alması.
 **Ön koşul:** Faz 10
 
+**Not:** Proje sahibinin onayıyla 21 Ekim 2026'da başlandı. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ("Veli paneli ve PDF rapor"), [docs/DATABASE.md](docs/DATABASE.md), [AUTHORIZATION.md](AUTHORIZATION.md).
+
+**Kararlar (bu fazda, güvenli varsayım):** PDF yalnızca haftalıktır; aylık özet ekranda kalır. Dönem istemciden tarih olarak gelmez: form `current` veya `previous` gönderir, sunucu Europe/Istanbul aralığını hesaplar. Bu hafta bugünde biter ve bitmediği yazılır. Geçen hafta bir önceki tam pazartesi–pazar günleridir. Dosya `report_jobs.pdf_bytes` içindedir; herkese açık bir yola yazılmaz. Aynı veli, öğrenci ve dönem yeniden üretilirse satırın üzerine yazılır ve 24 saat yeniden başlar. Üretim başarısızsa bayt yazılmaz. Silme, veli paneli açılınca veya rapor istenince çalışır; zamanlanmış görev yoktur (Faz 12). Kimse uğramazsa satır 24 saati aşabilir. Öğrenci rapor isteyemez. Yönetici rolü, aktif veli bağlantısı olmadan rapor açmaz.
+
 **İşler**
-- [ ] 11.1 Veli ana sayfası ve bağlı öğrenci seçimi
-- [ ] 11.2 Haftalık/aylık özetler
-- [ ] 11.3 `report_jobs` migration'ı
-- [ ] 11.4 Sunucu tarafında haftalık PDF raporu üretimi (dönem, üretim tarihi, metrik açıklamaları)
-- [ ] 11.5 İndirme öncesi yetki kontrolü
-- [ ] 11.6 Geçici rapor dosyalarının süre sonunda silinmesi
+- [x] 11.1 Veli ana sayfası ve bağlı öğrenci seçimi — `/veli`; bu haftanın soru ve dakika özeti, tarih aralığı ve birim
+- [x] 11.2 Haftalık/aylık özetler — `/veli/ogrenci/[studentId]`; koçluk kartı salt okunur
+- [x] 11.3 `report_jobs` migration'ı
+  - [x] 11.3.1 `20261021120000_report_jobs.sql` yerelde uygulandı ve test edildi (21 Ekim 2026). Yeni tablo; mevcut satırlar değişmez
+  - [x] 11.3.2 Production'a `supabase db push` (proje sahibi onayıyla) — önce `--dry-run` ile yalnızca bu migration'ın gideceği görüldü; uygulandı, `supabase migration list --linked` sekiz migration'ı da eşit gösteriyor (21 Ekim 2026). Staging 3.1.2.b ile birlikte ertelendi
+- [x] 11.4 Sunucu tarafında haftalık PDF raporu üretimi (dönem, üretim tarihi, metrik açıklamaları) — `pdf-lib` ve gömülü Nunito; `GET /veli/rapor/[jobId]`
+- [x] 11.5 İndirme öncesi yetki kontrolü — `canDownloadReport`; bağlantısız veli, öğrenci ve süresi dolmuş satır dosya alamaz
+- [x] 11.6 Geçici rapor dosyalarının süre sonunda silinmesi — `purge_expired_report_jobs()` veli sayfasında ve indirmede. Zamanlanmış silme Faz 12'de
 
 **Bitti sayılması için**
-- [ ] Veli A, bağlantısı olmayan öğrencinin raporunu indiremez (test)
-- [ ] Türkçe karakterler ve tablo kırılmaları PDF'de doğru görünür
-- [ ] Rapor üretimi başarısızsa boş dosya indirilmez, anlaşılır mesaj gösterilir
+- [x] Veli A, bağlantısı olmayan öğrencinin raporunu indiremez (test) — `tests/e2e/reports.spec.ts`: yabancı veli ve bağlantısı kaldırılmış veli HTML 404 alır, dosya almaz
+- [x] Türkçe karakterler ve tablo kırılmaları PDF'de doğru görünür — `pdf.test.ts` (Şişli, İstanbul) ve `document.test.ts` (ikinci sayfada tablo başlığı)
+- [x] Rapor üretimi başarısızsa boş dosya indirilmez, anlaşılır mesaj gösterilir — aynı uçtan uca test: `failed` satır `text/html` döner, ek yoktur; metin "Boş dosya gönderilmedi."
+- [x] 21 Ekim 2026 doğrulama: lint, `tsc --noEmit`, 280 birim testi ve `tests/e2e/reports.spec.ts` (320 px + masaüstü) yerelde geçti. Veli sayfasını açan `access`, `exams`, `catalog` ve `study` spec'leri de geçti. Tüm uçtan uca paket bu turda yeniden çalıştırılmadı. Production migration uygulandı (11.3.2)
 
 ---
 

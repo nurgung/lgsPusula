@@ -8,6 +8,12 @@ import { requireParent } from "@/features/access/guards";
 import { RedeemInviteForm } from "@/features/family/components/redeem-invite-form";
 import { RevokeLinkButton } from "@/features/family/components/revoke-link-button";
 import { loadOwnFamilyLinks } from "@/features/family/load-links";
+import { weekWindows } from "@/features/reports/periods";
+import { purgeExpiredReportJobs } from "@/services/supabase/report-store";
+import { createServiceClient } from "@/services/supabase/server-client";
+import { formatTurkishDateRange, istanbulToday } from "@/features/study/calendar";
+import { loadStudyRecords } from "@/features/study/load-study";
+import { summarizeLogs } from "@/features/study/summary";
 
 export const metadata: Metadata = { title: "Özet" };
 export const instant = false;
@@ -22,15 +28,24 @@ export default function ParentHomePage() {
 
 async function ParentHome() {
   const user = await requireParent();
+  await purgeExpiredReportJobs(createServiceClient());
   const links = await loadOwnFamilyLinks();
   const active = links.filter((link) => link.status === "active");
   const pending = links.filter((link) => link.status === "pending");
+  const today = istanbulToday();
+  const week = weekWindows(today).current;
+  const snapshots = await Promise.all(
+    active.map(async (link) => {
+      const study = await loadStudyRecords(link.student_id, week);
+      return { link, summary: summarizeLogs(study.logs, week) };
+    }),
+  );
 
   return (
     <>
       <PageHeader
         title={`Merhaba, ${user.displayName}`}
-        description="Yalnızca bağlı olduğun öğrenciyi görürsün. Kayıt giremez ve değiştiremezsin."
+        description="Bağlı öğrencini seç. Yalnızca aktif bağlantının kayıtlarını görürsün. Kayıt giremez ve değiştiremezsin."
       />
       <div className="grid gap-6">
         {active.length === 0 && pending.length === 0 ? (
@@ -41,13 +56,16 @@ async function ParentHome() {
           />
         ) : null}
 
-        {active.map((link) => (
+        {snapshots.map(({ link, summary }) => (
           <Card
             key={link.id}
             title={link.student_display_name}
-            description="Bağlantı açık"
+            description={`Bağlantı açık · ${formatTurkishDateRange(week)} · birim: soru ve dakika`}
           >
             <div className="grid gap-4">
+              <p className="text-ink-900">
+                Bu hafta {summary.questionCount} soru, {summary.durationMinutes} dakika.
+              </p>
               <div>
                 <ButtonLink href={`/veli/ogrenci/${link.student_id}`}>
                   Öğrenciyi gör

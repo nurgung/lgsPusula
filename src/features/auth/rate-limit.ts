@@ -9,6 +9,7 @@ export const RATE_LIMITS = {
   inviteRedeemByIp: { maxAttempts: 20, windowSeconds: 15 * 60 },
   inviteRedeemByUser: { maxAttempts: 5, windowSeconds: 15 * 60 },
   mfaVerifyByUser: { maxAttempts: 5, windowSeconds: 15 * 60 },
+  reportGenerateByUser: { maxAttempts: 8, windowSeconds: 15 * 60 },
 } as const satisfies Record<string, RateLimitPolicy>;
 
 export type RateLimitScope =
@@ -18,7 +19,8 @@ export type RateLimitScope =
   | "invite_create:user"
   | "invite_redeem:ip"
   | "invite_redeem:user"
-  | "mfa_verify:user";
+  | "mfa_verify:user"
+  | "report_generate:user";
 
 /** The subject (IP, username, user id) is stored only as an HMAC, never in plain text. */
 export function rateLimitKey(

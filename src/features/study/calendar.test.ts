@@ -3,10 +3,15 @@ import {
   addCalendarDays,
   calendarDateInTimeZone,
   defaultComparisonWindows,
+  endOfMonth,
   endOfWeek,
+  formatIstanbulDateTime,
   formatTurkishDate,
   goalWindow,
   inclusiveDayCount,
+  monthToDateWindow,
+  previousMonthWindow,
+  startOfMonth,
   startOfWeek,
   weekdayIndexMonday,
 } from "./calendar";
@@ -54,5 +59,31 @@ describe("Europe/Istanbul day boundary", () => {
 
   it("formats a date in Turkish without moving it to the previous day", () => {
     expect(formatTurkishDate("2026-10-19")).toBe("19 Ekim 2026");
+  });
+
+  it("builds month windows, including a non-leap and a leap February", () => {
+    expect(startOfMonth("2026-10-21")).toBe("2026-10-01");
+    expect(endOfMonth("2026-10-21")).toBe("2026-10-31");
+    expect(monthToDateWindow("2026-10-21")).toEqual({
+      from: "2026-10-01",
+      to: "2026-10-21",
+    });
+    expect(previousMonthWindow("2026-10-21")).toEqual({
+      from: "2026-09-01",
+      to: "2026-09-30",
+    });
+    expect(endOfMonth("2026-03-01")).toBe("2026-03-31");
+    expect(previousMonthWindow("2026-03-01")).toEqual({
+      from: "2026-02-01",
+      to: "2026-02-28",
+    });
+    expect(endOfMonth("2024-02-15")).toBe("2024-02-29");
+  });
+
+  it("labels an Istanbul instant without dropping it to the previous day", () => {
+    const label = formatIstanbulDateTime(new Date("2026-10-21T07:55:00.000Z"));
+    expect(label).toContain("21 Ekim 2026");
+    expect(label).toContain("10:55");
+    expect(label).toContain("İstanbul");
   });
 });

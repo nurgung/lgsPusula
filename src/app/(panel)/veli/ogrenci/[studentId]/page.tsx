@@ -7,20 +7,29 @@ import { PageHeader } from "@/components/ui/page-header";
 import { StateMessage } from "@/components/ui/state-message";
 import { canReadStudentRecord } from "@/features/access/student-access";
 import { requireParent } from "@/features/access/guards";
+import { RecommendationCard } from "@/features/coaching/components/recommendation-card";
+import { loadCoachingReport } from "@/features/coaching/load-coaching";
 import { RevokeLinkButton } from "@/features/family/components/revoke-link-button";
 import { loadOwnFamilyLinks } from "@/features/family/load-links";
-import {
-  formatTurkishDateRange,
-  goalWindow,
-  istanbulToday,
-} from "@/features/study/calendar";
+import { formatTurkishDateRange, istanbulToday } from "@/features/study/calendar";
 import { ExamList } from "@/features/exams/components/exam-list";
 import { loadExamList } from "@/features/exams/load-exams";
 import { ParentMascotCard } from "@/features/mascot/components/mascot-panels";
 import { loadMascotSummary } from "@/features/mascot/load-mascot";
+import { PeriodSummaryPanel } from "@/features/reports/components/period-summary";
+import { ReportDownloadForm } from "@/features/reports/components/report-download-form";
+import { REPORT_MESSAGES } from "@/features/reports/messages";
+import {
+  monthWindows,
+  parentOverviewWindow,
+  weekWindows,
+} from "@/features/reports/periods";
+import { purgeExpiredReportJobs } from "@/services/supabase/report-store";
+import { createServiceClient } from "@/services/supabase/server-client";
 import { GoalProgressList } from "@/features/study/components/goal-progress-list";
 import { StudyLogList } from "@/features/study/components/study-log-list";
 import { loadStudyRecords } from "@/features/study/load-study";
+import { summarizeLogs } from "@/features/study/summary";
 
 export const metadata: Metadata = { title: "Öğrenci" };
 export const instant = false;
@@ -55,14 +64,28 @@ async function ParentStudent({
   if (!link) notFound();
 
   const today = istanbulToday();
-  const week = goalWindow("week", today);
-  const weekRange = { from: week.from, to: today };
-  const study = await loadStudyRecords(studentId, weekRange);
-  const exams = await loadExamList(studentId, weekRange);
-  const mascot = await loadMascotSummary(studentId);
+  const overview = parentOverviewWindow(today);
+  const weeks = weekWindows(today);
+  const months = monthWindows(today);
+  await purgeExpiredReportJobs(createServiceClient());
+  const [study, exams, mascot, coaching] = await Promise.all([
+    loadStudyRecords(studentId, overview),
+    loadExamList(studentId, overview),
+    loadMascotSummary(studentId),
+    loadCoachingReport(studentId, today),
+  ]);
   const weekLogs = study.logs.filter(
-    (item) => item.studiedOn >= week.from && item.studiedOn <= today,
+    (item) => item.studiedOn >= weeks.current.from && item.studiedOn <= weeks.current.to,
   );
+  const weekExams = exams.filter(
+    (item) => item.takenOn >= weeks.current.from && item.takenOn <= weeks.current.to,
+  );
+  const weekNote = weeks.unfinished
+    ? `${REPORT_MESSAGES.unfinishedWeek} ${REPORT_MESSAGES.comparisonNote}`
+    : REPORT_MESSAGES.comparisonNote;
+  const monthNote = months.unfinished
+    ? `${REPORT_MESSAGES.unfinishedMonth} ${REPORT_MESSAGES.comparisonNote}`
+    : REPORT_MESSAGES.comparisonNote;
 
   return (
     <>
@@ -77,9 +100,38 @@ async function ParentStudent({
           description="Çalışma, hedef, deneme ve karakter özetini okuyabilirsin. Değiştirme yalnızca öğrenci hesabındadır."
         />
         <ParentMascotCard species={mascot.species} rewards={mascot.rewards} />
+        <RecommendationCard
+          report={coaching}
+          audience="parent"
+          readOnlyNote={REPORT_MESSAGES.parentSuggestionNote}
+        />
+        <Card
+          title={REPORT_MESSAGES.weekTitle}
+          description={`${formatTurkishDateRange(weeks.current)} · ${REPORT_MESSAGES.weekHint}`}
+        >
+          <PeriodSummaryPanel
+            currentLabel="Bu hafta"
+            current={summarizeLogs(study.logs, weeks.current)}
+            previousLabel="Geçen hafta"
+            previous={summarizeLogs(study.logs, weeks.previous)}
+            note={weekNote}
+          />
+        </Card>
+        <Card
+          title={REPORT_MESSAGES.monthTitle}
+          description={`${formatTurkishDateRange(months.current)} · ${REPORT_MESSAGES.monthHint}`}
+        >
+          <PeriodSummaryPanel
+            currentLabel="Bu ay"
+            current={summarizeLogs(study.logs, months.current)}
+            previousLabel="Geçen ay"
+            previous={summarizeLogs(study.logs, months.previous)}
+            note={monthNote}
+          />
+        </Card>
         <Card
           title="Bu haftanın hedefi"
-          description={`${formatTurkishDateRange(weekRange)} · birim: soru. Hafta pazartesi başlar, pazar biter.`}
+          description={`${formatTurkishDateRange(weeks.current)} · birim: soru. Hafta pazartesi başlar, pazar biter.`}
         >
           <GoalProgressList
             goals={study.goals}
@@ -91,15 +143,31 @@ async function ParentStudent({
         </Card>
         <Card
           title="Bu haftanın kayıtları"
-          description={`${formatTurkishDateRange(weekRange)} · birim: soru ve dakika`}
+          description={`${formatTurkishDateRange(weeks.current)} · birim: soru ve dakika`}
         >
-          <StudyLogList logs={weekLogs} editable={false} />
+          <StudyLogList
+            logs={weekLogs}
+            editable={false}
+            emptyTitle="Bu hafta kayıt yok."
+            emptyDescription="Öğrenci bir çalışma yazarsa burada görürsün. Kayıt yoksa bir ders sonucu çıkarılmaz."
+          />
         </Card>
         <Card
           title="Bu haftanın denemeleri"
-          description={`${formatTurkishDateRange(weekRange)} · birim: net (doğru − yanlış ÷ 3)`}
+          description={`${formatTurkishDateRange(weeks.current)} · birim: net (doğru − yanlış ÷ 3)`}
         >
-          <ExamList exams={exams} editable={false} />
+          <ExamList
+            exams={weekExams}
+            editable={false}
+            emptyTitle="Bu hafta deneme yok."
+            emptyDescription="Öğrenci bir deneme yazarsa burada görürsün. Deneme yoksa net hesaplanmaz."
+          />
+        </Card>
+        <Card
+          title="Haftalık rapor"
+          description="PDF sunucuda üretilir. İndirmeden önce bağlantın yeniden kontrol edilir."
+        >
+          <ReportDownloadForm studentId={studentId} />
         </Card>
         <Card title="Bağlantı">
           <RevokeLinkButton

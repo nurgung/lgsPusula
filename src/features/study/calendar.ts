@@ -136,3 +136,40 @@ export function formatTurkishDateRange(window: DateWindow): string {
   if (window.from === window.to) return formatTurkishDate(window.from);
   return `${formatTurkishDate(window.from)} – ${formatTurkishDate(window.to)}`;
 }
+
+/** First civil day of the month that contains `isoDate`. */
+export function startOfMonth(isoDate: string): string {
+  if (!isRealIsoDate(isoDate)) throw new Error("Invalid calendar date.");
+  return `${isoDate.slice(0, 8)}01`;
+}
+
+/** Last civil day of the month that contains `isoDate`. */
+export function endOfMonth(isoDate: string): string {
+  const nextMonth = startOfMonth(addCalendarDays(startOfMonth(isoDate), 32));
+  return addCalendarDays(nextMonth, -1);
+}
+
+/** The 1st of this month through `today`. Later days are not included. */
+export function monthToDateWindow(today: string): DateWindow {
+  if (!isRealIsoDate(today)) throw new Error("Invalid calendar date.");
+  return { from: startOfMonth(today), to: today };
+}
+
+/** The full calendar month before the month that contains `today`. */
+export function previousMonthWindow(today: string): DateWindow {
+  const last = addCalendarDays(startOfMonth(today), -1);
+  return { from: startOfMonth(last), to: last };
+}
+
+/** Wall-clock label in Europe/Istanbul. The zone name is part of the text. */
+export function formatIstanbulDateTime(instant: Date): string {
+  const formatted = new Intl.DateTimeFormat("tr-TR", {
+    timeZone: APP_TIME_ZONE,
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(instant);
+  return `${formatted} (İstanbul)`;
+}

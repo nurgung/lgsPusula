@@ -59,7 +59,7 @@ Her kategori için amaç, hukuki işleme şartı, erişim grubu, saklama süresi
 - Her veri türü için gerekçeli saklama süresi belirlenmelidir; süresiz saklama varsayılan olmamalıdır.
 - Hesap kapatma ve veri silme talebi için süreç oluşturulmalıdır.
 - Yedeklerdeki verilerin silinme zamanlaması ve istisnaları belgelenmelidir.
-- PDF/DOCX raporlarının geçici dosyaları güvenli biçimde ve belirlenen sürede temizlenmelidir.
+- PDF/DOCX raporlarının geçici dosyaları güvenli biçimde ve belirlenen sürede temizlenmelidir. Haftalık PDF (Faz 11) herkese açık bir dosya yolu değildir; baytlar `report_jobs` içindedir ve en geç 24 saat sonra silinmek üzere işaretlenir. Silme, veli paneli açılınca veya rapor istenince çalışır. Kimse uğramazsa satır 24 saati aşabilir; zamanlanmış silme Faz 12'dedir. DOCX henüz yoktur.
 - İçe aktarılan ham dosyalar, amaç tamamlandıktan sonra saklanmaya devam edecekse bunun gerekçesi belirlenmelidir.
 - Yasal saklama yükümlülükleri varsa, kapsam ve süre ayrıca belgelenmelidir.
 

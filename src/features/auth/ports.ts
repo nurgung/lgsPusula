@@ -25,6 +25,7 @@ export const AUDIT_EVENT_TYPES = [
   "family.invite_redeem",
   "family.link_respond",
   "family.link_revoke",
+  "report.generate",
 ] as const;
 export type AuditEventType = (typeof AUDIT_EVENT_TYPES)[number];
 
@@ -48,7 +49,9 @@ export type AuditMetadata = {
     | "not_allowed"
     | "invalid_mfa_code"
     | "duplicate"
-    | "not_found";
+    | "not_found"
+    | "generation_failed"
+    | "empty_document";
   rateLimitScope?: "ip" | "username" | "user";
   catalogEntity?: "subject" | "topic" | "learning_outcome";
   catalogAction?: "create" | "update" | "archive" | "restore";

@@ -24,6 +24,24 @@ describe("RecommendationCard", () => {
     );
   });
 
+  it("hides the student action when a parent is reading", () => {
+    render(
+      <RecommendationCard
+        audience="parent"
+        readOnlyNote="Kayıtları yalnızca öğrenci değiştirebilir."
+        report={buildCoachingReport({
+          today: "2026-10-20",
+          logs: [],
+          goals: [],
+          exams: [],
+          mistakes: [],
+        })}
+      />,
+    );
+    expect(screen.queryByRole("link", { name: "Hedef belirle" })).toBeNull();
+    expect(screen.getByText("Kayıtları yalnızca öğrenci değiştirebilir.")).toBeTruthy();
+  });
+
   it("shows no action link when the rules refuse to infer", () => {
     render(
       <RecommendationCard

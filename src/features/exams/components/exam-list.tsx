@@ -8,17 +8,17 @@ import type { ExamListItem } from "@/services/supabase/exam-store";
 export function ExamList({
   exams,
   editable,
+  emptyTitle = "Bu tarihlerde deneme yok.",
+  emptyDescription = "Deneme sonucunu yazınca burada görürsün. Bir gün ara vermen bir sorun değil.",
 }: {
   exams: readonly ExamListItem[];
   editable: boolean;
+  emptyTitle?: string;
+  emptyDescription?: string;
 }) {
   if (exams.length === 0) {
     return (
-      <StateMessage
-        variant="empty"
-        title="Bu tarihlerde deneme yok."
-        description="Deneme sonucunu yazınca burada görürsün. Bir gün ara vermen bir sorun değil."
-      />
+      <StateMessage variant="empty" title={emptyTitle} description={emptyDescription} />
     );
   }
 

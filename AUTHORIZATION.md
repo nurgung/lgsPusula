@@ -86,7 +86,7 @@ Uygulamada iki hesap vardır ([docs/DECISIONS.md](docs/DECISIONS.md), 0.13): pro
 
 - Koçluk ayrı bir tabloya yazılmaz. Öneri, öğrencinin zaten okuyabildiği çalışma, hedef, deneme ve kazanım satırlarından sunucuda hesaplanır (`loadCoachingReport`).
 - Öğrenci kimliği oturumdan alınır. Yükleyici oturum istemcisini kullanır; `service_role` kullanmaz. RLS ikinci savunmadır.
-- Kart yalnızca `/ogrenci` ana sayfasındadır. Veli ekranı bu öneriyi Faz 11'e kadar göstermez. Yönetici rolü ek erişim vermez.
+- Kart `/ogrenci` ana sayfasında ve, Faz 11'den beri, aktif bağlantılı velinin öğrenci sayfasındadır. Veli kartında öğrencinin işlem bağlantısı yoktur. Yönetici rolü ek erişim vermez.
 - Doğrulama: `src/features/coaching/rules.test.ts`. Uçtan uca kart: `tests/e2e/coaching.spec.ts`.
 
 **Faz 10**
@@ -96,6 +96,13 @@ Uygulamada iki hesap vardır ([docs/DECISIONS.md](docs/DECISIONS.md), 0.13): pro
 - Okuma `canReadMascot` / `canReadStudentRecord` ile aynıdır. Yönetici rolü ek erişim vermez. Veli karakteri ve puanı okur, yazamaz. Hatırlatma ayarı ve hatırlatma satırı yalnızca öğrencinindir.
 - Hatırlatma uygulama içidir (0.8). `open_study_reminder` metni veri tabanına yazmaz. Kapalıyken, sessiz saatte, bugün kayıt varken veya günlük sınır dolunca gösterilmez.
 - Doğrulama: `rules.test.ts`, `notices.test.ts`, `access.test.ts`, `tests/e2e/mascot.spec.ts`.
+
+**Faz 11**
+
+- Haftalık PDF isteği `canRequestReport` ister: oturumdaki kullanıcı veli rolündedir, öğrenci değildir ve `canReadStudentRecord` ile aktif bağlantısı vardır. Öğrenci kimliği formdan doğrulanır; dönem tarihi istemciden alınmaz.
+- Dosya `service_role` ile yazılır. `authenticated` ekleyemez, güncelleyemez ve silemez. `pdf_bytes` sütunu bu role verilmez. RLS, hazır ve süresi dolmamış satırın meta verisini yalnızca talep sahibine ve aktif bağlantı duruyorsa açar.
+- İndirme `canDownloadReport` ile yeniden bakar: aynı talep sahibi, istek hâlâ serbest, durum `ready`, süre dolmamış ve baytlar `%PDF-` ile başlıyor. Bağlantı kalkınca bilinen adres de dosya vermez. Öğrenci ve bağlantısız veli HTML 404 alır; boş dosya inmez.
+- Doğrulama: `src/features/reports/access.test.ts`, `bytes.test.ts`, `pdf.test.ts`, `tests/e2e/reports.spec.ts`.
 
 ## Veli-öğrenci ilişkilendirme akışı
 
@@ -121,7 +128,7 @@ Karar ve gerekçe: [docs/DECISIONS.md](docs/DECISIONS.md) (0.4).
 | Öğrenci karakteri       | Kendi karakteri          | Oku                      | Sistem içeriğini yönet                      |
 | Veli-öğrenci bağlantısı | Kendi bağlantısını yönet | Kendi bağlantısını yönet | İstisna desteği, denetimli                  |
 | Müfredat kataloğu       | Oku                      | Oku                      | CRUD                                        |
-| Rapor dışa aktarma      | Kendi verisi             | Bağlı öğrenci verisi     | Varsayılan olarak kapalı; istisna denetimli |
+| Rapor dışa aktarma      | Henüz yok (tam dışa aktarma Faz 12) | Aktif ilişkide haftalık PDF | Varsayılan olarak kapalı; yönetici rolü bağlantı olmadan açmaz |
 | Sistem rolleri          | Hayır                    | Hayır                    | Sınırlı ve denetimli                        |
 
 CRUD: oluşturma, okuma, güncelleme ve silme. Tablo başlangıç politikasıdır; nihai davranış kullanıcı hikâyeleriyle netleştirilmelidir.

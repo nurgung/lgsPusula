@@ -4,7 +4,7 @@ LGS Pusula; 8. sınıf öğrencilerinin günlük çalışmalarını, deneme sın
 
 > **Kullanım kapsamı:** Uygulama yalnızca aile içinde kullanılır: proje sahibi (veli + yönetici) ve çocuğu (öğrenci). Herkese açık kayıt yoktur. Ayrıntı: [docs/DECISIONS.md](docs/DECISIONS.md) (0.13).
 
-> **Proje durumu:** Faz 0, 1 ve 4–10 tamamlandı. Faz 2'de staging, Vercel–GitHub bağlantısı ve `braces` yaması bekliyor. Faz 3'te staging ve production aile hesapları bekliyor. Faz 11 başlanmadı. İlerleme [roadmap.md](roadmap.md) içinde izlenir. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+> **Proje durumu:** Faz 0, 1 ve 4–11 tamamlandı. Faz 2'de staging, Vercel–GitHub bağlantısı ve `braces` yaması bekliyor. Faz 3'te staging ve production aile hesapları bekliyor. Faz 12 başlanmadı. İlerleme [roadmap.md](roadmap.md) içinde izlenir. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Ürün hedefleri
 

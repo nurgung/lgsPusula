@@ -280,7 +280,7 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 - **Tek gönderim.** Form, sayfa açılınca bir `request_id` üretir. Aynı kimlik ve aynı içerik ikinci kez gelirse yeni satır açılmaz. İçerik farklıysa kayıt reddedilir; sessizce üzerine yazılmaz.
 - **Hedef.** Birimi soru sayısıdır, dakika değil. Günlük hedef o İstanbul gününü, haftalık hedef pazartesiden pazara kadar olan günleri sayar. `subject_id` boşsa tüm dersler birlikte sayılır. Aynı dönem ve ders yeniden kaydedilince satır güncellenir. İlerleme çubuğunun yanında tarih aralığı ve "soru" birimi yazılır.
 - **Karşılaştırma.** Varsayılan, bu haftanın bugüne kadarki günleri ile bir önceki tam haftadır. Aralıklar ve birim (soru ve dakika) ekranda yazılıdır. Özel aralık en fazla 370 gündür ve bugünden ileri gidemez.
-- **Veli.** Bağlı öğrencinin bu haftaki kayıtlarını ve hedeflerini görür. Değiştiremez. Haftalık PDF ve aylık özet Faz 11'dedir.
+- **Veli.** Bağlı öğrencinin bu haftaki kayıtlarını ve hedeflerini görür. Değiştiremez. Haftalık ve aylık özet ile PDF, aşağıdaki Faz 11 bölümündedir.
 - Bu migration yerelde uygulandı. Production'a proje sahibinin onayıyla 19 Ekim 2026'da uygulandı (`npx supabase db push`; önce `--dry-run`). Yeni tablolardır; mevcut satırlar değişmedi. Staging ertelendiği için orada henüz yoktur.
 
 ## Deneme sınavları ve net hesabı (Faz 7)
@@ -335,7 +335,7 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 - **Deneme.** Yalnızca son iki `lgs_full` karşılaştırılır. Branş denemeleri karışmaz. Hangi dersin neti değiştiği bu kartta söylenmez. Pencere 90 gündür.
 - **Kazanım.** `outcome-priority-v1` ile aynı 90 gün. Bağlanmamış yanlıştan kazanım adı üretilmez.
 - **Hedef.** Kart yalnızca günlük hedefi kullanır. Haftalık hedef ana sayfadaki hedef kartında kalır. Birim soru. Gün sınırı Europe/Istanbul.
-- **Yetki.** Öğrenci kimliği oturumdan gelir. Veli ekranına bu kart Faz 11'de gelir. Yeni tablo ve yeni yazma yoktur.
+- **Yetki.** Öğrenci kimliği oturumdan gelir. Aynı kart, öğrencinin işlem bağlantısı olmadan veli sayfasında da gösterilir (Faz 11). Yönetici rolü ek erişim vermez. Yeni tablo ve yeni yazma yoktur.
 - **Durumlar.** Sayfa yüklenirken mevcut `Suspense` metni görünür. Kural uymazsa kart bunu "Neden?" altında söyler. Okuma hatası sayfa hata durumuna düşer.
 
 ## Karakter, görev ve bildirimler (Faz 10)
@@ -356,9 +356,29 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 - **Menü.** Alt çubuk 5 öğeyle dolu olduğu için karakter ve hatırlatma ana sayfadan açılır. Adresler durur.
 - Migration: `20261020140000_mascot.sql`. Yerelde ve production'da uygulandı (20 Ekim 2026, `npx supabase db push`; önce `--dry-run`). Yeni tablolardır; mevcut satırlar değişmedi. Staging ertelendiği için orada henüz yoktur.
 
+## Veli paneli ve PDF rapor (Faz 11)
+
+Veli, aktif bağlantısındaki öğrencinin haftalık ve aylık özetini okur. Haftalık PDF'i sunucu üretir. Aylık PDF yoktur. Öğrenci rapor isteyemez ve indiremez. Yönetici rolü, aktif veli bağlantısı olmadan rapor açmaz.
+
+| Katman | Dosyalar | Görev |
+| --- | --- | --- |
+| Dönem | `src/features/reports/periods.ts` | İstanbul haftası ve ayı. Form yalnızca `current` veya `previous` gönderir. |
+| Belge | `document.ts`, `layout.ts`, `pdf.ts` | Metin blokları, sayfa kırılması, gömülü Nunito ile PDF. Diske yazılmaz. |
+| Yetki | `access.ts` | `canRequestReport` ve `canDownloadReport`. Supabase'i bilmez. |
+| Adaptör | `src/services/supabase/report-store.ts` | Yazma `service_role` ile, aktif bağlantı kontrolünden sonra. Okuma da öyle; indirme yeniden kontrol edilir. |
+| Sayfalar | `/veli`, `/veli/ogrenci/[studentId]`, `GET /veli/rapor/[jobId]` | Özet, indirme formu, dosya veya Türkçe ret sayfası. |
+
+- **Dönem.** Bu hafta pazartesiden bugüne kadardır ve bitmediği yazılır. Geçen hafta bir önceki tam pazartesi–pazardır. Bu ay ayın birinden bugüne, geçen ay bir önceki tam takvim ayıdır. Aralık ve birim (soru, dakika, net) ekranda ve PDF'te yazılıdır.
+- **PDF.** `pdf-lib` 1.17.1 ve `@pdf-lib/fontkit` 1.1.1. Standart PDF yazı tipleri ğ, ş, ı ve İ çizemez. Nunito Regular/Bold (latin ve latin-ext, SIL OFL) `src/features/reports/fonts` altındadır. ESM paketi yalnızca varsayılan dışa aktarımı verdiği için yükleyici her iki şekli de kabul eder. Üretim tarihi İstanbul saatidir. Net formülü `Net = doğru - (yanlış / 3)` diye yazılır. Koçluk cümlesi öğrencinin kartındaki metindir; veliye kaydı yalnızca öğrencinin değiştirebileceği söylenir.
+- **Dosya.** Baytlar `report_jobs.pdf_bytes` içindedir (`storage_kind = database`). Hazır dosya `%PDF-` ile başlar, 400 ile 1.500.000 bayt arasındadır. Başarısız satırda bayt yoktur; `failure_code` `generation_failed` veya `empty_document` olur. İndirme `application/pdf` ve `attachment` döner. Ret sayfası HTML'dir, ek yoktur ve `%PDF` içermez.
+- **Tekrar.** Aynı veli, öğrenci, tür ve dönem yeniden üretilirse satır güncellenir ve 24 saat yeniden başlar. Veli 15 dakikada en fazla 8 rapor ister. Denetim olayı `report.generate` neden kodunu yazar; PDF içeriğini, adı ve öğrenci kimliğini yazmaz.
+- **Silme.** `purge_expired_report_jobs()` veli ana sayfası, öğrenci sayfası ve indirme isteğinde çalışır. Zamanlanmış görev yoktur. Kimse uğramazsa satır 24 saati aşabilir. Süresi dolmuş satır indirilemez. Zamanlanmış silme Faz 12'dedir.
+- **Route.** `instant = false` ve `connection()` ile indirme adresi oturumsuz önbelleğe alınmaz. Aksi halde herkese `/giris` yönlendirmesi yapışırdı.
+- Migration: `20261021120000_report_jobs.sql`. Yerelde ve production'da uygulandı (21 Ekim 2026, `npx supabase db push`; önce `--dry-run`). Yeni tablodur; mevcut satırlar değişmedi. Staging ertelendiği için orada henüz yoktur.
+
 ### Henüz uygulanmayanlar
 
-- Bitmiş bağlantı, `audit_events` ve süresi dolan oran sınırı kayıtlarının saklama süresine göre otomatik silinmesi (karar 0.5: 1 yıl). Silme işi Faz 12'deki yedekleme betikleriyle birlikte planlanacak.
-- Yapay zekâ adaptörü, içe aktarma, PDF/DOCX raporlar.
+- Bitmiş bağlantı, `audit_events` ve süresi dolan oran sınırı kayıtlarının saklama süresine göre otomatik silinmesi (karar 0.5: 1 yıl). Silme işi Faz 12'deki yedekleme betikleriyle birlikte planlanacak. Rapor satırının zamanlanmış silinmesi de bu işe bırakıldı; veli ziyareti olmadan 24 saat aşılabilir.
+- Yapay zekâ adaptörü, içe aktarma ve DOCX rapor. Haftalık PDF Faz 11'de uygulandı.
 - PWA manifesti ve simgeler, nonce tabanlı CSP, hata izleme.
 - Staging Supabase projesi, Preview ortam değişkenleri ve Vercel–GitHub bağlantısı (durum yukarıda).

@@ -5,7 +5,15 @@ import { COACHING_RULE_VERSION } from "../constants";
 import { COACHING_MESSAGES } from "../messages";
 import type { CoachingReport } from "../rules";
 
-export function RecommendationCard({ report }: { report: CoachingReport }) {
+export function RecommendationCard({
+  report,
+  audience = "student",
+  readOnlyNote,
+}: {
+  report: CoachingReport;
+  audience?: "student" | "parent";
+  readOnlyNote?: string;
+}) {
   const item = report.recommendation;
   return (
     <Card
@@ -31,12 +39,15 @@ export function RecommendationCard({ report }: { report: CoachingReport }) {
             ))}
           </ul>
         </section>
-        {item.href && item.actionLabel ? (
+        {audience === "student" && item.href && item.actionLabel ? (
           <div>
             <ButtonLink href={item.href} variant="secondary">
               {item.actionLabel}
             </ButtonLink>
           </div>
+        ) : null}
+        {audience === "parent" && readOnlyNote ? (
+          <p className="text-sm text-ink-700">{readOnlyNote}</p>
         ) : null}
       </div>
     </Card>

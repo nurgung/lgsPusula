@@ -93,6 +93,16 @@ Migration: `supabase/migrations/20261020140000_mascot.sql`. Puan `mascot-v1` kur
 
 `sync_mascot_rewards()` ve `open_study_reminder()` oturumdaki öğrenciyi ister. Veli çalıştıramaz. Hatırlatma cümlesi kodda sabittir; sınav sonucu, net veya puan içermez. Sessiz saatte ve günlük sınır dolunca yeni satır açılmaz.
 
+## Uygulanan şema (Faz 11)
+
+Migration: `supabase/migrations/20261021120000_report_jobs.sql`. Yerelde ve production'da uygulandı (21 Ekim 2026). Haftalık PDF baytları bu tablodadır; herkese açık bir dosya yolu yoktur. Süresi en fazla 24 saat sonradır. Geçmiş bir `expires_at` yazılabilir; indirme yine de reddeder. Silme `purge_expired_report_jobs()` ile olur ve yalnızca `service_role` çalıştırır. Zamanlanmış görev yoktur.
+
+| Tablo | Alanlar | Erişim (`authenticated`) | Erişim (`service_role`) |
+| --- | --- | --- | --- |
+| `report_jobs` | `student_id`, `requested_by`, `report_type` (`weekly_pdf`), `period_from`, `period_to`, `status` (`ready`/`failed`), `pdf_bytes`, `byte_size`, `failure_code`, `storage_kind` (`database`), `expires_at` | Talep sahibi, aktif bağlantısı duruyorsa ve satır hazırsa ve süresi dolmamışsa meta veriyi okur. `pdf_bytes` sütunu verilmez. Ekleme, güncelleme ve silme yok. Öğrenci okuyamaz. | Okur/yazar/siler. Uygulama, aktif bağlantıyı kontrol ettikten sonra yazar |
+
+Hazır satır `%PDF-` ile başlar ve 400–1.500.000 bayttır. Başarısız satırda bayt yoktur. Aynı veli, öğrenci, tür ve dönem tek satırdır. Talep sahibi veli rolünde olmalıdır; konu yalnızca öğrenci rolünde olmalıdır. İkisi aynı kişi olamaz. Dönem en fazla 7 gündür.
+
 ## Önerilen tablolar
 
 - `study_logs`, `study_goals`, `exams`, `exam_subject_results`, `exam_mistakes`: uygulandı (yukarıya bakın).
@@ -100,8 +110,8 @@ Migration: `supabase/migrations/20261020140000_mascot.sql`. Puan `mascot-v1` kur
 - `reward_events`: öğrenci, olay türü, puan ve idempotency anahtarı. Uygulandı (Faz 10).
 - `notification_preferences`: kanal, sıklık, sessiz saatler ve izinler. Uygulandı (Faz 10); kanal yalnızca uygulama içidir.
 - `import_jobs`: dosya kimliği, durum, satır sayıları, hata özeti ve başlatan kullanıcı.
-- `report_jobs`: rapor türü, dönem, talep sahibi, durum ve geçici dosya konumu.
-- `audit_events`: gerekli güvenlik olayları; parola, token veya gereksiz kişisel veri içermez.
+- `report_jobs`: uygulandı (Faz 11, yerel ve production). Baytlar tablodadır; geçici dosya yolu yoktur.
+- `audit_events`: gerekli güvenlik olayları; parola, token veya gereksiz kişisel veri içermez. `report.generate` bu tabloya yazar.
 
 ## Veri modelleme ilkeleri
 

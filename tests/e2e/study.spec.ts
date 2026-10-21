@@ -135,7 +135,7 @@ test("a student sets a goal, records work, edits it and cannot save an inconsist
   await expect(page.getByText("25 dakika", { exact: true })).toBeVisible();
 
   await page.goto("/ogrenci");
-  await expect(page.getByText("5 / 12 soru")).toBeVisible();
+  await expect(page.getByText("5 / 12 soru", { exact: true })).toBeVisible();
   await expectNoHorizontalOverflow(page);
 
   await page.goto("/ogrenci/calisma");

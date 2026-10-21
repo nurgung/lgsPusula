@@ -6,17 +6,17 @@ import type { StudyLogView } from "@/features/study/summary";
 export function StudyLogList({
   logs,
   editable,
+  emptyTitle = "Bu tarihlerde kayıt yok.",
+  emptyDescription = "Çalışmanı yazınca burada görürsün. Bir gün ara vermen bir sorun değil.",
 }: {
   logs: readonly StudyLogView[];
   editable: boolean;
+  emptyTitle?: string;
+  emptyDescription?: string;
 }) {
   if (logs.length === 0) {
     return (
-      <StateMessage
-        variant="empty"
-        title="Bu tarihlerde kayıt yok."
-        description="Çalışmanı yazınca burada görürsün. Bir gün ara vermen bir sorun değil."
-      />
+      <StateMessage variant="empty" title={emptyTitle} description={emptyDescription} />
     );
   }
 
