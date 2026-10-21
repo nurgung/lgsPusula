@@ -7,6 +7,12 @@ import { StateMessage } from "@/components/ui/state-message";
 import { requireStudent } from "@/features/access/guards";
 import { RecommendationCard } from "@/features/coaching/components/recommendation-card";
 import { loadCoachingReport } from "@/features/coaching/load-coaching";
+import {
+  MascotSummaryCard,
+  ReminderCard,
+  TaskList,
+} from "@/features/mascot/components/mascot-panels";
+import { loadOwnMascot } from "@/features/mascot/load-mascot";
 import { loadCatalog } from "@/features/curriculum/load-catalog";
 import { CreateInviteForm } from "@/features/family/components/create-invite-form";
 import { RespondLinkForms } from "@/features/family/components/respond-link-forms";
@@ -33,11 +39,12 @@ async function StudentHome() {
   const user = await requireStudent();
   const today = istanbulToday();
   const week = goalWindow("week", today);
-  const [links, catalog, study, coaching] = await Promise.all([
+  const [links, catalog, study, coaching, mascot] = await Promise.all([
     loadOwnFamilyLinks(),
     loadCatalog({ includeArchived: false }),
     loadStudyRecords(user.id, { from: week.from, to: today }),
     loadCoachingReport(user.id, today),
+    loadOwnMascot(user.id, { openReminder: true }),
   ]);
   const subjects = catalog.map((subject) => ({ id: subject.id, name: subject.name }));
   const todayLogs = study.logs.filter((log) => log.studiedOn === today);
@@ -51,7 +58,19 @@ async function StudentHome() {
         description={`Bugün ${formatTurkishDate(today)}. Gün, Türkiye saatiyle (İstanbul) gece yarısı değişir.`}
       />
       <div className="grid gap-6">
+        {mascot.reminderId ? <ReminderCard noticeId={mascot.reminderId} /> : null}
+        <MascotSummaryCard species={mascot.species} rewards={mascot.rewards} />
         <RecommendationCard report={coaching} />
+        <TaskList
+          facts={{
+            todayLogCount: todayLogs.length,
+            todayQuestionCount: todayLogs.reduce((sum, log) => sum + log.questionCount, 0),
+            dailyGoalTarget:
+              study.goals.find((goal) => goal.period === "day" && goal.subjectId == null)
+                ?.targetQuestions ?? null,
+            reviewExamId: mascot.reviewExamId,
+          }}
+        />
 
         <Card
           title="Bugünün hedefi"

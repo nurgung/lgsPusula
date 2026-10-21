@@ -338,9 +338,27 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 - **Yetki.** Öğrenci kimliği oturumdan gelir. Veli ekranına bu kart Faz 11'de gelir. Yeni tablo ve yeni yazma yoktur.
 - **Durumlar.** Sayfa yüklenirken mevcut `Suspense` metni görünür. Kural uymazsa kart bunu "Neden?" altında söyler. Okuma hatası sayfa hata durumuna düşer.
 
+## Karakter, görev ve bildirimler (Faz 10)
+
+Öğrenci bir hayvan veya bitki seçer. Puan sunucuda, `mascot-v1` ile ve yalnızca bir kez yazılır. Hatırlatma e-posta değildir; sınav sonucu içermez.
+
+| Katman | Dosyalar | Görev |
+| --- | --- | --- |
+| Kural | `constants.ts`, `rules.ts`, `notices.ts`, `messages.ts` | Aşama, rozet, görev, sessiz saat ve yasak ifade. Supabase'i bilmez. |
+| Adaptör | `src/services/supabase/mascot-store.ts` | Okuma ve tür/ayar yazması oturumdaki kullanıcıyla. Puan ve hatırlatma satırı SQL fonksiyonundan gelir. |
+| Sayfalar | `/ogrenci`, `/ogrenci/karakter`, `/ogrenci/bildirimler`, `/veli/ogrenci/[studentId]` | Seçim, puan, görev, hatırlatma ayarı. Veli karakteri salt okur; hatırlatmayı görmez. |
+
+- **Puan.** Çalışma kaydı 5, bugünkü tüm dersler hedefi 10, deneme kaydı 5, kazanım eşleştirmesi 8. Anahtar `study_log:{id}`, `daily_goal:{tarih}`, `exam:{id}`, `outcome_review:{id}`. İkinci çağrı 0 yeni satır döner.
+- **Aşama.** 0 Yeni arkadaş, 10 Alışıyor, 30 Birlikte büyüyor, 60 Yol arkadaşı. Toplam düşmediği için aşama geri gitmez. Bir gün boş kalmak satır silmez.
+- **Görev.** Bugün kayıt, varsa tüm dersler günlük hedefi, varsa bağlanmamış bir deneme. Görev ayrı puan yazmaz; puan kaynak olaydadır.
+- **Rozet.** İlk kayıt, hedef, üç farklı gün, kazanım, deneme kaydı. Üç gün sayacı aradaki boş günde silinmez. Rozet metni sonuç sayısını söylemez.
+- **Hatırlatma.** Varsayılan açık, sessiz saat 21:00–08:00 (İstanbul), günde en fazla 1. Eşit saat sessiz saati kapatır. Cümle sabittir: bugün kayıt yoksa nazik bir davet. Kapalı, sessiz saat, kayıt veya sınır varken görünmez.
+- **Menü.** Alt çubuk 5 öğeyle dolu olduğu için karakter ve hatırlatma ana sayfadan açılır. Adresler durur.
+- Migration: `20261020140000_mascot.sql`. Yerelde ve production'da uygulandı (20 Ekim 2026, `npx supabase db push`; önce `--dry-run`). Yeni tablolardır; mevcut satırlar değişmedi. Staging ertelendiği için orada henüz yoktur.
+
 ### Henüz uygulanmayanlar
 
 - Bitmiş bağlantı, `audit_events` ve süresi dolan oran sınırı kayıtlarının saklama süresine göre otomatik silinmesi (karar 0.5: 1 yıl). Silme işi Faz 12'deki yedekleme betikleriyle birlikte planlanacak.
-- Yapay zekâ adaptörü, karakter puanları, bildirimler, içe aktarma, PDF/DOCX raporlar.
+- Yapay zekâ adaptörü, içe aktarma, PDF/DOCX raporlar.
 - PWA manifesti ve simgeler, nonce tabanlı CSP, hata izleme.
 - Staging Supabase projesi, Preview ortam değişkenleri ve Vercel–GitHub bağlantısı (durum yukarıda).

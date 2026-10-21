@@ -22,7 +22,7 @@
 | 7 | Deneme sınavları ve net hesabı | Tamamlandı — kod, yerel testler ve CI; migration production'a uygulandı (20 Ekim 2026) |
 | 8 | Kazanım analizi ve grafikler | Tamamlandı — kod, yerel testler ve CI; migration production'a uygulandı (20 Ekim 2026) |
 | 9 | Kural tabanlı koçluk | Tamamlandı — kod, birim testler ve uçtan uca kart; öneri tablosu yok (20 Ekim 2026) |
-| 10 | Karakter, görev ve bildirimler | Başlanmadı |
+| 10 | Karakter, görev ve bildirimler | Tamamlandı — kod ve yerel testler; migration production'a uygulandı (20 Ekim 2026). Tüm uçtan uca paket bu turda yeniden çalıştırılmadı |
 | 11 | Veli paneli ve PDF rapor | Başlanmadı |
 | 12 | PWA, erişilebilirlik ve yayın hazırlığı | Başlanmadı |
 | 13 | MVP sonrası: yapay zekâ, içe aktarma, DOCX | Başlanmadı |
@@ -332,18 +332,25 @@
 **Amaç:** Cezalandırmayan motivasyon sistemi ve nazik hatırlatmalar.
 **Ön koşul:** Faz 9, karar 0.8
 
+**Not:** Proje sahibinin onayıyla 20 Ekim 2026'da başlandı. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ("Karakter, görev ve bildirimler"), [docs/DATABASE.md](docs/DATABASE.md), [AUTHORIZATION.md](AUTHORIZATION.md).
+
+**Kararlar (bu fazda, güvenli varsayım):** Karakter beş türden biri (kedi, kaplumbağa, serçe, papatya, fidan). Puan kuralı `mascot-v1`: çalışma kaydı 5, bugünkü tüm dersler hedefi 10, deneme kaydı 5, kazanım eşleştirmesi 8. Aynı anahtar ikinci kez puan yazmaz. Puan satırı silinmez ve güncellenmez; bir gün ara veya kaydı silmek aşamayı düşürmez. Aşamalar 0 / 10 / 30 / 60 puanda değişir ve yalnızca ileri gider. Görevler her istekte hesaplanır, ayrı puan yazmaz. Hatırlatma yalnızca uygulama içidir; varsayılan açık, sessiz saat 21:00–08:00 (İstanbul), günde en fazla 1. Eşit saat sessiz saati kapatır. Hatırlatma cümlesi sabittir ve sınav sonucu içermez.
+
 **İşler**
-- [ ] 10.1 Karakter seçimi (hayvan/bitki) ve `mascot_profiles` migration'ı
-- [ ] 10.2 `reward_events`: puanlar sunucuda, idempotency anahtarıyla hesaplanır
-- [ ] 10.3 Karakter aşamaları, rozetler ve görevler
-- [ ] 10.4 Bildirim tercihleri, sessiz saatler ve sıklık sınırı
-- [ ] 10.5 Veri girilmediğinde nazik hatırlatma
+- [x] 10.1 Karakter seçimi (hayvan/bitki) ve `mascot_profiles` migration'ı
+  - [x] 10.1.1 `20261020140000_mascot.sql` yerelde uygulandı ve test edildi (20 Ekim 2026). Yeni tablolar; mevcut satırlar değişmez
+  - [x] 10.1.2 Production'a `supabase db push` (proje sahibi onayıyla) — önce `--dry-run` ile yalnızca bu migration'ın gideceği görüldü; uygulandı, `supabase migration list --linked` yedi migration'ı da eşit gösteriyor (20 Ekim 2026). Staging 3.1.2.b ile birlikte ertelendi
+- [x] 10.2 `reward_events`: puanlar sunucuda, idempotency anahtarıyla hesaplanır — `sync_mascot_rewards_for`; öğrenci puan yazamaz
+- [x] 10.3 Karakter aşamaları, rozetler ve görevler — `/ogrenci/karakter` ve ana sayfadaki görev listesi
+- [x] 10.4 Bildirim tercihleri, sessiz saatler ve sıklık sınırı — `/ogrenci/bildirimler`
+- [x] 10.5 Veri girilmediğinde nazik hatırlatma — ana sayfa; metin kodda, veri tabanında cümle tutulmaz
 
 **Bitti sayılması için**
-- [ ] Aynı olay tekrar işlendiğinde çift puan oluşmaz (test)
-- [ ] Bir gün ara vermek karakteri geriletmez (test)
-- [ ] Öğrenci bildirimleri kapatabilir
-- [ ] Bildirimlerde hassas sınav bilgisi gösterilmez
+- [x] Aynı olay tekrar işlendiğinde çift puan oluşmaz (test) — `rules.test.ts` ve `tests/e2e/mascot.spec.ts` (ikinci `sync` 0 döner; kayıt düzenlenince satır 1 kalır)
+- [x] Bir gün ara vermek karakteri geriletmez (test) — aynı dosyalar: boş gün puanı düşürmez; kayıt silinince puan durur
+- [x] Öğrenci bildirimleri kapatabilir — aynı uçtan uca test, 320 px ve masaüstü
+- [x] Bildirimlerde hassas sınav bilgisi gösterilmez — hatırlatma kartında net, puan, yanlış, doğru, sınav ve deneme yok (aynı uçtan uca test)
+- [x] 20 Ekim 2026 doğrulama: lint, `tsc --noEmit`, 262 birim testi, `tests/e2e/mascot.spec.ts` ve `tests/e2e/coaching.spec.ts` (320 px + masaüstü) yerelde geçti. Tüm uçtan uca paket bu turda yeniden çalıştırılmadı. Production migration uygulandı (10.1.2)
 
 ---
 

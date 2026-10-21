@@ -89,6 +89,14 @@ Uygulamada iki hesap vardır ([docs/DECISIONS.md](docs/DECISIONS.md), 0.13): pro
 - Kart yalnızca `/ogrenci` ana sayfasındadır. Veli ekranı bu öneriyi Faz 11'e kadar göstermez. Yönetici rolü ek erişim vermez.
 - Doğrulama: `src/features/coaching/rules.test.ts`. Uçtan uca kart: `tests/e2e/coaching.spec.ts`.
 
+**Faz 10**
+
+- Karakter (`mascot_profiles`) yazması yalnızca öğrenci hesabınadır. Öğrenci kimliği oturumdan alınır. Tür güncellenebilir; aşama ve puan formdan yazılmaz.
+- Puan (`reward_events`) yalnızca `sync_mascot_rewards_for` ile eklenir. Öğrencinin ekleme yetkisi yoktur. Aynı olay anahtarı ikinci puan açmaz. Satır güncellenemez; kayıt silmek veya bir gün ara vermek puanı düşürmez.
+- Okuma `canReadMascot` / `canReadStudentRecord` ile aynıdır. Yönetici rolü ek erişim vermez. Veli karakteri ve puanı okur, yazamaz. Hatırlatma ayarı ve hatırlatma satırı yalnızca öğrencinindir.
+- Hatırlatma uygulama içidir (0.8). `open_study_reminder` metni veri tabanına yazmaz. Kapalıyken, sessiz saatte, bugün kayıt varken veya günlük sınır dolunca gösterilmez.
+- Doğrulama: `rules.test.ts`, `notices.test.ts`, `access.test.ts`, `tests/e2e/mascot.spec.ts`.
+
 ## Veli-öğrenci ilişkilendirme akışı
 
 Karar ve gerekçe: [docs/DECISIONS.md](docs/DECISIONS.md) (0.4).

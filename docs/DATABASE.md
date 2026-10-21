@@ -80,12 +80,25 @@ Kazanım, ders satırının dersiyle aynı olmalıdır. Aynı türde eşleştirm
 
 Öneri tablosu yoktur. `coaching-v1` her istekte `study_logs`, `study_goals`, `exams` ve `exam_mistakes` satırlarından hesaplanır. Neden, kural sürümü ve kanıt yalnızca o yanıtın nesnesinde durur. Yeni okuma veya yazma politikası yoktur.
 
+## Uygulanan şema (Faz 10)
+
+Migration: `supabase/migrations/20261020140000_mascot.sql`. Puan `mascot-v1` kuralıyla yalnızca `sync_mascot_rewards_for` içinde yazılır: çalışma kaydı 5, tüm dersler günlük hedefi (bugün, bir kez) 10, deneme kaydı 5, kazanım eşleştirmesi 8. Aynı `(student_id, idempotency_key)` ikinci satır açmaz. Satırlar güncellenemez. Kaynak silinse de puan satırı durur; bir gün ara puanı düşürmez. Aşama saklanmaz; uygulama puan toplamından türetir.
+
+| Tablo | Alanlar | Erişim (`authenticated`) | Erişim (`service_role`) |
+| --- | --- | --- | --- |
+| `mascot_profiles` | `student_id`, `species` (`cat`/`turtle`/`sparrow`/`daisy`/`sapling`) | Öğrenci kendi satırını ekler, okur ve türünü günceller. Aktif bağlantılı veli yalnızca okur. | Okur/yazar/siler |
+| `reward_events` | `event_type`, `points` (1–20), `idempotency_key`, `source_date`, `rule_version` (`mascot-v1`) | Öğrenci ve aktif veli okur. Ekleme, güncelleme ve silme yok. | Okur/ekler/siler; güncelleme tetikleyiciyle de kapalı |
+| `notification_preferences` | `enabled`, `quiet_start`, `quiet_end` (İstanbul duvar saati; eşitse sessiz saat kapalı), `max_per_day` (1–3) | Yalnızca öğrenci kendi satırını okur ve yazar. Veli okuyamaz. | Okur/yazar/siler |
+| `in_app_notices` | `kind` (`study_reminder`), `notice_date`, `sequence` (1–3), `dismissed_at` | Öğrenci kendi satırını okur ve yalnızca `dismissed_at` günceller. Metin sütunu yoktur. | Okur/yazar/siler |
+
+`sync_mascot_rewards()` ve `open_study_reminder()` oturumdaki öğrenciyi ister. Veli çalıştıramaz. Hatırlatma cümlesi kodda sabittir; sınav sonucu, net veya puan içermez. Sessiz saatte ve günlük sınır dolunca yeni satır açılmaz.
+
 ## Önerilen tablolar
 
 - `study_logs`, `study_goals`, `exams`, `exam_subject_results`, `exam_mistakes`: uygulandı (yukarıya bakın).
-- `mascot_profiles`: öğrenci, seçilen karakter ve aşama.
-- `reward_events`: öğrenci, olay türü, puan ve idempotency anahtarı.
-- `notification_preferences`: kanal, sıklık, sessiz saatler ve izinler.
+- `mascot_profiles`: öğrenci, seçilen karakter ve aşama. Uygulandı (Faz 10); aşama sütunu yoktur, puan toplamından türetilir.
+- `reward_events`: öğrenci, olay türü, puan ve idempotency anahtarı. Uygulandı (Faz 10).
+- `notification_preferences`: kanal, sıklık, sessiz saatler ve izinler. Uygulandı (Faz 10); kanal yalnızca uygulama içidir.
 - `import_jobs`: dosya kimliği, durum, satır sayıları, hata özeti ve başlatan kullanıcı.
 - `report_jobs`: rapor türü, dönem, talep sahibi, durum ve geçici dosya konumu.
 - `audit_events`: gerekli güvenlik olayları; parola, token veya gereksiz kişisel veri içermez.

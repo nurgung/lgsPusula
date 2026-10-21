@@ -16,6 +16,8 @@ import {
 } from "@/features/study/calendar";
 import { ExamList } from "@/features/exams/components/exam-list";
 import { loadExamList } from "@/features/exams/load-exams";
+import { ParentMascotCard } from "@/features/mascot/components/mascot-panels";
+import { loadMascotSummary } from "@/features/mascot/load-mascot";
 import { GoalProgressList } from "@/features/study/components/goal-progress-list";
 import { StudyLogList } from "@/features/study/components/study-log-list";
 import { loadStudyRecords } from "@/features/study/load-study";
@@ -57,6 +59,7 @@ async function ParentStudent({
   const weekRange = { from: week.from, to: today };
   const study = await loadStudyRecords(studentId, weekRange);
   const exams = await loadExamList(studentId, weekRange);
+  const mascot = await loadMascotSummary(studentId);
   const weekLogs = study.logs.filter(
     (item) => item.studiedOn >= week.from && item.studiedOn <= today,
   );
@@ -71,8 +74,9 @@ async function ParentStudent({
         <StateMessage
           variant="info"
           title="Kayıtları değiştiremezsin."
-          description="Çalışma, hedef ve deneme özetlerini okuyabilirsin. Değiştirme yalnızca öğrenci hesabındadır."
+          description="Çalışma, hedef, deneme ve karakter özetini okuyabilirsin. Değiştirme yalnızca öğrenci hesabındadır."
         />
+        <ParentMascotCard species={mascot.species} rewards={mascot.rewards} />
         <Card
           title="Bu haftanın hedefi"
           description={`${formatTurkishDateRange(weekRange)} · birim: soru. Hafta pazartesi başlar, pazar biter.`}
