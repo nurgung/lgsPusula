@@ -4,11 +4,8 @@ import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
 import { requireParent } from "@/features/access/guards";
 import { retryAfterMinutes, RATE_LIMITS, rateLimitKey } from "@/features/auth/rate-limit";
-import { loadCoachingReport } from "@/features/coaching/load-coaching";
-import { loadExamList } from "@/features/exams/load-exams";
 import { loadOwnFamilyLinks } from "@/features/family/load-links";
 import { istanbulToday } from "@/features/study/calendar";
-import { loadStudyRecords } from "@/features/study/load-study";
 import {
   AuthProviderError,
   createAuditLog,
@@ -23,11 +20,10 @@ import {
 import { createServiceClient } from "@/services/supabase/server-client";
 import { canRequestReport } from "./access";
 import { classifyReportBytes } from "./bytes";
-import { buildWeeklyReportBlocks } from "./document";
 import type { ReportFormState } from "./form-state";
+import { loadWeeklyBlocks } from "./load-weekly";
 import { REPORT_MESSAGES } from "./messages";
 import { renderReportPdf } from "./pdf";
-import { parentOverviewWindow, weeklyReportWindow } from "./periods";
 
 const requestSchema = z.object({
   studentId: z.uuid(),
@@ -94,37 +90,13 @@ export async function requestWeeklyReportAction(
 
     await purgeExpiredReportJobs(service);
     const today = istanbulToday();
-    const periodWindow = weeklyReportWindow(today, parsed.data.period);
-    const overview = parentOverviewWindow(today);
-    const readWindow = {
-      from: overview.from < periodWindow.from ? overview.from : periodWindow.from,
-      to: overview.to > periodWindow.to ? overview.to : periodWindow.to,
-    };
-    const [study, exams, coaching] = await Promise.all([
-      loadStudyRecords(parsed.data.studentId, readWindow),
-      loadExamList(parsed.data.studentId, readWindow),
-      loadCoachingReport(parsed.data.studentId, today),
-    ]);
-    const blocks = buildWeeklyReportBlocks({
+    const weekly = await loadWeeklyBlocks({
+      studentId: parsed.data.studentId,
       studentName: link.student_display_name,
-      generatedAt: new Date(),
       period: parsed.data.period,
       today,
-      logs: study.logs,
-      goals: study.goals,
-      exams: exams.map((exam) => ({
-        title: exam.title,
-        takenOn: exam.takenOn,
-        examType: exam.examType,
-        totalNet: exam.totalNet,
-        ruleVersion: exam.ruleVersion,
-      })),
-      suggestion: {
-        message: coaching.recommendation.message,
-        reason: coaching.recommendation.reason,
-        evidence: coaching.recommendation.evidence,
-      },
     });
+    const blocks = weekly.blocks;
 
     let rendered: Uint8Array | null = null;
     let renderFailed = false;
@@ -138,8 +110,8 @@ export async function requestWeeklyReportAction(
     const jobId = await saveReportJob(service, {
       studentId: parsed.data.studentId,
       requestedBy: user.id,
-      periodFrom: periodWindow.from,
-      periodTo: periodWindow.to,
+      periodFrom: weekly.periodFrom,
+      periodTo: weekly.periodTo,
       status: classified.ok ? "ready" : "failed",
       bytes: classified.ok ? classified.bytes : null,
       failureCode: classified.ok ? null : classified.failureCode,

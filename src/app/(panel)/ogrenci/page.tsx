@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { StateMessage } from "@/components/ui/state-message";
 import { requireStudent } from "@/features/access/guards";
+import { loadCoachingExplanation } from "@/features/ai/load-explanation";
 import { RecommendationCard } from "@/features/coaching/components/recommendation-card";
 import { loadCoachingReport } from "@/features/coaching/load-coaching";
 import {
@@ -47,6 +48,7 @@ async function StudentHome() {
     loadCoachingReport(user.id, today),
     loadOwnMascot(user.id, { openReminder: true }),
   ]);
+  const explained = await loadCoachingExplanation(user, user.id, coaching, [], today);
   const subjects = catalog.map((subject) => ({ id: subject.id, name: subject.name }));
   const todayLogs = study.logs.filter((log) => log.studiedOn === today);
   const active = links.find((link) => link.status === "active");
@@ -61,7 +63,10 @@ async function StudentHome() {
       <div className="grid gap-6">
         {mascot.reminderId ? <ReminderCard noticeId={mascot.reminderId} /> : null}
         <MascotSummaryCard species={mascot.species} rewards={mascot.rewards} />
-        <RecommendationCard report={coaching} />
+        <RecommendationCard
+          report={explained.report}
+          explanation={explained.explanation}
+        />
         <TaskList
           facts={{
             todayLogCount: todayLogs.length,
@@ -155,6 +160,7 @@ async function StudentHome() {
           <p className="mt-3 text-ink-900">{STUDENT_DATA_NOTICE.notKept}</p>
           <p className="mt-3 text-ink-900">{STUDENT_DATA_NOTICE.parent}</p>
           <p className="mt-3 text-ink-900">{STUDENT_DATA_NOTICE.device}</p>
+          <p className="mt-3 text-ink-900">{STUDENT_DATA_NOTICE.ai}</p>
         </Card>
 
         {active ? (

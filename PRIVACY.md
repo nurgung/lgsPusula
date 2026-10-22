@@ -84,4 +84,4 @@ Veri sorumlusu, başvuru kanalı, başvurulara yanıt süreci, veri ihlali değe
 - [x] Saklama/silme süreleri tanımlandı.
 - [x] Veri dışa aktarma betiği yerel kurgusal veriyle denendi. Hesap silme betiği onay sözcüğü olmadan çalışmaz; production'da çalıştırılmadı.
 - [ ] Log ve analitik sistemlerinde gereksiz kişisel veri bulunmuyor. Kod yolu test edildi. Sentry projesi henüz yok; DSN boşken gönderim olmaz.
-- [x] Yapay zekâya giden veri alanı yok. Karar 0.12 duruyor; Faz 13'te sağlayıcı şartları yeniden bakılacak.
+- [x] Yapay zekâya giden veri, kural kartındaki sayılardan oluşan kısa bir özettir. Ad, e-posta ve hesap kimliği çıkarılır. Anahtar yoksa veya sıfır saklama onaylanmamışsa istek gitmez (22 Ekim 2026, karar 0.12).

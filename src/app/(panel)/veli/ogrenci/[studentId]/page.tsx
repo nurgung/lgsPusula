@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { StateMessage } from "@/components/ui/state-message";
 import { canReadStudentRecord } from "@/features/access/student-access";
 import { requireParent } from "@/features/access/guards";
+import { loadCoachingExplanation } from "@/features/ai/load-explanation";
 import { RecommendationCard } from "@/features/coaching/components/recommendation-card";
 import { loadCoachingReport } from "@/features/coaching/load-coaching";
 import { RevokeLinkButton } from "@/features/family/components/revoke-link-button";
@@ -17,6 +18,7 @@ import { loadExamList } from "@/features/exams/load-exams";
 import { ParentMascotCard } from "@/features/mascot/components/mascot-panels";
 import { loadMascotSummary } from "@/features/mascot/load-mascot";
 import { PeriodSummaryPanel } from "@/features/reports/components/period-summary";
+import { DocxDownload } from "@/features/reports/components/docx-download";
 import { ReportDownloadForm } from "@/features/reports/components/report-download-form";
 import { REPORT_MESSAGES } from "@/features/reports/messages";
 import {
@@ -74,6 +76,13 @@ async function ParentStudent({
     loadMascotSummary(studentId),
     loadCoachingReport(studentId, today),
   ]);
+  const explained = await loadCoachingExplanation(
+    user,
+    studentId,
+    coaching,
+    activeLinks,
+    today,
+  );
   const weekLogs = study.logs.filter(
     (item) => item.studiedOn >= weeks.current.from && item.studiedOn <= weeks.current.to,
   );
@@ -101,9 +110,10 @@ async function ParentStudent({
         />
         <ParentMascotCard species={mascot.species} rewards={mascot.rewards} />
         <RecommendationCard
-          report={coaching}
+          report={explained.report}
           audience="parent"
           readOnlyNote={REPORT_MESSAGES.parentSuggestionNote}
+          explanation={explained.explanation}
         />
         <Card
           title={REPORT_MESSAGES.weekTitle}
@@ -165,9 +175,12 @@ async function ParentStudent({
         </Card>
         <Card
           title="Haftalık rapor"
-          description="PDF sunucuda üretilir. İndirmeden önce bağlantın yeniden kontrol edilir."
+          description="PDF ve Word sunucuda üretilir. İndirmeden önce bağlantın yeniden kontrol edilir."
         >
-          <ReportDownloadForm studentId={studentId} />
+          <div className="grid gap-6">
+            <ReportDownloadForm studentId={studentId} />
+            <DocxDownload studentId={studentId} />
+          </div>
         </Card>
         <Card title="Bağlantı">
           <RevokeLinkButton

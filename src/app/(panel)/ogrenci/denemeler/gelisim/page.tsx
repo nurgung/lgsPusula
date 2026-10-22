@@ -7,8 +7,8 @@ import { StateMessage } from "@/components/ui/state-message";
 import { requireStudent } from "@/features/access/guards";
 import { NetTrendChart } from "@/features/outcomes/components/net-trend-chart";
 import { loadNetTrend } from "@/features/outcomes/load-analysis";
-import { outcomeAnalysisWindow } from "@/features/outcomes/window";
-import { istanbulToday } from "@/features/study/calendar";
+import { examChartWindow } from "@/features/outcomes/window";
+import { formatTurkishDate, istanbulToday, STUDY_DATE_MIN } from "@/features/study/calendar";
 
 export const metadata: Metadata = { title: "Net değişimi" };
 export const instant = false;
@@ -23,14 +23,14 @@ export default function ExamTrendPage() {
 
 async function Content() {
   const user = await requireStudent();
-  const window = outcomeAnalysisWindow(istanbulToday());
+  const window = examChartWindow(istanbulToday());
   const trend = await loadNetTrend(user.id, window);
 
   return (
     <>
       <PageHeader
         title="Net değişimi"
-        description="Denemeler arasındaki toplam net. Grafiğin altında aynı verinin tablosu vardır."
+        description={`${formatTurkishDate(STUDY_DATE_MIN)} tarihinden bugüne kaydettiğin denemelerin toplam neti. Grafiğin altında aynı verinin tablosu vardır.`}
       />
       <Card className="mb-4">
         <NetTrendChart

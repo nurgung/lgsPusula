@@ -9,6 +9,7 @@ describe("student data notice", () => {
     expect(text).toContain("onaylamadan");
     expect(text).toContain("değiştiremez");
     expect(text).toContain("telefonda saklanmaz");
+    expect(text).toContain("Yapay zekâ kapalıyken");
     expect(supportiveNoticeIssues(text)).toEqual([]);
   });
 });

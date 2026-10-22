@@ -11,7 +11,9 @@ export const OUTCOME_MESSAGES = {
   emptyNoMappings:
     "Henüz yanlış veya boş soruyu bir kazanıma bağlamadın. Bağlayınca burada öncelik listesi görünür.",
   emptyTrend:
-    "Net değişimini görmek için en az iki deneme kaydı gerekir. İlk denemeni yazman yeterli bir başlangıç.",
+    "Bu aralıkta net değişimini görmek için en az iki deneme gerekir. İlk denemeni yazman yeterli bir başlangıç.",
+  emptyTrendOne:
+    "Bu aralıkta bir deneme var. Bir deneme daha kaydedince değişim burada görünür.",
   chartTitle: "Denemeler arası toplam net",
   chartUnit: "Toplam net (soru neti)",
 } as const;

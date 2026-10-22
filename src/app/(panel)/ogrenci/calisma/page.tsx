@@ -88,7 +88,12 @@ async function StudyContent({
       <div className="grid gap-6">
         {status ? <StateMessage variant="success" title={status} /> : null}
         <div>
-          <ButtonLink href="/ogrenci/calisma/yeni">Yeni kayıt</ButtonLink>
+          <div className="flex flex-wrap gap-3">
+            <ButtonLink href="/ogrenci/calisma/yeni">Yeni kayıt</ButtonLink>
+            <ButtonLink href="/ogrenci/ice-aktar" variant="secondary">
+              Dosyadan aktar
+            </ButtonLink>
+          </div>
         </div>
         <StudyLogList logs={listed} editable />
         <Card

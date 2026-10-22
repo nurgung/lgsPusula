@@ -34,7 +34,9 @@ export function NetTrendChart({
     return (
       <StateMessage
         variant="empty"
-        title={OUTCOME_MESSAGES.emptyTrend}
+        title={
+          points.length === 1 ? OUTCOME_MESSAGES.emptyTrendOne : OUTCOME_MESSAGES.emptyTrend
+        }
         description={`Aralık: ${rangeLabel}. Birim: ${OUTCOME_MESSAGES.chartUnit}.`}
       />
     );

@@ -26,6 +26,7 @@ export const AUDIT_EVENT_TYPES = [
   "family.link_respond",
   "family.link_revoke",
   "report.generate",
+  "study.import",
 ] as const;
 export type AuditEventType = (typeof AUDIT_EVENT_TYPES)[number];
 

@@ -35,6 +35,9 @@ Bu belge Faz 0'da proje sahibinin verdiği kararları ve gerekçelerini tutar. K
 | 12 Ekim 2026 | Depo herkese açık yapıldı (0.11); GitHub özel güvenlik açığı bildirimi açıldı (0.10).                                                                                                                                                  |
 | 12 Ekim 2026 | Faz 3 için: giriş kullanıcı adıyla yapılır, yerel geliştirme Docker'da yerel Supabase ile yapılır; `@supabase/supabase-js`, `@supabase/ssr` ve `supabase` CLI eklenmesi onaylandı (0.1).                                               |
 | 13 Ekim 2026 | Faz 4 uygulaması: bekleyen veli isteği 24 saat içinde yanıtlanmazsa süresi dolar; öğrenci başına aynı anda en fazla bir bekleyen bağlantı vardır (0.4). Yönetici MFA'sı TOTP'dir; MFA'sız oturum veli sayfalarını kullanabilir (0.13). |
+| 22 Ekim 2026 | Bu uygulamanın tek bulut veri tabanı `lgs-pusula-prod`. Dokuz migration uzak projeyle aynı. İkinci ücretsiz proje yeri başka bir uygulamada; o proje duraklatılmaz. Staging ertelenmiş kalır (0.1). |
+| 22 Ekim 2026 | Groq şartları 0.12 ölçütleriyle yeniden bakıldı. Eğitim yasağı duruyor. Sıfır saklama panelden açılır; açılmadan kod istek atmaz. Konsol kullanıcısı 18 yaşından büyük olmalıdır. Bölge ABD. |
+| 22 Ekim 2026 | Ayrı staging Supabase projesi açılmadı. Proje sahibi, önizleme ortamının bu uygulamanın bulut veritabanı `lgs-pusula-prod` üzerinde çalışmasına karar verdi. `velitakipnew` duraklatılmaz. |
 
 ---
 
@@ -72,7 +75,7 @@ Bu belge Faz 0'da proje sahibinin verdiği kararları ve gerekçelerini tutar. K
 - Migration'lar Supabase CLI ile depoda tutulur.
 - Giriş **kullanıcı adı + parola** ile yapılır (proje sahibi kararı, 12 Ekim 2026). E-posta gönderilmediği için (0.8) gerçek e-posta istenmez; Supabase Auth'un istediği adres, teslim edilemeyen `<kullanıcı_adı>@users.lgs-pusula.invalid` biçiminde iç bir değerdir.
 - Yerel geliştirme ve uçtan uca testler Docker'da çalışan yerel Supabase ile yapılır (proje sahibi kararı, 12 Ekim 2026); CI da aynı yerel ortamı kullanır.
-- Staging projesi ertelendi (proje sahibi kararı, 13 Ekim 2026): ücretsiz planda hesap başına en fazla 2 aktif proje var. Önce yalnızca production açıldı; başka bir proje duraklatıldı. Staging, yer açıldığında ya da ücretli plana geçilince açılır. O zamana kadar Preview dağıtımlarına veri tabanı anahtarı verilmez.
+- Bu uygulamanın tek bulut veri tabanı `lgs-pusula-prod` (Frankfurt). Ayrı staging projesi açılmadı (proje sahibi kararı, 13 Ekim 2026; 22 Ekim 2026'da yenilendi): ücretsiz planda hesap başına en fazla 2 aktif proje var ve ikinci yer başka bir uygulamada. O proje duraklatılmaz. 22 Ekim 2026'da proje sahibi, Vercel önizlemesinin de `lgs-pusula-prod` kullanmasına karar verdi. Önizleme bu yüzden production ile aynı verilere yazar. Ayrı proje, yer açıldığında ya da ücretli plana geçilince açılır.
 
 **Ücretsiz planın sınırları:**
 
@@ -295,7 +298,24 @@ Proje sahibi ücretsiz bir sağlayıcı istedi. Ücretsiz planların koşulları
 | Mistral                   | Ücretsiz planda varsayılan olarak evet; panelden kapatılabilir                        | Ücretsiz planda sıfır saklama yok                           | AB (Fransa) | Yedek seçenek; eğitim izni mutlaka kapatılmalı                          |
 | Google Gemini             | Evet; Türkiye AB/AEA dışında olduğu için ücretsiz planda insan incelemesi de olabilir | Ücretsiz planda kontrol yok                                 | Küresel     | **Önerilmez:** Google çocuğa ait/kişisel veri gönderilmemesini söylüyor |
 
-**Seçim (proje sahibi onayladı, 12 Ekim 2026):** Groq ücretsiz plan, panelde sıfır veri saklama (ZDR) açık. Model, Faz 13'te Türkçe metin kalitesine göre seçilir.
+**Seçim (proje sahibi onayladı, 12 Ekim 2026):** Groq ücretsiz plan, panelde sıfır veri saklama (ZDR) açık. Model `llama-3.3-70b-versatile` (22 Ekim 2026). Başka model kimliği kodda reddedilir.
+
+### Yeniden kontrol (22 Ekim 2026)
+
+Kaynaklar: [Groq hizmet sözleşmesi](https://console.groq.com/docs/legal/services-agreement/) (belgeler 22 Haziran 2026'da güncellenmiş) ve [Your Data in GroqCloud](https://console.groq.com/docs/your-data).
+
+| Ölçüt | Durum |
+| --- | --- |
+| Eğitimde kullanılmama | Sözleşmede yasak. Müşteri açıkça izin vermedikçe girdi ve çıktı eğitimde kullanılmaz. Ücretsiz kullanım da bu maddeye girer. |
+| Saklama | Çıkarım varsayılan olarak saklanmaz. Güvenilirlik ve kötüye kullanım kaydı 30 güne kadar tutulabilir. Sıfır saklama (ZDR) herkese açık; panelden açılır. Açılınca bu kayıt ve saklama isteyen özellikler kapanır. |
+| Bölge | Müşteri verisi ABD'deki Google Cloud kovalarında durur. AB bölgesi yok. |
+| Çocuk | Konsolu kullanan kişi 18 yaşından büyük olmalıdır. Hizmet çocuklara yönelik değildir. Bu yüzden çocuk Groq hesabı açmaz; istek yalnızca veli hesabındaki anahtarla, sunucudan, adsız özetle gider. |
+| Şemalı çıktı | Sohbet ucu JSON nesnesi isteyebilir. Kod tek alan kabul eder: `text`. |
+| Türkçe | Model kimliği sabitlendi. Cümle kural kartının yanındadır; kural metni durur. |
+| Maliyet | Ücretsiz kullanım sınırı vardır. Günlük istek tavanı `AI_DAILY_REQUEST_LIMIT` (varsayılan 20, en fazla 100). |
+| Hata ve kota | Zaman aşımı, kota ve bozuk gövde kural kartına döner. |
+
+**Sıfır saklama:** Proje sahibi 22 Ekim 2026'da Groq Data Controls içinde kuruluş için Zero Data Retention açtığını bildirdi. `AI_ZDR_CONFIRMED=true` Vercel Production ve yerel `.env.local` içindedir. `AI_ENABLED=true` ve `AI_PROVIDER=groq` de oradadır. `AI_API_KEY` yerel `.env.local` ve Vercel Production gizli değişkenindedir; depoda yoktur. Yerel öğrenci anahtarı `ogrenci` hesabında açıktır. Production'da aile hesabı olmadığı için orada anahtar satırı yoktur. Depodaki örnek değerler `false` kalır.
 
 **Koşullar:**
 

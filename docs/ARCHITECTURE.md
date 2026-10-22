@@ -174,15 +174,15 @@ Sınırlayıcıya ulaşılamazsa istek reddedilir (fail closed). Parola sıfırl
 
 **Uyarı:** `supabase/config.toml` bulut projesine olduğu gibi `supabase config push` ile gönderilmemelidir. Dosyada yalnızca yerel ortam için olan değerler var (giriş oran sınırı 1000). TOTP yerel ortamda da açıktır; barındırılan projelerde TOTP varsayılan olarak açık ve ücretsizdir, bu yüzden MFA için ayrıca `config push` gerekmez. Telefon MFA kapalı kalır. Auth ayarları için yalnızca gereken anahtarları içeren geçici bir yapılandırma ile önce `supabase config diff`, sonra `supabase config push` kullanılır.
 
-### Bulut ortamlarının durumu (13 Ekim 2026)
+### Bulut ortamlarının durumu
 
 | Ortam      | Supabase                      | Vercel                                                                                       | Durum                                                                                                                                                                                      |
 | ---------- | ----------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Production | `lgs-pusula-prod` (Frankfurt) | Production değişkenleri girildi; adres `https://lgs-pusula.vercel.app` (fonksiyonlar `fra1`) | Migration uygulandı; dışarıdan kayıt kapalı (doğrulandı: `signup_disabled`); parola kuralı 10 karakter, harf + rakam; HTTPS ve güvenlik başlıkları doğrulandı; giriş Supabase'e bağlanıyor |
-| Staging    | Açılmadı                      | Preview için değişken yok                                                                    | Ücretsiz planın 2 proje sınırı nedeniyle proje sahibi kararıyla ertelendi. Preview dağıtımlarında giriş "şu an kullanılamıyor" mesajı verir; production anahtarı Preview'a verilmez        |
+| Production | `lgs-pusula-prod` (Frankfurt) | Production değişkenleri girildi; adres `https://lgs-pusula.vercel.app` (fonksiyonlar `fra1`) | Bu uygulamanın tek bulut veri tabanı. 22 Ekim 2026: dokuz migration yerel listeyle aynı. Kayıt kapalı; parola kuralı 10 karakter, harf + rakam. Yerel `config.toml` basılmadı |
+| Staging    | Ayrı proje yok. Önizleme `lgs-pusula-prod` kullanır | Preview değişkenleri girildi (`APP_ENV=staging`). `AUTH_SECRET` production'dan ayrı. GitHub bağlı | Proje sahibi kararı, 22 Ekim 2026. İkinci ücretsiz yer `velitakipnew` ve duraklatılmaz. Önizleme, production ile aynı veritabanına yazar. Kalıcı staging dalı henüz yok |
 
 - Önizleme dağıtım adresleri Vercel Authentication ile korunuyor (oturumsuz istek Vercel girişine yönlenir).
-- Vercel projesi GitHub deposuna henüz bağlanamadı (`vercel git connect` hata veriyor). Bu yüzden push sonrası otomatik dağıtım yok; dağıtım `npx vercel deploy --prod` ile elle yapılır. Bağlantı için Vercel hesabında GitHub bağlantısı ve Vercel GitHub uygulamasının depoya erişimi gerekir.
+- Vercel projesi 22 Ekim 2026'da `nurgung/lgsPusula` deposuna bağlandı (`vercel git connect` → Connected). Bağlama komutu yeni bir dağıtım başlatmadı. Sıradaki GitHub push'u dağıtımı dener.
 - Aile hesapları production'da henüz oluşturulmadı (adım 5). Geçici parolalar yalnızca ekranda gösterildiği için bu adımı proje sahibi kendi bilgisayarında çalıştırır.
 
 ## Roller ve veli-öğrenci ilişkisi (Faz 4)
@@ -315,7 +315,7 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 
 - **Kaynak / güven.** Faz 8 yalnızca `manual` / `high` yazar. İleride içe aktarma veya yapay zekâ ayrı kaynak ve güven düzeyleri ekleyebilir.
 - **Boş durum.** Eşleştirme yoksa öncelik listesi “tespit yapılmış” gibi davranmaz. Net grafiği için en az iki deneme gerekir.
-- **Pencere.** Öncelik ve grafik varsayılan 90 gün (Europe/Istanbul, bugün dahil).
+- **Pencere.** Kazanım önceliği 90 gün (Europe/Istanbul, bugün dahil). Net grafiği, deneme girilebilen en erken günden (`STUDY_DATE_MIN`, 1 Eylül 2024) bugüne bakar; böylece 90 günden eski bir deneme grafikten düşmez.
 - Migration: `20261020120000_exam_mistakes.sql`. Yerelde ve production'da uygulandı (20 Ekim 2026). Staging ertelendiği için orada henüz yoktur.
 
 ## Kural tabanlı koçluk (Faz 9)
@@ -403,5 +403,12 @@ Kök yerleşim her istekte `connection()` bekler. Böylece HTML, o isteğin nonc
 
 - Saklama temizliği için zamanlanmış görev. Fonksiyon production'da var. Kimse `npm run data -- retain` çalıştırmazsa satırlar sürelerini aşabilir.
 - Faz 12 kodunun production'a dağıtılması. `SENTRY_DSN` Vercel'de durur; canlı sürüm bu kodu içermediği için henüz olay göndermez.
-- Yapay zekâ adaptörü, içe aktarma ve DOCX rapor. Kodda Groq çağrısı yoktur (karar 0.12, Faz 13'te yeniden bakılır).
-- Staging Supabase projesi, Preview ortam değişkenleri ve Vercel–GitHub bağlantısı (durum yukarıda).
+- Kalıcı staging dalı ve o adresin HTTPS kontrolü (2.8.3.c). GitHub bağlantısı 22 Ekim 2026'da kuruldu.
+
+## Yapay zekâ, içe aktarma ve Word raporu (Faz 13)
+
+Karar 0.12, 22 Ekim 2026'da yeniden bakıldı. İstek yalnızca `https://api.groq.com/openai/v1/chat/completions` adresine gider. Proje sahibi aynı gün kuruluş için sıfır saklamayı açtı. `AI_ZDR_CONFIRMED` ve `AI_ENABLED` production ile yerelde açıktır. `AI_API_KEY` yerel dosyada ve Vercel Production gizli değişkenindedir; depoda yoktur. Anahtar, sağlayıcı ve sıfır saklama onayı birlikte olmadan istek gitmez. Gövde kural kartının kısa özetidir; hesap kimliği, ad ve e-posta çıkarılır. Model yanıtında `text` dışında bir alan varsa cümle gösterilmez. Kural kartı değişmez. Günlük tavan `consume_ai_request` ile sayılır.
+
+İçe aktarma `/ogrenci/ice-aktar` üzerindedir. Öğrenci kimliği oturumdandır. CSV ve xlsx 500 KB ve 100 satırla sınırlıdır. Formül hücresi reddedilir. PDF modele gitmez; metin katmanındaki `tarih:` satırları okunur, yoksa satır uydurulmaz. Kayıt, önizlemeden sonra `confirm=evet` ile yazılır. Aynı satır aynı `request_id` üretir.
+
+Word raporu PDF ile aynı bloklardandır. Dosya `report_jobs` tablosuna yazılmaz; veli bağlantısı kontrol edildikten sonra tarayıcıya iner. Production migration `20261022100000_ai_preferences.sql` henüz gönderilmedi.

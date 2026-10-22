@@ -9,6 +9,9 @@ describe("parseServerEnv", () => {
     expect(env.UI_PREVIEW_ENABLED).toBe(false);
     expect(env.REPORT_TEMP_TTL_MINUTES).toBe(30);
     expect(env.DATABASE_URL).toBeUndefined();
+    expect(env.AI_ENABLED).toBe(false);
+    expect(env.AI_ZDR_CONFIRMED).toBe(false);
+    expect(env.AI_DAILY_REQUEST_LIMIT).toBe(20);
   });
 
   it("treats empty strings from .env files as unset", () => {
@@ -97,5 +100,10 @@ describe("parseServerEnv", () => {
       expect((error as ServerEnvError).invalidKeys).toEqual(["DATABASE_URL"]);
       expect((error as Error).message).not.toContain(secret);
     }
+  });
+
+  it("accepts only the groq provider name", () => {
+    expect(parseServerEnv({ AI_PROVIDER: "groq" }).AI_PROVIDER).toBe("groq");
+    expect(() => parseServerEnv({ AI_PROVIDER: "other" })).toThrow(/AI_PROVIDER/);
   });
 });

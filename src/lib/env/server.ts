@@ -27,6 +27,16 @@ export const serverEnvSchema = z
     AI_PROVIDER: optionalText,
     AI_API_KEY: optionalText,
     AI_MODEL: optionalText,
+    AI_ENABLED: z
+      .preprocess(emptyToUndefined, z.enum(["true", "false"]).default("false"))
+      .transform((value) => value === "true"),
+    AI_ZDR_CONFIRMED: z
+      .preprocess(emptyToUndefined, z.enum(["true", "false"]).default("false"))
+      .transform((value) => value === "true"),
+    AI_DAILY_REQUEST_LIMIT: z.preprocess(
+      emptyToUndefined,
+      z.coerce.number().int().min(1).max(100).default(20),
+    ),
 
     STORAGE_BUCKET: optionalText,
     // Optional. Empty disables error reporting. Only an EU ingest DSN is accepted.
@@ -62,6 +72,13 @@ export const serverEnvSchema = z
           });
         }
       }
+    }
+    if (env.AI_PROVIDER !== undefined && env.AI_PROVIDER !== "groq") {
+      ctx.addIssue({
+        code: "custom",
+        path: ["AI_PROVIDER"],
+        message: "AI_PROVIDER must be groq.",
+      });
     }
     if (
       env.SENTRY_DSN &&

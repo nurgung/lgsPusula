@@ -4,9 +4,12 @@ import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { StateMessage } from "@/components/ui/state-message";
+import { AiSwitch } from "@/features/ai/components/ai-switch";
 import { SignOutControls } from "@/features/auth/components/sign-out-controls";
 import { MFA_PATH } from "@/features/auth/paths";
 import { CHANGE_PASSWORD_PATH, requireUser } from "@/features/auth/session";
+import { readAiEnabled } from "@/services/supabase/ai-store";
+import { createServiceClient } from "@/services/supabase/server-client";
 import { ROLE_LABELS } from "@/types/roles";
 
 export const metadata: Metadata = { title: "Hesabım" };
@@ -27,6 +30,8 @@ async function AccountContent({
 }: Pick<PageProps<"/hesap">, "searchParams">) {
   const user = await requireUser();
   const { durum } = await searchParams;
+  const student = user.roles.length === 1 && user.roles[0] === "student";
+  const aiEnabled = student ? await readAiEnabled(createServiceClient(), user.id) : false;
 
   return (
     <>
@@ -61,6 +66,15 @@ async function AccountContent({
             ) : (
               <ButtonLink href={MFA_PATH}>Doğrulamayı aç</ButtonLink>
             )}
+          </Card>
+        ) : null}
+
+        {student ? (
+          <Card
+            title="Sade anlatım"
+            description="İstersen kural önerisinin yanına kısa bir cümle eklenebilir."
+          >
+            <AiSwitch enabled={aiEnabled} />
           </Card>
         ) : null}
 

@@ -10,6 +10,7 @@ export const STUDENT_DATA_NOTICE = {
   parent:
     "Velin, sen onaylamadan kayıtlarını göremez. Onaylarsan görebilir ama değiştiremez. Bağlantıyı istediğin zaman kaldırabilirsin.",
   device: "Uygulamayı telefona eklesen bile kayıtlar telefonda saklanmaz.",
+  ai: "Yapay zekâ kapalıyken öneri yalnızca kurallardan gelir. Açarsan modele adın gitmez. İstediğin zaman kapatabilirsin.",
 } as const;
 
 const FORBIDDEN = ["utanç", "herkes senden", "başaramaz", "ceza", "kork"];
@@ -21,6 +22,7 @@ export function noticeText(): string {
     STUDENT_DATA_NOTICE.notKept,
     STUDENT_DATA_NOTICE.parent,
     STUDENT_DATA_NOTICE.device,
+    STUDENT_DATA_NOTICE.ai,
   ].join(" ");
 }
 

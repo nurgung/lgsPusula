@@ -9,10 +9,12 @@ export function RecommendationCard({
   report,
   audience = "student",
   readOnlyNote,
+  explanation = null,
 }: {
   report: CoachingReport;
   audience?: "student" | "parent";
   readOnlyNote?: string;
+  explanation?: string | null;
 }) {
   const item = report.recommendation;
   return (
@@ -39,6 +41,18 @@ export function RecommendationCard({
             ))}
           </ul>
         </section>
+        {explanation ? (
+          <section aria-labelledby="oneri-sade" className="grid min-w-0 gap-2">
+            <h3 id="oneri-sade" className="text-base font-bold text-ink-900">
+              Sade anlatım
+            </h3>
+            <p className="min-w-0 break-words text-ink-900">{explanation}</p>
+            <p className="text-sm text-ink-700">
+              Bu cümle yapay zekâdan gelir. Öneri ve neden satırı yine kuraldan gelir. Bu
+              cümle puanı, kaydı ve yetkiyi değiştirmez.
+            </p>
+          </section>
+        ) : null}
         {audience === "student" && item.href && item.actionLabel ? (
           <div>
             <ButtonLink href={item.href} variant="secondary">

@@ -14,8 +14,8 @@
 |---|---|---|
 | 0 | Ürün ve servis kararları | Tamamlandı — 13/13 karar verildi ([docs/DECISIONS.md](docs/DECISIONS.md)) |
 | 1 | Proje altyapısı | Tamamlandı |
-| 2 | Tasarım sistemi ve CI | Devam ediyor — Vercel production `https://lgs-pusula.vercel.app` HTTPS ve güvenlik başlıklarıyla açık; staging (ertelendi), Vercel–GitHub bağlantısı ve `braces` yaması (hâlâ yok) bekliyor |
-| 3 | Veri tabanı ve kimlik doğrulama | Devam ediyor — production Supabase (Frankfurt) kuruldu, kayıt kapalı, CI yeşil; staging projesi (ertelendi) ve production aile hesapları (proje sahibi) bekliyor |
+| 2 | Tasarım sistemi ve CI | Devam ediyor — Vercel production `https://lgs-pusula.vercel.app` açık. Preview `lgs-pusula-prod` kullanıyor. GitHub bağlantısı 22 Ekim 2026'da kuruldu. `braces` yaması ve kalıcı staging adresi bekliyor |
+| 3 | Veri tabanı ve kimlik doğrulama | Devam ediyor — bulut veri tabanı `lgs-pusula-prod`. Ayrı staging projesi yok; önizleme aynı projeyi kullanır (22 Ekim 2026). Production aile hesapları bekliyor |
 | 4 | Roller ve veli-öğrenci ilişkisi | Tamamlandı — yerel testler ve CI geçti; migration production'a uygulandı (13 Ekim 2026) |
 | 5 | Müfredat kataloğu | Tamamlandı — kod, yerel testler ve CI tamam; migration ve MEB 8. sınıf kataloğu (326 kazanım) production'da (14 Ekim 2026) |
 | 6 | Günlük çalışma kayıtları ve hedefler | Tamamlandı — kod, yerel testler ve CI; migration production'a uygulandı (19 Ekim 2026) |
@@ -25,7 +25,7 @@
 | 10 | Karakter, görev ve bildirimler | Tamamlandı — kod ve yerel testler; migration production'a uygulandı (20 Ekim 2026). Tüm uçtan uca paket bu turda yeniden çalıştırılmadı |
 | 11 | Veli paneli ve PDF rapor | Tamamlandı — kod, yerel testler ve production migration (21 Ekim 2026). Tüm uçtan uca paket bu turda yeniden çalıştırılmadı |
 | 12 | PWA, erişilebilirlik ve yayın hazırlığı | Devam ediyor — PWA, çevrimdışı sınır, nonce CSP, yedek ve saklama migration'ı doğrulandı. Sentry AB projesi ve `SENTRY_DSN` Production'da (21 Ekim 2026). Gerçek cihaz ve Gitleaks bekliyor |
-| 13 | MVP sonrası: yapay zekâ, içe aktarma, DOCX | Başlanmadı |
+| 13 | MVP sonrası: yapay zekâ, içe aktarma, DOCX | Devam ediyor — sıfır saklama açık, `AI_ENABLED=true`. Groq anahtarı yerelde ve Vercel Production gizli değişkeninde; depoda yok. Production migration bekliyor |
 
 ---
 
@@ -113,10 +113,10 @@
   - [ ] 2.7.3 Yamalı sürüm çıkınca güncelle (Dependabot haber verir) — 13 Ekim 2026: npm'de son sürüm hâlâ 3.0.3, yama yok
 - [ ] 2.8 Staging ortamını kur ve ortam değişkenlerini platformun secret yönetimine taşı
   - [x] 2.8.1 `vercel.json` (Frankfurt, `fra1`) ve kurulum adımları ([docs/ARCHITECTURE.md](docs/ARCHITECTURE.md))
-  - [ ] 2.8.2 Vercel projesini bağla ve ortam değişkenlerini Preview/Production için ayrı gir
+  - [x] 2.8.2 Vercel projesini bağla ve ortam değişkenlerini Preview/Production için ayrı gir
     - [x] 2.8.2.a Vercel projesi `nurgung/lgs-pusula` oluşturuldu; Production değişkenleri girildi (gizli olanlar "Secret" türünde) — 13 Ekim 2026
-    - [ ] 2.8.2.b Preview (staging) değişkenleri — staging Supabase projesine bağlı (3.1.2.b)
-    - [ ] 2.8.2.c Vercel–GitHub bağlantısı (push sonrası otomatik dağıtım); `vercel git connect` şu an hata veriyor
+    - [x] 2.8.2.b Preview değişkenleri — ayrı Supabase projesi yok. Proje sahibi kararıyla `lgs-pusula-prod` (22 Ekim 2026). `APP_ENV=staging`, örnek sayfalar kapalı, `AUTH_SECRET` production'dan ayrı
+    - [x] 2.8.2.c Vercel–GitHub bağlantısı — `vercel git connect` 22 Ekim 2026'da `nurgung/lgsPusula` için "Connected" döndü. Bu komut yeni dağıtım başlatmadı; sıradaki GitHub push'u dağıtımı dener
   - [ ] 2.8.3 Preview dağıtımlarında Vercel Authentication açık; staging adresi HTTPS ve güvenlik başlıklarıyla açılır
     - [x] 2.8.3.a Önizleme dağıtım adresi Vercel girişine yönleniyor (Vercel Authentication açık)
     - [x] 2.8.3.b Production adresi `https://lgs-pusula.vercel.app` HTTPS ile açılıyor; HTTP→HTTPS yönlendirmesi, HSTS, `nosniff`, `X-Frame-Options: DENY`, referrer ve izin politikası doğrulandı; fonksiyonlar `fra1`'de
@@ -140,7 +140,7 @@
   - [x] 3.1.1 Supabase'i koda bağla (`@supabase/ssr`, `src/services/supabase`); yerel geliştirme ortamı Docker'da (`npm run db:start`, portlar 553xx)
   - [ ] 3.1.2 Staging ve production Supabase projelerini Frankfurt'ta aç; kayıt kapalı, parola kuralı ayarlanır, `supabase db push` ile migration uygulanır, değerler Vercel'e girilir (adımlar [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md))
     - [x] 3.1.2.a Production: `lgs-pusula-prod` (Frankfurt) açıldı, migration uygulandı, parola kuralı (10 karakter, harf + rakam) ayarlandı, değerler Vercel Production'a girildi; canlı adreste giriş Supabase'e bağlanıyor (yanlış girişte doğru hata mesajı) — 13 Ekim 2026
-    - [ ] 3.1.2.b Staging: ücretsiz planın 2 proje sınırı nedeniyle proje sahibi kararıyla ertelendi ([docs/DECISIONS.md](docs/DECISIONS.md), 0.1)
+    - [ ] 3.1.2.b Ayrı staging Supabase projesi açılmadı. 22 Ekim 2026: proje sahibi önizlemenin `lgs-pusula-prod` üzerinde çalışmasına karar verdi. `velitakipnew` duraklatılmaz. Ayrı proje, yer açılırsa veya plan yükselirse gelir
     - [ ] 3.1.2.c Production'da iki aile hesabını oluştur (`scripts/accounts.ts setup`; geçici parolalar yalnızca ekranda gösterildiği için proje sahibi çalıştırır)
 - [x] 3.2 Migration altyapısını kur
   - [x] 3.2.1 `supabase/migrations` + Supabase CLI; migration `supabase db reset` ile sıfırdan uygulandı
@@ -420,27 +420,29 @@
 **Ön koşul:** MVP yayında, karar 0.12
 
 **Yapay zekâ destekli açıklamalar**
-- [ ] 13.0 Groq'un güncel veri ve kota şartlarını 0.12 ölçütleriyle yeniden kontrol et; panelde sıfır veri saklamayı aç
-- [ ] 13.1 Sağlayıcıdan bağımsız yapay zekâ adaptörü (ilk sağlayıcı: Groq)
-- [ ] 13.2 Modele yalnızca gerekli en az veriyi gönderme; tanımlayıcıları çıkarma
-- [ ] 13.3 Çıktı şeması doğrulaması, uzunluk sınırı, istem enjeksiyonu önlemleri
-- [ ] 13.4 Hata, zaman aşımı ve kota durumunda kural tabanlı geri dönüş
-- [ ] 13.5 Yapay zekâyı kapatma ayarı ve maliyet sınırı
+- [x] 13.0 Groq'un güncel veri ve kota şartlarını 0.12 ölçütleriyle yeniden kontrol et; panelde sıfır veri saklamayı aç
+  - [x] 13.0.1 Şartlar 22 Ekim 2026'da yeniden bakıldı ve [docs/DECISIONS.md](docs/DECISIONS.md) içine yazıldı. Konsol 18 yaş ister. Bölge ABD. Eğitim yasağı duruyor
+  - [x] 13.0.2 Proje sahibi 22 Ekim 2026'da kuruluş için sıfır saklamayı açtı. `AI_ZDR_CONFIRMED=true`, `AI_ENABLED=true` ve `AI_PROVIDER=groq` Vercel Production ile yerelde duruyor. `AI_API_KEY` gizli değişken; depoda yok
+- [x] 13.1 Sağlayıcıdan bağımsız yapay zekâ adaptörü (ilk sağlayıcı: Groq) — `src/features/ai/explain.ts`, `src/services/ai/groq.ts`. Birim testler geçti
+- [x] 13.2 Modele yalnızca gerekli en az veriyi gönderme; tanımlayıcıları çıkarma — `coachingBrief`. Hesap kimliği, e-posta ve bağlantı özete girmez
+- [x] 13.3 Çıktı şeması doğrulaması, uzunluk sınırı, istem enjeksiyonu önlemleri — tek alan `text`, en fazla 400 karakter, ek alan reddi
+- [x] 13.4 Hata, zaman aşımı ve kota durumunda kural tabanlı geri dönüş — `explain.test.ts`
+- [x] 13.5 Yapay zekâyı kapatma ayarı ve maliyet sınırı — öğrenci anahtarı `/hesap`, günlük tavan `AI_DAILY_REQUEST_LIMIT`. `AI_ENABLED` varsayılan kapalı
 
 **CSV/XLSX içe aktarma**
-- [ ] 13.6 Şablon ve alan eşleştirme
-- [ ] 13.7 Boyut, tür, imza ve satır sınırları; formül enjeksiyonu önlemi
-- [ ] 13.8 Önizleme, satır bazında hata ve kullanıcı onayı
-- [ ] 13.9 Yinelenen kayıt kontrolü (idempotent içe aktarma)
+- [x] 13.6 Şablon ve alan eşleştirme — CSV şablonu `tarih,ders,soru,dogru,yanlis,bos,sure`. Ders adı katalogla eşleşir
+- [x] 13.7 Boyut, tür, imza ve satır sınırları; formül enjeksiyonu önlemi — 500 KB, 100 satır, CSV veya PK başlıklı xlsx. Formül satırı yazılmaz
+- [x] 13.8 Önizleme, satır bazında hata ve kullanıcı onayı — `/ogrenci/ice-aktar`. Kayıt yalnızca `confirm=evet` ile
+- [x] 13.9 Yinelenen kayıt kontrolü (idempotent içe aktarma) — aynı satır aynı `request_id` üretir
 
 **Diğer**
-- [ ] 13.10 DOCX rapor
-- [ ] 13.11 PDF'den veri çıkarımı (ayrı değerlendirme ve kullanıcı onaylı akış)
+- [x] 13.10 DOCX rapor — veli sayfasında Word indirme. Dosya `report_jobs` içine yazılmaz. `docx.test.ts` Türkçe karakter ve tablo başlığını doğruladı
+- [x] 13.11 PDF'den veri çıkarımı (ayrı değerlendirme ve kullanıcı onaylı akış) — PDF modele gitmez. Etiketli metin yoksa satır uydurulmaz. Yazmadan önce önizleme ve onay gerekir
 
 **Bitti sayılması için**
-- [ ] Yapay zekâ kullanılamadığında temel koçluk çalışır (test)
-- [ ] Model çıktısı puan, yetki veya veri tabanı sorgusunu belirlemez (test)
-- [ ] Geçersiz dosyalar güvenle reddedilir; satırlar başka öğrenciye yazılamaz (test)
+- [x] Yapay zekâ kullanılamadığında temel koçluk çalışır (test) — `src/features/ai/explain.test.ts`, 22 Ekim 2026
+- [x] Model çıktısı puan, yetki veya veri tabanı sorgusunu belirlemez (test) — aynı dosya: ek alanlar reddedilir, kural kartı aynı kalır
+- [x] Geçersiz dosyalar güvenle reddedilir; satırlar başka öğrenciye yazılamaz (test) — `src/features/import/plan.test.ts`
 
 ---
 
@@ -455,10 +457,10 @@
 
 - [x] Rol ve ilişki erişim testleri başarılı. `tests/e2e/access.spec.ts`, 21 Ekim 2026.
 - [x] Net ve hedef hesaplama testleri başarılı. Birim testler ve `tests/e2e/exams.spec.ts` aynı gün.
-- [x] Rapor erişim testleri başarılı. `tests/e2e/reports.spec.ts` aynı gün. Dosya yükleme ucu yok (Faz 13).
+- [x] Rapor erişim testleri başarılı. `tests/e2e/reports.spec.ts` aynı gün. Faz 13 içe aktarması öğrenci kimliğini oturumdan alır.
 - [ ] Gizli anahtar taraması temiz. Bu turda Gitleaks çalıştırılmadı.
 - [x] Yedekleme ve geri yükleme denenmiş. Yerel deneme; production yedeği yok.
 - [x] Öğrencinin ilk girişte gördüğü "hangi bilgiler tutuluyor, veli neyi görebilir" açıklaması ve veli bağlantı onayı akışı incelenmiş. Metin `/ogrenci` ana sayfasında; onay akışı erişim testleriyle duruyor.
-- [x] Yapay zekâ sağlayıcısının veri kullanımı ve saklama şartları incelenmiş. MVP istek atmıyor. Karar 0.12 duruyor; Faz 13'te yeniden bakılacak.
+- [x] Yapay zekâ sağlayıcısının veri kullanımı ve saklama şartları incelenmiş. 22 Ekim 2026'da yeniden bakıldı. İstek, sıfır saklama onayı ve `AI_ENABLED` olmadan gitmez.
 - [x] Hata izleme araçlarında hassas veri sızıntısı kontrol edilmiş. Gönderilen gövde testte tarandı. Canlı projeye olay gitmedi.
 - [x] Destek ve güvenlik olayı müdahale süreci belgelenmiş. [SECURITY.md](SECURITY.md) ("Olay müdahalesi").

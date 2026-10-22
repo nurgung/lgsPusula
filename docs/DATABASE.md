@@ -109,9 +109,19 @@ Hazır satır `%PDF-` ile başlar ve 400–1.500.000 bayttır. Başarısız sat�
 - `mascot_profiles`: öğrenci, seçilen karakter ve aşama. Uygulandı (Faz 10); aşama sütunu yoktur, puan toplamından türetilir.
 - `reward_events`: öğrenci, olay türü, puan ve idempotency anahtarı. Uygulandı (Faz 10).
 - `notification_preferences`: kanal, sıklık, sessiz saatler ve izinler. Uygulandı (Faz 10); kanal yalnızca uygulama içidir.
-- `import_jobs`: dosya kimliği, durum, satır sayıları, hata özeti ve başlatan kullanıcı.
+- `import_jobs`: ayrı tablo açılmadı. İçe aktarma istek içinde biter. Tekrar, `study_logs.request_id` ile engellenir (Faz 13).
 - `report_jobs`: uygulandı (Faz 11, yerel ve production). Baytlar tablodadır; geçici dosya yolu yoktur.
 - `audit_events`: gerekli güvenlik olayları; parola, token veya gereksiz kişisel veri içermez. `report.generate` bu tabloya yazar.
+
+## Uygulanan şema (Faz 13)
+
+Migration: `supabase/migrations/20261022100000_ai_preferences.sql`. Yerelde 22 Ekim 2026'da uygulandı. Production'a gönderilmedi.
+
+| Tablo / fonksiyon | Alanlar | Erişim (`authenticated`) | Erişim (`service_role`) |
+| --- | --- | --- | --- |
+| `ai_preferences` | `student_id`, `enabled` (varsayılan kapalı), `used_on`, `request_count` (0–100) | Yalnızca kendi satırını **okur**. Doğrudan ekleme ve güncelleme yok. | Okur/yazar. Sayaç `consume_ai_request` ile artar. |
+| `set_ai_enabled(boolean)` | Öğrencinin kendi anahtarını açar veya kapatır. Sayaca dokunmaz. | Yalnızca rolü tek başına `student` olan oturum çalıştırır. | Çalıştırır |
+| `consume_ai_request(uuid, date, integer)` | İstanbul günü değişince sayacı 1 yapar; aynı günde tavana gelince `false` döner. | Çalıştıramaz | Çalıştırır |
 
 ## Veri modelleme ilkeleri
 

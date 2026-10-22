@@ -148,9 +148,9 @@ Güvenlik açıklarını herkese açık issue olarak değil, GitHub'ın özel bi
 - [x] Yetkisiz nesne erişimi/IDOR testleri. `tests/e2e/access.spec.ts` 21 Ekim 2026'da yeniden geçti.
 - [x] RLS ve sunucu tarafı yetki testleri. Aynı çalışma ve `tests/e2e/auth.spec.ts`.
 - [x] Oturum, parola sıfırlama ve oran sınırlaması testleri. `tests/e2e/auth.spec.ts` aynı gün geçti.
-- [x] Rapor indirme testleri. `tests/e2e/reports.spec.ts` aynı gün geçti. Dosya yükleme ucu yok (Faz 13).
+- [x] Rapor indirme testleri. `tests/e2e/reports.spec.ts` aynı gün geçti. Faz 13 içe aktarması öğrenci kimliğini oturumdan alır (`src/features/import/plan.test.ts`).
 - [ ] Gizli anahtar ve bağımlılık taraması. Bu turda Gitleaks yerelde çalıştırılmadı. CI push'ta çalışır. `braces` kabul edilen risk olarak duruyor.
-- [x] Yapay zekâ istemi yok. Kod Groq'a istek atmaz. İstem enjeksiyonu testi Faz 13'te.
+- [x] Yapay zekâ istemi, anahtar ve sıfır saklama onayı yokken gitmez. Giden özet kimlik taşımaz. Model çıktısındaki ek alanlar reddedilir (`src/features/ai/explain.test.ts`, 22 Ekim 2026).
 - [x] Yedekleme geri yükleme denemesi. Yerel tablo şifrelenip geri yüklendi (21 Ekim 2026). Production yedeği alınmadı.
 - [x] Hata izleme kodu hassas alanları göndermez (`scrub.test.ts`). Canlı Sentry projesi henüz yok; DSN boşken gönderim olmaz.
 - [x] Saklama temizliği yerel testle doğrulandı (`tests/e2e/retention.spec.ts`). `erase` production'da çalıştırılmadı.
