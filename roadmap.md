@@ -24,7 +24,7 @@
 | 9 | Kural tabanlı koçluk | Tamamlandı — kod, birim testler ve uçtan uca kart; öneri tablosu yok (20 Ekim 2026) |
 | 10 | Karakter, görev ve bildirimler | Tamamlandı — kod ve yerel testler; migration production'a uygulandı (20 Ekim 2026). Tüm uçtan uca paket bu turda yeniden çalıştırılmadı |
 | 11 | Veli paneli ve PDF rapor | Tamamlandı — kod, yerel testler ve production migration (21 Ekim 2026). Tüm uçtan uca paket bu turda yeniden çalıştırılmadı |
-| 12 | PWA, erişilebilirlik ve yayın hazırlığı | Başlanmadı |
+| 12 | PWA, erişilebilirlik ve yayın hazırlığı | Devam ediyor — PWA, çevrimdışı sınır, nonce CSP, yedek ve saklama migration'ı doğrulandı. Sentry AB projesi ve `SENTRY_DSN` Production'da (21 Ekim 2026). Gerçek cihaz ve Gitleaks bekliyor |
 | 13 | MVP sonrası: yapay zekâ, içe aktarma, DOCX | Başlanmadı |
 
 ---
@@ -386,17 +386,29 @@
 **Amaç:** MVP'yi gerçek kullanıcılara açmaya hazır hale getirmek.
 **Ön koşul:** Faz 11, kararlar 0.9, 0.10, 0.11
 
+**Not:** Proje sahibinin onayıyla 21 Ekim 2026'da başlandı. Ayrıntılar: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ("Yayın hazırlığı"), [docs/DATABASE.md](docs/DATABASE.md), [SECURITY.md](SECURITY.md).
+
+**Kararlar (bu fazda, güvenli varsayım):** Çevrimdışı önbellek yalnızca statik "İnternet yok" sayfası ve simgelerdir. Kayıtlı sayfalar saklanmaz. Hata izleme DSN'i yoksa kapalıdır; varsa yalnızca AB ingest adresine, digest ve temizlenmiş metin gider. Yedek AES-256-GCM ile şifrelenir ve `backups/` altında durur. Dışa aktarma ve silme uygulama içi ekran değil, proje sahibinin bilgisayarındaki betiktir. Saklama temizliği zamanlanmış görev değildir; `npm run data -- retain` ile çalışır.
+
 **İşler**
-- [ ] 12.1 PWA manifesti, simgeler ve yükleme deneyimi
-- [ ] 12.2 Çevrimdışı kapsamı belirle; hassas kayıtları cihazda önbelleğe alma
-- [ ] 12.3 Nonce tabanlı tam İçerik Güvenlik Politikası
-- [ ] 12.4 Hata izleme (kişisel veri maskelenmiş)
+- [x] 12.1 PWA manifesti, simgeler ve yükleme deneyimi — `src/app/manifest.ts`, `public/icons`, `/hesap` içindeki ekleme adımları. Production'da manifest adı ve 3 simge doğrulandı
+- [x] 12.2 Çevrimdışı kapsamı belirle; hassas kayıtları cihazda önbelleğe alma — `public/sw.js`. Tarayıcı çevrimdışıyken `/giris` giriş formunu değil, "İnternet yok" sayfasını açtı (21 Ekim 2026, production sunucusu)
+- [x] 12.3 Nonce tabanlı tam İçerik Güvenlik Politikası — `src/proxy.ts`. Production yanıtında nonce eşleşti; `unsafe-eval` ve `unsafe-inline` yoktu; konsol hatası yoktu
+- [x] 12.4 Hata izleme (kişisel veri maskelenmiş)
+  - [x] 12.4.1 Sunucu adaptörü, temizlik ve testler. DSN boşken gönderim yok. AB dışı adres reddedilir
+  - [x] 12.4.2 Sentry kuruluşu `lgs-pusula`, bölge `de`, plan Developer (`am3_f`, 30 gün). Proje `lgs-pusula-sj`. İstemci anahtarında oturum tekrarı kapalı. `SENTRY_DSN` Vercel Production'da gizli değişken. `NEXT_PUBLIC_SENTRY_DSN` kaldırıldı. Canlı site bu kodu henüz dağıtmadığı için olay göndermiyor
 - [ ] 12.5 Erişilebilirlik denetimi: klavye, ekran okuyucu, kontrast
-- [ ] 12.6 Gerçek mobil cihazlarda kritik akış testleri
-- [ ] 12.7 Yedekleme ve geri yükleme denemesi
+  - [x] 12.5.1 Metin renkleri AA kontrast testini geçti. Çevrimdışı sayfada klavye odağı ve 320 px taşma kontrol edildi
+  - [ ] 12.5.2 Ekran okuyucu ile gerçek cihaz geçişi (12.6 ile birlikte)
+- [ ] 12.6 Gerçek mobil cihazlarda kritik akış testleri — adımlar [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ("Yayın hazırlığı"). Bu turda telefon yoktu
+- [x] 12.7 Yedekleme ve geri yükleme denemesi — yerel tablo şifrelenip geri yüklendi. Production yedeği alınmadı. Eski yedekleri 30 gün sonra proje sahibi siler
+  - [x] 12.7.1 `20261021160000_retention.sql` production'a `supabase db push` (proje sahibi onayı, 21 Ekim 2026). Önce `--dry-run` yalnızca bu dosyayı gösterdi. `purge_retained_rows` ve `erase_personal_data` oluştu; ikisini de yalnızca `postgres` ve `service_role` çalıştırabilir. Fonksiyonlar çağrılmadı
 - [ ] 12.8 Tüm verileri dışa aktarma ve tüm verileri silme betiği
-- [ ] ~~12.8.1 Resmî gizlilik bildirimi ve uygulama içi hesap kapatma ekranı~~ — kapsam dışı (0.13)
-- [ ] 12.9 Güvenlik değerlendirmesi ve bulguların kapatılması
+  - [x] 12.8.a `npm run data -- export` yerel kurgusal veriyle dosya yazdı; davet özeti ve PDF baytı yoktu. Dosya silindi
+  - [x] 12.8.b `erase` onay sözcüğü birim testte zorunlu. Betik çalıştırılıp veri silinmedi
+  - [ ] 12.8.c Production'da çalıştırmak proje sahibine aittir
+- [x] ~~12.8.1 Resmî gizlilik bildirimi ve uygulama içi hesap kapatma ekranı~~ — kapsam dışı (0.13)
+- [x] 12.9 Güvenlik değerlendirmesi ve bulguların kapatılması — bu turdaki bulgu satır içi stildi; kalktı. Çevrimdışı önbellek ve hata gövdesi test edildi. Açık kalanlar: `braces` (kabul), staging, gerçek cihaz. Ayrıntı: [SECURITY.md](SECURITY.md)
 
 **Bitti sayılması için**
 - [ ] Aşağıdaki "Yayın öncesi kapı kontrolü" listesinin tamamı işaretlidir
@@ -441,12 +453,12 @@
 
 ## Yayın öncesi kapı kontrolü
 
-- [ ] Rol ve ilişki erişim testleri başarılı.
-- [ ] Net ve hedef hesaplama testleri başarılı.
-- [ ] Dosya yükleme ve rapor erişim testleri başarılı.
-- [ ] Gizli anahtar taraması temiz.
-- [ ] Yedekleme ve geri yükleme denenmiş.
-- [ ] Öğrencinin ilk girişte gördüğü "hangi bilgiler tutuluyor, veli neyi görebilir" açıklaması ve veli bağlantı onayı akışı incelenmiş.
-- [ ] Yapay zekâ sağlayıcısının veri kullanımı ve saklama şartları incelenmiş.
-- [ ] Hata izleme araçlarında hassas veri sızıntısı kontrol edilmiş.
-- [ ] Destek ve güvenlik olayı müdahale süreci belgelenmiş.
+- [x] Rol ve ilişki erişim testleri başarılı. `tests/e2e/access.spec.ts`, 21 Ekim 2026.
+- [x] Net ve hedef hesaplama testleri başarılı. Birim testler ve `tests/e2e/exams.spec.ts` aynı gün.
+- [x] Rapor erişim testleri başarılı. `tests/e2e/reports.spec.ts` aynı gün. Dosya yükleme ucu yok (Faz 13).
+- [ ] Gizli anahtar taraması temiz. Bu turda Gitleaks çalıştırılmadı.
+- [x] Yedekleme ve geri yükleme denenmiş. Yerel deneme; production yedeği yok.
+- [x] Öğrencinin ilk girişte gördüğü "hangi bilgiler tutuluyor, veli neyi görebilir" açıklaması ve veli bağlantı onayı akışı incelenmiş. Metin `/ogrenci` ana sayfasında; onay akışı erişim testleriyle duruyor.
+- [x] Yapay zekâ sağlayıcısının veri kullanımı ve saklama şartları incelenmiş. MVP istek atmıyor. Karar 0.12 duruyor; Faz 13'te yeniden bakılacak.
+- [x] Hata izleme araçlarında hassas veri sızıntısı kontrol edilmiş. Gönderilen gövde testte tarandı. Canlı projeye olay gitmedi.
+- [x] Destek ve güvenlik olayı müdahale süreci belgelenmiş. [SECURITY.md](SECURITY.md) ("Olay müdahalesi").

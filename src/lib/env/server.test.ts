@@ -68,6 +68,25 @@ describe("parseServerEnv", () => {
     );
   });
 
+  it("rejects a Sentry DSN that is not the EU ingest host and does not echo it", () => {
+    const dsn = "https://publickey@evil.example/123";
+    try {
+      parseServerEnv({ SENTRY_DSN: dsn });
+      expect.unreachable();
+    } catch (error) {
+      expect((error as ServerEnvError).invalidKeys).toEqual(["SENTRY_DSN"]);
+      expect((error as Error).message).not.toContain("evil.example");
+    }
+  });
+
+  it("accepts an EU Sentry DSN and treats an empty one as off", () => {
+    expect(parseServerEnv({ SENTRY_DSN: "" }).SENTRY_DSN).toBeUndefined();
+    expect(
+      parseServerEnv({ SENTRY_DSN: "https://abc123key@o99.ingest.de.sentry.io/456" })
+        .SENTRY_DSN,
+    ).toContain("ingest.de.sentry.io");
+  });
+
   it("reports variable names but never secret values", () => {
     const secret = "not-a-url-super-secret-value";
     try {

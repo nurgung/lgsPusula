@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { StateMessage } from "@/components/ui/state-message";
+import { reportRouteError } from "@/features/monitoring/actions";
 
 export default function ErrorPage({
   error,
@@ -12,8 +13,9 @@ export default function ErrorPage({
   retry: () => void;
 }) {
   useEffect(() => {
-    // Only the digest is logged; the message may contain user data.
+    // Only the digest is logged or reported; the message may contain user data.
     console.error("Route error", error.digest ?? "no-digest");
+    if (error.digest) void reportRouteError(error.digest);
   }, [error]);
 
   return (

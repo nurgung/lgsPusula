@@ -1,16 +1,8 @@
 export type SecurityHeader = { key: string; value: string };
 
-// A full script/style CSP needs per-request nonces (via proxy.ts); until then only
-// directives that do not depend on nonces are enforced.
-const contentSecurityPolicy = [
-  "base-uri 'self'",
-  "form-action 'self'",
-  "frame-ancestors 'none'",
-  "object-src 'none'",
-].join("; ");
-
+// The script/style policy is per request (nonce) and is set in src/proxy.ts.
+// These headers apply to every response, including static files the proxy skips.
 export const securityHeaders: SecurityHeader[] = [
-  { key: "Content-Security-Policy", value: contentSecurityPolicy },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

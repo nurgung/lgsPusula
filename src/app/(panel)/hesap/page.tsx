@@ -64,6 +64,21 @@ async function AccountContent({
           </Card>
         ) : null}
 
+        <Card
+          title="Telefona ekle"
+          description="Ana ekrana eklersen uygulama tam ekran açılır. Kayıtların telefonda durmaz."
+        >
+          <ol className="grid list-decimal gap-2 pl-5 text-ink-900">
+            <li>
+              Android: tarayıcı menüsünden “Ana ekrana ekle” veya “Uygulamayı yükle”.
+            </li>
+            <li>iPhone: Safari’de paylaş düğmesine bas, sonra “Ana Ekrana Ekle”.</li>
+          </ol>
+          <p className="mt-3 text-ink-900">
+            İnternet yokken eski kayıtlar açılmaz. Bağlantı gelince devam edersin.
+          </p>
+        </Card>
+
         <Card title="Güvenlik">
           <div className="grid gap-4">
             <div>

@@ -9,9 +9,18 @@ import { getSupabaseConfig } from "./config";
  * write cookies). This is NOT an authorization check: pages and actions verify the user again
  * through the data access layer.
  */
-export async function refreshSession(request: NextRequest): Promise<NextResponse> {
+export async function refreshSession(
+  request: NextRequest,
+  extraHeaders?: Headers,
+): Promise<NextResponse> {
+  const forward = () => {
+    const headers = new Headers(request.headers);
+    extraHeaders?.forEach((value, key) => headers.set(key, value));
+    return NextResponse.next({ request: { headers } });
+  };
+
   const config = getSupabaseConfig();
-  let response = NextResponse.next({ request });
+  let response = forward();
   if (!config) return response;
 
   const supabase = createServerClient(config.url, config.anonKey, {
@@ -20,7 +29,7 @@ export async function refreshSession(request: NextRequest): Promise<NextResponse
       getAll: () => request.cookies.getAll(),
       setAll(cookiesToSet, headers) {
         for (const { name, value } of cookiesToSet) request.cookies.set(name, value);
-        response = NextResponse.next({ request });
+        response = forward();
         for (const { name, value, options } of cookiesToSet) {
           response.cookies.set(name, value, withAuthCookieOptions(options));
         }

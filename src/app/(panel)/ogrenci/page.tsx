@@ -22,6 +22,7 @@ import { formatTurkishDate, goalWindow, istanbulToday } from "@/features/study/c
 import { GoalProgressList } from "@/features/study/components/goal-progress-list";
 import { StudyLogForm } from "@/features/study/components/study-log-form";
 import { StudyLogList } from "@/features/study/components/study-log-list";
+import { STUDENT_DATA_NOTICE } from "@/features/privacy/notice";
 import { loadStudyRecords } from "@/features/study/load-study";
 
 export const metadata: Metadata = { title: "Ana sayfa" };
@@ -64,7 +65,10 @@ async function StudentHome() {
         <TaskList
           facts={{
             todayLogCount: todayLogs.length,
-            todayQuestionCount: todayLogs.reduce((sum, log) => sum + log.questionCount, 0),
+            todayQuestionCount: todayLogs.reduce(
+              (sum, log) => sum + log.questionCount,
+              0,
+            ),
             dailyGoalTarget:
               study.goals.find((goal) => goal.period === "day" && goal.subjectId == null)
                 ?.targetQuestions ?? null,
@@ -142,11 +146,16 @@ async function StudentHome() {
           <StudyLogList logs={todayLogs} editable />
         </Card>
 
-        <StateMessage
-          variant="info"
-          title="Velin neleri görebilir?"
-          description="Bağlantıyı sen onaylarsan velin kayıtlarını ve hedeflerini görebilir. Değiştiremez. Onaylamazsan hiçbir şey göremez."
-        />
+        <Card title={STUDENT_DATA_NOTICE.title}>
+          <ul className="grid list-disc gap-1 pl-5 text-ink-900">
+            {STUDENT_DATA_NOTICE.kept.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          <p className="mt-3 text-ink-900">{STUDENT_DATA_NOTICE.notKept}</p>
+          <p className="mt-3 text-ink-900">{STUDENT_DATA_NOTICE.parent}</p>
+          <p className="mt-3 text-ink-900">{STUDENT_DATA_NOTICE.device}</p>
+        </Card>
 
         {active ? (
           <Card title="Bağlı velin" description="Çalışmalarını görebilir, değiştiremez.">

@@ -8,14 +8,7 @@ describe("securityHeaders", () => {
   it("prevents MIME sniffing and framing", () => {
     expect(header("X-Content-Type-Options")).toBe("nosniff");
     expect(header("X-Frame-Options")).toBe("DENY");
-    expect(header("Content-Security-Policy")).toContain("frame-ancestors 'none'");
-  });
-
-  it("blocks plugins and restricts form targets and base URI", () => {
-    const csp = header("Content-Security-Policy") ?? "";
-    expect(csp).toContain("object-src 'none'");
-    expect(csp).toContain("form-action 'self'");
-    expect(csp).toContain("base-uri 'self'");
+    expect(header("Strict-Transport-Security")).toContain("max-age=63072000");
   });
 
   it("limits referrer and powerful browser features", () => {

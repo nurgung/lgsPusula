@@ -29,7 +29,7 @@ Migration: `supabase/migrations/20261013120000_family_links.sql`. Yazmalar `serv
 | `visible_family_links()`                                                                                                 | Bağlantı alanları ve iki tarafın `display_name` değeri                                                                                                                                                | Çalıştırır (`security definer`). Yalnızca çağıranın taraf olduğu satırlar; kullanıcı adı, rol ve parola bayrağı dönmez.     | Çalıştırır                                                                                                                              |
 | `create_family_invite`, `redeem_family_invite`, `respond_family_link`, `revoke_family_link`, `expire_stale_family_links` | Davet ve bağlantı durum geçişleri                                                                                                                                                                     | Çalıştıramaz                                                                                                                | Çalıştırır. Süresi dolan kod ve bekleyen istek `expired` olur. Onay ve kaldırma, hedef durumdaysa yeniden çağrılırsa aynı sonucu verir. |
 
-Bitmiş bağlantı satırları 1 yıl saklanır (karar 0.5). Otomatik silme Faz 12'dedir; henüz yoktur.
+Bitmiş bağlantı satırları 1 yıl, kullanılmayan davetler 7 gün saklanır (karar 0.5). `purge_retained_rows()` bunu uygular (Faz 12, `20261021160000_retention.sql`). Production'a 21 Ekim 2026'da gönderildi. Zamanlanmış görev yoktur; temizlik `npm run data -- retain` ile çalışır.
 
 ## Uygulanan şema (Faz 5)
 

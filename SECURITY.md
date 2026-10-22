@@ -123,6 +123,17 @@ Bir uyarı düzeltilemiyorsa burada gerekçesi ve gözden geçirme koşuluyla ka
 - Veri kaybı, hesap ele geçirilmesi ve sağlayıcı kesintisi için olay planı hazırlayın.
 - Üretim değişiklikleri için geri alma planı tutun.
 
+## Olay müdahalesi
+
+Aile içi kullanımda müdahale eden kişi proje sahibidir. Bu bölüm bir hukuk bildirimi değildir.
+
+1. Kapsamı sınırla. Etkilenen hesabın parolasını `npm run accounts -- reset-password` ile yenile. Gerekirse Vercel dağıtımını durdur.
+2. Kanıtı koru. `audit_events` ve platform logları parola, çerez, davet kodu veya deneme sonucu içermeden saklanır. Ham yedek şifreli kalır ve depoya girmez.
+3. Etkiyi yaz. Hangi hesap, hangi tablo, hangi saat. Notlara öğrenci kaydı yapıştırma.
+4. Bildir. Aile içinde kararı proje sahibi verir. Depodaki bir açık, herkese açık issue değil, GitHub'ın özel güvenlik kanalına yazılır.
+5. Düzelt ve geri yükle. `npm run backup -- restore` onay sözcüğü olmadan yazmaz. Saklama temizliği `npm run data -- retain` ile yapılır.
+6. Yedekler 30 gün durur, sonra silinir. Silinen hesabın yedekteki kopyası bu sürenin sonunda gider.
+
 ## Güvenlik açığı bildirimi
 
 Güvenlik açıklarını herkese açık issue olarak değil, GitHub'ın özel bildirim kanalıyla iletin. Bildirimlerde gerçek öğrenci verisi veya açıkları istismar etmeye yarayacak gereksiz ayrıntılar paylaşılmamalıdır.
@@ -134,13 +145,13 @@ Güvenlik açıklarını herkese açık issue olarak değil, GitHub'ın özel bi
 
 ## Yayın öncesi güvenlik kontrol listesi
 
-- [ ] Yetkisiz nesne erişimi/IDOR testleri.
-- [ ] RLS ve sunucu tarafı yetki testleri.
-- [ ] Oturum, parola sıfırlama ve oran sınırlaması testleri.
-- [ ] Dosya yükleme, içe aktarma ve rapor indirme testleri.
-- [ ] Gizli anahtar ve bağımlılık taraması.
-- [ ] Yapay zekâ istem enjeksiyonu ve veri minimizasyonu testleri.
-- [ ] Yedekleme geri yükleme denemesi.
-- [ ] Hata izleme ve loglarda hassas veri kontrolü.
-- [ ] Veri saklama/silme akışlarının doğrulanması.
-- [ ] Kritik/yüksek riskli bulguların giderilmesi.
+- [x] Yetkisiz nesne erişimi/IDOR testleri. `tests/e2e/access.spec.ts` 21 Ekim 2026'da yeniden geçti.
+- [x] RLS ve sunucu tarafı yetki testleri. Aynı çalışma ve `tests/e2e/auth.spec.ts`.
+- [x] Oturum, parola sıfırlama ve oran sınırlaması testleri. `tests/e2e/auth.spec.ts` aynı gün geçti.
+- [x] Rapor indirme testleri. `tests/e2e/reports.spec.ts` aynı gün geçti. Dosya yükleme ucu yok (Faz 13).
+- [ ] Gizli anahtar ve bağımlılık taraması. Bu turda Gitleaks yerelde çalıştırılmadı. CI push'ta çalışır. `braces` kabul edilen risk olarak duruyor.
+- [x] Yapay zekâ istemi yok. Kod Groq'a istek atmaz. İstem enjeksiyonu testi Faz 13'te.
+- [x] Yedekleme geri yükleme denemesi. Yerel tablo şifrelenip geri yüklendi (21 Ekim 2026). Production yedeği alınmadı.
+- [x] Hata izleme kodu hassas alanları göndermez (`scrub.test.ts`). Canlı Sentry projesi henüz yok; DSN boşken gönderim olmaz.
+- [x] Saklama temizliği yerel testle doğrulandı (`tests/e2e/retention.spec.ts`). `erase` production'da çalıştırılmadı.
+- [x] Bu turda açılan yüksek bulgu kapatıldı: katı CSP için satır içi stil kalktı, çevrimdışı önbellek kayıt tutmuyor. `braces` kabul edilen risk olarak duruyor.

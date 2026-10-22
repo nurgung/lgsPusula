@@ -48,7 +48,7 @@
 | Stil                | Tailwind CSS 4; renk/gölge/köşe token'ları yalnızca `src/app/globals.css` içindeki `@theme` bloğunda                                                                       |
 | Doğrulama           | Zod 4. Sunucu ortam değişkenleri `src/lib/env/server.ts` içinde doğrulanır; hata mesajı yalnızca değişken adını içerir, değeri içermez.                                    |
 | Sunucu sınırı       | Sunucuya özel modüller `import "server-only"` ile işaretlenir; istemci paketine girerse build hata verir.                                                                  |
-| Güvenlik başlıkları | `src/lib/security-headers.ts`: nosniff, çerçeveleme yasağı, referrer ve izin politikaları, HSTS, nonce gerektirmeyen CSP yönergeleri. Betik/stil CSP'si (nonce) henüz yok. |
+| Güvenlik başlıkları | `src/lib/security-headers.ts` her yanıtta nosniff, çerçeveleme yasağı, referrer, izin politikası ve HSTS gönderir. Betik/stil CSP'si istek başına nonce ile `src/proxy.ts` içindedir (Faz 12). |
 | Testler             | Vitest + Testing Library (birim/bileşen, test dosyaları kaynağın yanında `*.test.ts(x)`), Playwright (`tests/e2e`, 320 px mobil ve masaüstü).                              |
 | Biçim               | Prettier; ESLint `eslint-config-next` + `any`/`@ts-ignore` yasağı + `NEXT_PUBLIC_` gizli ad yasağı                                                                         |
 
@@ -372,13 +372,36 @@ Veli, aktif bağlantısındaki öğrencinin haftalık ve aylık özetini okur. H
 - **PDF.** `pdf-lib` 1.17.1 ve `@pdf-lib/fontkit` 1.1.1. Standart PDF yazı tipleri ğ, ş, ı ve İ çizemez. Nunito Regular/Bold (latin ve latin-ext, SIL OFL) `src/features/reports/fonts` altındadır. ESM paketi yalnızca varsayılan dışa aktarımı verdiği için yükleyici her iki şekli de kabul eder. Üretim tarihi İstanbul saatidir. Net formülü `Net = doğru - (yanlış / 3)` diye yazılır. Koçluk cümlesi öğrencinin kartındaki metindir; veliye kaydı yalnızca öğrencinin değiştirebileceği söylenir.
 - **Dosya.** Baytlar `report_jobs.pdf_bytes` içindedir (`storage_kind = database`). Hazır dosya `%PDF-` ile başlar, 400 ile 1.500.000 bayt arasındadır. Başarısız satırda bayt yoktur; `failure_code` `generation_failed` veya `empty_document` olur. İndirme `application/pdf` ve `attachment` döner. Ret sayfası HTML'dir, ek yoktur ve `%PDF` içermez.
 - **Tekrar.** Aynı veli, öğrenci, tür ve dönem yeniden üretilirse satır güncellenir ve 24 saat yeniden başlar. Veli 15 dakikada en fazla 8 rapor ister. Denetim olayı `report.generate` neden kodunu yazar; PDF içeriğini, adı ve öğrenci kimliğini yazmaz.
-- **Silme.** `purge_expired_report_jobs()` veli ana sayfası, öğrenci sayfası ve indirme isteğinde çalışır. Zamanlanmış görev yoktur. Kimse uğramazsa satır 24 saati aşabilir. Süresi dolmuş satır indirilemez. Zamanlanmış silme Faz 12'dedir.
+- **Silme.** `purge_expired_report_jobs()` veli ana sayfası, öğrenci sayfası ve indirme isteğinde çalışır. `purge_retained_rows()` buna ek olarak süresi dolmuş raporları, 1 yıllık denetim ve bitmiş bağlantı satırlarını, 7 günden eski davetleri ve 1 günden eski oran sınırı pencerelerini siler. Bunu `npm run data -- retain` çalıştırır. Kimse çalıştırmazsa satırlar sürelerini aşabilir. Fonksiyon production'da var (21 Ekim 2026); bu turda çalıştırılmadı.
 - **Route.** `instant = false` ve `connection()` ile indirme adresi oturumsuz önbelleğe alınmaz. Aksi halde herkese `/giris` yönlendirmesi yapışırdı.
 - Migration: `20261021120000_report_jobs.sql`. Yerelde ve production'da uygulandı (21 Ekim 2026, `npx supabase db push`; önce `--dry-run`). Yeni tablodur; mevcut satırlar değişmedi. Staging ertelendiği için orada henüz yoktur.
 
+## Yayın hazırlığı (Faz 12)
+
+Kök yerleşim her istekte `connection()` bekler. Böylece HTML, o isteğin nonce'u ile üretilir. `cacheComponents` açık kalır; oturum sayfaları yine dinamiktir.
+
+| Konu | Karar |
+| --- | --- |
+| PWA | `src/app/manifest.ts`, `public/icons`. Hesap sayfası Android ve iPhone ekleme adımlarını yazar. Chromium `beforeinstallprompt` verirse üstte "Ekle" çıkar. |
+| Çevrimdışı | `public/sw.js` yalnızca `/cevrimdisi` ve simgeleri önbelleğe alır. Gezinme ağdadır; ağ yoksa statik çevrimdışı sayfa gelir. Çalışma, deneme ve hesap HTML'i Cache API'ye yazılmaz. Kayıt sırasında geliştirme ortamında işçi kaydı yapılmaz. |
+| CSP | Production: nonce + `strict-dynamic`, `style-src-attr 'none'`, `upgrade-insecure-requests`. Geliştirme: React için `unsafe-eval` ve `unsafe-inline`. İlerleme çubuğu 5'er puanlık sınıflar kullanır; satır içi `style` yoktur. |
+| Hata izleme | `SENTRY_DSN` boşsa gönderim yoktur. Doluysa yalnızca `o*.ingest.de.sentry.io` kabul edilir. Gövde digest ve temizlenmiş metindir; kullanıcı, çerez ve istek yoktur. Oturum tekrarı kodda yoktur. Production: kuruluş `lgs-pusula`, bölge `de`, plan Developer (30 gün), proje `lgs-pusula-sj`. DSN gizli değişkendir. İstemci anahtarında replay kapalıdır. |
+| Saklama | `purge_retained_rows()` ve `erase_personal_data()` (`20261021160000_retention.sql`). İkisi de yalnızca `service_role`. Silme müfredatı silmez. Betik onay istemeden çağırmaz. Production'a 21 Ekim 2026'da uygulandı; fonksiyonlar çağrılmadı. |
+| Yedek | `npm run backup -- dump` şifreli dosyayı `backups/` altına yazar. AES-256-GCM, parola diske yazılmaz. Düz metin yedek tutulmaz. Saklama 30 gündür; eski dosyayı proje sahibi siler. |
+| Dışa aktarma | `npm run data -- export`. Davet özeti, PDF baytı ve oran sınırı anahtarı yoktur. Dosya depoya girmez. |
+
+**Yerel deneme (21 Ekim 2026):** şifreli yedek alınıp aynı tabloya geri yüklendi. Çevrimdışı gezinme giriş formunu değil, "İnternet yok" sayfasını açtı. Production CSP'de `unsafe-eval` yok ve betik nonce'u başlıkla aynıydı.
+
+**Gerçek telefonda bakılacaklar (12.6, henüz yapılmadı):**
+
+1. Öğrenci girişi, bir çalışma kaydı, bir deneme.
+2. Veli bağlantısı: kod, onay, veli özeti, PDF.
+3. Ana ekrana ekleme ve uçak modunda eski kaydın açılmaması.
+4. 320 px genişlikte yatay taşma olmaması.
+
 ### Henüz uygulanmayanlar
 
-- Bitmiş bağlantı, `audit_events` ve süresi dolan oran sınırı kayıtlarının saklama süresine göre otomatik silinmesi (karar 0.5: 1 yıl). Silme işi Faz 12'deki yedekleme betikleriyle birlikte planlanacak. Rapor satırının zamanlanmış silinmesi de bu işe bırakıldı; veli ziyareti olmadan 24 saat aşılabilir.
-- Yapay zekâ adaptörü, içe aktarma ve DOCX rapor. Haftalık PDF Faz 11'de uygulandı.
-- PWA manifesti ve simgeler, nonce tabanlı CSP, hata izleme.
+- Saklama temizliği için zamanlanmış görev. Fonksiyon production'da var. Kimse `npm run data -- retain` çalıştırmazsa satırlar sürelerini aşabilir.
+- Faz 12 kodunun production'a dağıtılması. `SENTRY_DSN` Vercel'de durur; canlı sürüm bu kodu içermediği için henüz olay göndermez.
+- Yapay zekâ adaptörü, içe aktarma ve DOCX rapor. Kodda Groq çağrısı yoktur (karar 0.12, Faz 13'te yeniden bakılır).
 - Staging Supabase projesi, Preview ortam değişkenleri ve Vercel–GitHub bağlantısı (durum yukarıda).

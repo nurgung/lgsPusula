@@ -29,6 +29,8 @@ export const serverEnvSchema = z
     AI_MODEL: optionalText,
 
     STORAGE_BUCKET: optionalText,
+    // Optional. Empty disables error reporting. Only an EU ingest DSN is accepted.
+    SENTRY_DSN: optionalText,
     REPORT_TEMP_TTL_MINUTES: z.preprocess(
       emptyToUndefined,
       z.coerce.number().int().min(1).max(1440).default(30),
@@ -60,6 +62,18 @@ export const serverEnvSchema = z
           });
         }
       }
+    }
+    if (
+      env.SENTRY_DSN &&
+      !/^https:\/\/[A-Za-z0-9]+@o[0-9]+\.ingest\.de\.sentry\.io\/[0-9]+$/.test(
+        env.SENTRY_DSN,
+      )
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["SENTRY_DSN"],
+        message: "SENTRY_DSN must be an EU ingest DSN.",
+      });
     }
   });
 

@@ -59,7 +59,7 @@ Her kategori için amaç, hukuki işleme şartı, erişim grubu, saklama süresi
 - Her veri türü için gerekçeli saklama süresi belirlenmelidir; süresiz saklama varsayılan olmamalıdır.
 - Hesap kapatma ve veri silme talebi için süreç oluşturulmalıdır.
 - Yedeklerdeki verilerin silinme zamanlaması ve istisnaları belgelenmelidir.
-- PDF/DOCX raporlarının geçici dosyaları güvenli biçimde ve belirlenen sürede temizlenmelidir. Haftalık PDF (Faz 11) herkese açık bir dosya yolu değildir; baytlar `report_jobs` içindedir ve en geç 24 saat sonra silinmek üzere işaretlenir. Silme, veli paneli açılınca veya rapor istenince çalışır. Kimse uğramazsa satır 24 saati aşabilir; zamanlanmış silme Faz 12'dedir. DOCX henüz yoktur.
+- PDF/DOCX raporlarının geçici dosyaları güvenli biçimde ve belirlenen sürede temizlenmelidir. Haftalık PDF (Faz 11) herkese açık bir dosya yolu değildir; baytlar `report_jobs` içindedir ve en geç 24 saat sonra silinmek üzere işaretlenir. Veli paneli ve `purge_retained_rows()` süresi dolan satırı siler. DOCX henüz yoktur. Dışa aktarma `npm run data -- export` ile yapılır; dosya `backups/` altındadır ve depoya girmez. Tüm hesapları silmek `npm run data -- erase` ile olur ve müfredat kataloğunu silmez.
 - İçe aktarılan ham dosyalar, amaç tamamlandıktan sonra saklanmaya devam edecekse bunun gerekçesi belirlenmelidir.
 - Yasal saklama yükümlülükleri varsa, kapsam ve süre ayrıca belgelenmelidir.
 
@@ -81,7 +81,7 @@ Veri sorumlusu, başvuru kanalı, başvurulara yanıt süreci, veri ihlali değe
 - [ ] Gizlilik bildirimi ve kullanıcı aydınlatmaları hukuk incelemesinden geçti.
 - [ ] Çocuk kullanıcılar ve veli onayı süreci değerlendirildi.
 - [ ] Tüm üçüncü taraflar ve veri işleme koşulları kaydedildi.
-- [ ] Saklama/silme süreleri tanımlandı.
-- [ ] Veri dışa aktarma ve hesap kapatma akışları test edildi.
-- [ ] Log ve analitik sistemlerinde gereksiz kişisel veri bulunmuyor.
-- [ ] Yapay zekâya giden veri alanları ve sağlayıcı şartları gözden geçirildi.
+- [x] Saklama/silme süreleri tanımlandı.
+- [x] Veri dışa aktarma betiği yerel kurgusal veriyle denendi. Hesap silme betiği onay sözcüğü olmadan çalışmaz; production'da çalıştırılmadı.
+- [ ] Log ve analitik sistemlerinde gereksiz kişisel veri bulunmuyor. Kod yolu test edildi. Sentry projesi henüz yok; DSN boşken gönderim olmaz.
+- [x] Yapay zekâya giden veri alanı yok. Karar 0.12 duruyor; Faz 13'te sağlayıcı şartları yeniden bakılacak.

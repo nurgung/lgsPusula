@@ -5,6 +5,7 @@ import { StateMessage } from "@/components/ui/state-message";
 import { homePathFor } from "@/features/auth/paths";
 import { requireUser } from "@/features/auth/session";
 import { getNavItems } from "@/features/navigation/nav-items";
+import { InstallHint } from "@/features/pwa/install-hint";
 
 /** Authenticated routes read the session on every request; they cannot be instant. */
 export const instant = false;
@@ -26,7 +27,11 @@ export default function PanelLayout({ children }: { children: ReactNode }) {
 async function PanelFrame({ children }: { children: ReactNode }) {
   const user = await requireUser();
   return (
-    <AppShell navItems={getNavItems(user.roles)} homeHref={homePathFor(user.roles)}>
+    <AppShell
+      banner={<InstallHint />}
+      navItems={getNavItems(user.roles)}
+      homeHref={homePathFor(user.roles)}
+    >
       {children}
     </AppShell>
   );

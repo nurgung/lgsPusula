@@ -1,13 +1,20 @@
 "use client";
 
+import { useEffect } from "react";
+import { reportRouteError } from "@/features/monitoring/actions";
 import "./globals.css";
 
 export default function GlobalError({
+  error,
   retry,
 }: {
   error: Error & { digest?: string };
   retry: () => void;
 }) {
+  useEffect(() => {
+    if (error.digest) void reportRouteError(error.digest);
+  }, [error]);
+
   return (
     <html lang="tr">
       <body className="p-4">
