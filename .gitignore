@@ -19,3 +19,4 @@ next-env.d.ts
 Thumbs.db
 .vercel/
 backups/
+.vercel

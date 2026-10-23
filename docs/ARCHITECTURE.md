@@ -183,7 +183,7 @@ Sınırlayıcıya ulaşılamazsa istek reddedilir (fail closed). Parola sıfırl
 
 - Önizleme dağıtım adresleri Vercel Authentication ile korunuyor (oturumsuz istek Vercel girişine yönlenir).
 - Vercel projesi 22 Ekim 2026'da `nurgung/lgsPusula` deposuna bağlandı (`vercel git connect` → Connected). Bağlama komutu yeni bir dağıtım başlatmadı. Sıradaki GitHub push'u dağıtımı dener.
-- Aile hesapları production'da henüz oluşturulmadı (adım 5). Geçici parolalar yalnızca ekranda gösterildiği için bu adımı proje sahibi kendi bilgisayarında çalıştırır.
+- Aile hesapları production'da 23 Ekim 2026'da oluşturuldu. Geçici parolalar belgede tutulmaz. İlk girişte parola değişimi zorunludur.
 
 ## Roller ve veli-öğrenci ilişkisi (Faz 4)
 

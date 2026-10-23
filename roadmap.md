@@ -15,7 +15,7 @@
 | 0 | Ürün ve servis kararları | Tamamlandı — 13/13 karar verildi ([docs/DECISIONS.md](docs/DECISIONS.md)) |
 | 1 | Proje altyapısı | Tamamlandı |
 | 2 | Tasarım sistemi ve CI | Devam ediyor — Vercel production `https://lgs-pusula.vercel.app` açık. Preview `lgs-pusula-prod` kullanıyor. GitHub bağlantısı 22 Ekim 2026'da kuruldu. `braces` yaması ve kalıcı staging adresi bekliyor |
-| 3 | Veri tabanı ve kimlik doğrulama | Devam ediyor — bulut veri tabanı `lgs-pusula-prod`. Ayrı staging projesi yok; önizleme aynı projeyi kullanır (22 Ekim 2026). Production aile hesapları bekliyor |
+| 3 | Veri tabanı ve kimlik doğrulama | Devam ediyor — bulut veri tabanı `lgs-pusula-prod`. Ayrı staging projesi yok; önizleme aynı projeyi kullanır (22 Ekim 2026). Production aile hesapları 23 Ekim 2026'da oluşturuldu; ilk girişte parola değişimi duruyor |
 | 4 | Roller ve veli-öğrenci ilişkisi | Tamamlandı — yerel testler ve CI geçti; migration production'a uygulandı (13 Ekim 2026) |
 | 5 | Müfredat kataloğu | Tamamlandı — kod, yerel testler ve CI tamam; migration ve MEB 8. sınıf kataloğu (326 kazanım) production'da (14 Ekim 2026) |
 | 6 | Günlük çalışma kayıtları ve hedefler | Tamamlandı — kod, yerel testler ve CI; migration production'a uygulandı (19 Ekim 2026) |
@@ -141,7 +141,7 @@
   - [ ] 3.1.2 Staging ve production Supabase projelerini Frankfurt'ta aç; kayıt kapalı, parola kuralı ayarlanır, `supabase db push` ile migration uygulanır, değerler Vercel'e girilir (adımlar [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md))
     - [x] 3.1.2.a Production: `lgs-pusula-prod` (Frankfurt) açıldı, migration uygulandı, parola kuralı (10 karakter, harf + rakam) ayarlandı, değerler Vercel Production'a girildi; canlı adreste giriş Supabase'e bağlanıyor (yanlış girişte doğru hata mesajı) — 13 Ekim 2026
     - [ ] 3.1.2.b Ayrı staging Supabase projesi açılmadı. 22 Ekim 2026: proje sahibi önizlemenin `lgs-pusula-prod` üzerinde çalışmasına karar verdi. `velitakipnew` duraklatılmaz. Ayrı proje, yer açılırsa veya plan yükselirse gelir
-    - [ ] 3.1.2.c Production'da iki aile hesabını oluştur (`scripts/accounts.ts setup`; geçici parolalar yalnızca ekranda gösterildiği için proje sahibi çalıştırır)
+    - [x] 3.1.2.c Production'da iki aile hesabı oluşturuldu (23 Ekim 2026). Roller veli+yönetici ve öğrenci. Geçici parolalar yalnızca o anda gösterildi; ilk girişte parola değişimi zorunlu. Staging ayrı proje olmadığı için yok
 - [x] 3.2 Migration altyapısını kur
   - [x] 3.2.1 `supabase/migrations` + Supabase CLI; migration `supabase db reset` ile sıfırdan uygulandı
   - [x] 3.2.2 CI'daki uçtan uca iş yerel Supabase'i başlatıp migration'ları uygular; push sonrası GitHub'da yeşil olduğu doğrulanır — [çalışma 38355078745](https://github.com/nurgung/lgsPusula/actions/runs/38355078745)
