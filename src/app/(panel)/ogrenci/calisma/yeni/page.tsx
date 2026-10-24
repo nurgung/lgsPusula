@@ -11,19 +11,31 @@ import { StudyLogForm } from "@/features/study/components/study-log-form";
 export const metadata: Metadata = { title: "Yeni çalışma kaydı" };
 export const instant = false;
 
-export default function NewStudyLogPage() {
+export default function NewStudyLogPage({
+  searchParams,
+}: PageProps<"/ogrenci/calisma/yeni">) {
   return (
     <Suspense fallback={<StateMessage variant="loading" title="Form yükleniyor..." />}>
-      <NewStudyLog />
+      <NewStudyLog searchParams={searchParams} />
     </Suspense>
   );
 }
 
-async function NewStudyLog() {
+function one(value: string | string[] | undefined): string {
+  return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
+}
+
+async function NewStudyLog({
+  searchParams,
+}: Pick<PageProps<"/ogrenci/calisma/yeni">, "searchParams">) {
   await requireStudent();
   const today = istanbulToday();
   const catalog = await loadCatalog({ includeArchived: false });
   const subjects = catalog.map((subject) => ({ id: subject.id, name: subject.name }));
+  const requested = one((await searchParams).ders);
+  const subjectId = subjects.some((subject) => subject.id === requested)
+    ? requested
+    : undefined;
 
   return (
     <>
@@ -44,6 +56,7 @@ async function NewStudyLog() {
             catalog={catalog}
             subjects={subjects}
             today={today}
+            defaults={subjectId ? { subjectId } : undefined}
           />
         )}
       </Card>

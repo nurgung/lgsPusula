@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { StateMessage } from "@/components/ui/state-message";
@@ -14,16 +13,18 @@ import { CreateInviteForm } from "@/features/family/components/create-invite-for
 import { RespondLinkForms } from "@/features/family/components/respond-link-forms";
 import { RevokeLinkButton } from "@/features/family/components/revoke-link-button";
 import { loadOwnFamilyLinks } from "@/features/family/load-links";
-import { CharacterHero } from "@/features/home/components/character-hero";
+import { DailyGoals } from "@/features/home/components/daily-goals";
 import { EarnedBadges } from "@/features/home/components/earned-badges";
 import { GoalBoard } from "@/features/home/components/goal-board";
+import { StagePath } from "@/features/home/components/stage-path";
+import { SubjectTiles } from "@/features/home/components/subject-tiles";
 import { WeekAndExamSummary } from "@/features/home/components/week-and-exam";
-import { ReminderCard, TaskList } from "@/features/mascot/components/mascot-panels";
+import { ReminderCard } from "@/features/mascot/components/mascot-panels";
 import { loadOwnMascot } from "@/features/mascot/load-mascot";
+import { stageForPoints, totalPoints } from "@/features/mascot/rules";
 import { examChartWindow } from "@/features/outcomes/window";
 import { STUDENT_DATA_NOTICE } from "@/features/privacy/notice";
 import { formatTurkishDate, goalWindow, istanbulToday } from "@/features/study/calendar";
-import { StudyLogForm } from "@/features/study/components/study-log-form";
 import { loadStudyRecords } from "@/features/study/load-study";
 import { summarizeLogs } from "@/features/study/summary";
 
@@ -57,6 +58,16 @@ async function StudentHome() {
   const latest = exams[0];
   const active = links.find((link) => link.status === "active");
   const pending = links.find((link) => link.status === "pending");
+  const points = totalPoints(mascot.rewards);
+  const stage = stageForPoints(points);
+  const taskFacts = {
+    todayLogCount: todayLogs.length,
+    todayQuestionCount: todayLogs.reduce((sum, log) => sum + log.questionCount, 0),
+    dailyGoalTarget:
+      study.goals.find((goal) => goal.period === "day" && goal.subjectId == null)
+        ?.targetQuestions ?? null,
+    reviewExamId: mascot.reviewExamId,
+  };
 
   return (
     <>
@@ -70,89 +81,48 @@ async function StudentHome() {
         </div>
       ) : null}
       {/*
-        Source order is the mobile priority. From lg, placement puts the character
-        and today's suggestion in the first column, and goals with the week summary
-        in the second. Later sections stay full width.
+        Four bands. Source order is the phone: path, today's goals, lesson tiles,
+        then the summary. From lg, goals and tiles sit side by side.
       */}
-      <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-        <div className="min-w-0 lg:col-start-1 lg:row-start-1">
-          <CharacterHero species={mascot.species} rewards={mascot.rewards} />
+      <div className="grid min-w-0 gap-6 rounded-card bg-canvas-soft p-3 sm:p-5">
+        <StagePath
+          stageId={stage.id}
+          species={mascot.species}
+          points={points}
+          detailed
+        />
+        <div className="grid min-w-0 gap-6 lg:grid-cols-2 lg:items-start">
+          <div className="grid min-w-0 gap-6">
+            <DailyGoals facts={taskFacts} />
+            <GoalBoard goals={study.goals} logs={study.logs} today={today} />
+          </div>
+          <SubjectTiles subjects={subjects} />
         </div>
-        <div className="min-w-0 lg:col-start-1 lg:row-start-2">
-          <RecommendationCard
-            report={explained.report}
-            explanation={explained.explanation}
-          />
-        </div>
-        <div className="min-w-0 lg:col-start-2 lg:row-start-1">
-          <GoalBoard goals={study.goals} logs={study.logs} today={today} />
-        </div>
-        <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-3">
-          <TaskList
-            facts={{
-              todayLogCount: todayLogs.length,
-              todayQuestionCount: todayLogs.reduce(
-                (sum, log) => sum + log.questionCount,
-                0,
-              ),
-              dailyGoalTarget:
-                study.goals.find(
-                  (goal) => goal.period === "day" && goal.subjectId == null,
-                )?.targetQuestions ?? null,
-              reviewExamId: mascot.reviewExamId,
-            }}
-          />
-        </div>
-        <div className="min-w-0 lg:col-start-2 lg:row-start-2">
-          <WeekAndExamSummary
-            summary={weekSummary}
-            exam={
-              latest
-                ? {
-                    id: latest.id,
-                    title: latest.title,
-                    takenOn: latest.takenOn,
-                    examType: latest.examType,
-                    totalNet: latest.totalNet,
-                  }
-                : null
-            }
-          />
-        </div>
-        <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-4">
-          <Card
-            title="Hızlı kayıt"
-            description="Bugün için kısa kayıt. Konu seçmek istersen ayrıntılı formu kullan."
-          >
-            {subjects.length === 0 ? (
-              <StateMessage
-                variant="empty"
-                title="Ders listesi henüz hazır değil."
-                description="Yönetici dersleri ekleyince buradan kayıt yazabilirsin."
-              />
-            ) : (
-              <div className="grid gap-4">
-                <StudyLogForm
-                  mode="create"
-                  catalog={catalog}
-                  subjects={subjects}
-                  today={today}
-                  showPicker={false}
-                  compact
-                />
-                <div>
-                  <ButtonLink href="/ogrenci/calisma/yeni" variant="secondary">
-                    Konu seçerek kaydet
-                  </ButtonLink>
-                </div>
-              </div>
-            )}
-          </Card>
-        </div>
-        <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-5">
+        <div className="grid min-w-0 gap-6" role="region" aria-labelledby="alt-ozet">
+          <h2 id="alt-ozet" className="text-lg font-bold text-ink-900">
+            Özet
+          </h2>
+          <div className="grid min-w-0 gap-6 lg:grid-cols-2 lg:items-start">
+            <WeekAndExamSummary
+              summary={weekSummary}
+              exam={
+                latest
+                  ? {
+                      id: latest.id,
+                      title: latest.title,
+                      takenOn: latest.takenOn,
+                      examType: latest.examType,
+                      totalNet: latest.totalNet,
+                    }
+                  : null
+              }
+            />
+            <RecommendationCard
+              report={explained.report}
+              explanation={explained.explanation}
+            />
+          </div>
           <EarnedBadges rewards={mascot.rewards} />
-        </div>
-        <div className="grid min-w-0 gap-6 lg:col-span-2 lg:col-start-1 lg:row-start-6">
           <Card variant="quiet" title={STUDENT_DATA_NOTICE.title}>
             <ul className="grid list-disc gap-1 pl-5 text-ink-900">
               {STUDENT_DATA_NOTICE.kept.map((item) => (

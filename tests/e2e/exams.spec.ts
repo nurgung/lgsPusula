@@ -108,6 +108,10 @@ test("a student records a branch exam, edits nets and parents only read", async 
   await page.locator('input[name="branch.blankCount"]').fill("4");
   await page.getByRole("button", { name: "Denemeyi kaydet" }).click();
   await expect(page.getByText("Deneme kaydedildi.")).toBeVisible();
+  const celebration = page.getByRole("dialog");
+  await expect(celebration).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(celebration).toHaveCount(0);
   await expect(page.getByText("Toplam net 0,00")).toBeVisible();
 
   await page.getByRole("link", { name: "Detay / düzenle" }).click();

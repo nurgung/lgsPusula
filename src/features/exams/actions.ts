@@ -3,6 +3,8 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireStudent } from "@/features/access/guards";
+import { withCelebrationParam } from "@/features/home/celebration-token";
+import { celebrationToken, readCelebrationBaseline } from "@/features/home/issue-celebration";
 import { istanbulToday } from "@/features/study/calendar";
 import { createSessionClient } from "@/services/supabase/server-client";
 import {
@@ -55,10 +57,13 @@ export async function createExamAction(
     };
   }
 
+  let celebration: string | null = null;
   try {
     const session = await createSessionClient({ writable: true });
+    const today = istanbulToday();
+    const before = await readCelebrationBaseline(session, user.id, today);
     const subjectIds = await listSubjectIdByCode(session);
-    const parsed = parseExamInput(values, istanbulToday(), subjectIds, CURRENT_RULE_VERSION);
+    const parsed = parseExamInput(values, today, subjectIds, CURRENT_RULE_VERSION);
     if (!parsed.ok) {
       return {
         status: "error",
@@ -76,12 +81,15 @@ export async function createExamAction(
     if (result.status === "conflict") {
       return { status: "error", message: EXAM_MESSAGES.conflict, values };
     }
+    if (result.status === "created") {
+      celebration = await celebrationToken(session, user.id, today, before);
+    }
   } catch (error) {
     return providerError(error, values);
   }
 
   refresh();
-  redirect("/ogrenci/denemeler?durum=kaydedildi");
+  redirect(withCelebrationParam("/ogrenci/denemeler?durum=kaydedildi", celebration));
 }
 
 export async function updateExamAction(

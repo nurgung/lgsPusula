@@ -68,6 +68,10 @@ test("maps mistakes to outcomes, ranks priorities, and shows net trend with tabl
   await page.locator('input[name="branch.blankCount"]').fill("2");
   await page.getByRole("button", { name: "Denemeyi kaydet" }).click();
   await expect(page.getByText("Deneme kaydedildi.")).toBeVisible();
+  const celebration = page.getByRole("dialog");
+  await expect(celebration).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(celebration).toHaveCount(0);
 
   await page.getByRole("link", { name: "Detay / düzenle" }).click();
   await page.getByRole("link", { name: "Yanlış / boş → kazanım" }).click();

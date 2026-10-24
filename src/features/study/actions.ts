@@ -3,6 +3,8 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireStudent } from "@/features/access/guards";
+import { withCelebrationParam } from "@/features/home/celebration-token";
+import { celebrationToken, readCelebrationBaseline } from "@/features/home/issue-celebration";
 import { fieldErrorsFrom } from "@/features/auth/schemas";
 import { decodeSelection } from "@/features/curriculum/catalog";
 import { createSessionClient } from "@/services/supabase/server-client";
@@ -74,8 +76,11 @@ export async function createStudyLogAction(
     };
   }
 
+  let celebration: string | null = null;
   try {
     const session = await createSessionClient({ writable: true });
+    const today = istanbulToday();
+    const before = await readCelebrationBaseline(session, user.id, today);
     const selection = decodeSelection(parsed.data.catalogItem);
     const facts = await readPlacementFacts(session, parsed.data.subjectId, selection);
     const placement = resolveStudyPlacement({
@@ -115,12 +120,15 @@ export async function createStudyLogAction(
     if (result.status === "conflict") {
       return { status: "error", message: STUDY_MESSAGES.conflict, values };
     }
+    if (result.status === "created") {
+      celebration = await celebrationToken(session, user.id, today, before);
+    }
   } catch (error) {
     return providerError(error, values);
   }
 
   refresh();
-  redirect("/ogrenci/calisma?durum=kaydedildi");
+  redirect(withCelebrationParam("/ogrenci/calisma?durum=kaydedildi", celebration));
 }
 
 export async function updateStudyLogAction(
@@ -141,8 +149,11 @@ export async function updateStudyLogAction(
     };
   }
 
+  let celebration: string | null = null;
   try {
     const session = await createSessionClient({ writable: true });
+    const today = istanbulToday();
+    const before = await readCelebrationBaseline(session, user.id, today);
     const existing = await getStudyLog(session, user.id, id.data);
     if (!existing) return { status: "error", message: STUDY_MESSAGES.notFound, values };
 
@@ -182,12 +193,13 @@ export async function updateStudyLogAction(
     if (updated === "not_found") {
       return { status: "error", message: STUDY_MESSAGES.notFound, values };
     }
+    celebration = await celebrationToken(session, user.id, today, before);
   } catch (error) {
     return providerError(error, values);
   }
 
   refresh();
-  redirect("/ogrenci/calisma?durum=guncellendi");
+  redirect(withCelebrationParam("/ogrenci/calisma?durum=guncellendi", celebration));
 }
 
 export async function deleteStudyLogAction(

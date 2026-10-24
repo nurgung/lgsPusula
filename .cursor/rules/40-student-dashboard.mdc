@@ -1,0 +1,27 @@
+---
+description: Öğrenci ana sayfasının kart dizilimi ve hedef tamamlama ekranı
+globs: src/app/(panel)/ogrenci/**/*.tsx,src/features/home/**/*.tsx,src/features/mascot/**/*.tsx,src/components/layout/**/*.tsx,src/app/globals.css
+alwaysApply: false
+---
+
+# Öğrenci paneli
+
+Ayrıntı `roadmap.md` Faz 14. Örnek görseller dizilim içindir; ekran birebir kopyalanmaz.
+
+- Dört bant: aşama yolu, günlük hedefler, ders karoları, alt özet. `lg` altında bantlar alt alta iner.
+- Menü `getNavItems` ile kalır. Yeni öğe ve koyu yan menü ekleme.
+- Renk yalnızca `globals.css` token'ıdır. Yeni çift `src/lib/contrast.test.ts` içine girer. Satır içi `style` yok.
+- Tamamlama penceresi yalnızca bu kayıtta hedef, rozet veya aşama eşiği aşılınca açılır. İçinde dört durak, işaretli hedefler, madalya, gerçek Türkçe ad ve "Tamam" vardır.
+- Pencere odak içinde kalır, Esc kapatır, kapanınca tek kullanımlık adres işareti silinir. Aynı gün yenilemek tekrar açmaz.
+- Aşama adları `STAGE_LEVELS` içindedir: Yeni arkadaş, Alışıyor, Birlikte büyüyor, Yol arkadaşı. Boş gün aşamayı geri götürmez.
+- Alma: ada haritası, "Level 32", "LEVEL UP!", kelime kartı, NFT, jeton, ücretli plan, ruh hâli, uydurma yüzde, sıfırlanan seri.
+- `prefers-reduced-motion` açıkken konfeti durur. Tamamlanan hedefte işaret ve metin birlikte durur.
+
+```tsx
+// ❌ Örnek metni kopyalamak
+<p>Level 32: Explorer</p>
+<p>You unlocked the Explorer badge!</p>
+
+// ✅ Bu kaydın açtığı gerçek ad
+<p>Birlikte büyüyor aşamasına geldin.</p>
+```

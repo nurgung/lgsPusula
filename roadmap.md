@@ -26,6 +26,7 @@
 | 11 | Veli paneli ve PDF rapor | Tamamlandı — kod, yerel testler ve production migration (21 Ekim 2026). Tüm uçtan uca paket bu turda yeniden çalıştırılmadı |
 | 12 | PWA, erişilebilirlik ve yayın hazırlığı | Devam ediyor — PWA, çevrimdışı sınır, nonce CSP, yedek ve saklama migration'ı doğrulandı. Sentry AB projesi ve `SENTRY_DSN` Production'da (21 Ekim 2026). Gerçek cihaz ve Gitleaks bekliyor |
 | 13 | MVP sonrası: yapay zekâ, içe aktarma, DOCX | Devam ediyor — sıfır saklama açık, `AI_ENABLED=true`. Groq anahtarı yerelde ve Vercel Production gizli değişkeninde; depoda yok. Production migration bekliyor |
+| 14 | Öğrenci ana sayfa görünümü | Tamamlandı — dört bant, kutlama penceresi, birim testler ve ilgili uçtan uca testler (320 px ve masaüstü) geçti (24 Ekim 2026). Yeni tablo yok |
 
 ---
 
@@ -443,6 +444,58 @@
 - [x] Yapay zekâ kullanılamadığında temel koçluk çalışır (test) — `src/features/ai/explain.test.ts`, 22 Ekim 2026
 - [x] Model çıktısı puan, yetki veya veri tabanı sorgusunu belirlemez (test) — aynı dosya: ek alanlar reddedilir, kural kartı aynı kalır
 - [x] Geçersiz dosyalar güvenle reddedilir; satırlar başka öğrenciye yazılamaz (test) — `src/features/import/plan.test.ts`
+
+---
+
+## Faz 14 — Öğrenci ana sayfa görünümü
+
+**Amaç:** `/ogrenci` sayfasına kartlı bir dizilim vermek ve hedef tamamlanınca ayrı bir kutlama ekranı açmak. Örnek görsellerin ritmi alınır; ekranları birebir kopyalanmaz. Veri modeli, yetki ve puan kuralları değişmez.
+**Ön koşul:** 14.0. Faz 12'nin kalan yayın işlerini bekletmez.
+**Karar (24 Ekim 2026):** Birinci görsel yalnızca dizilim örneğidir. İkinci görsel, hedef tamamlama ekranının örneğidir.
+
+Bugünkü sayfa üst başlık ve üst üste form kartlarıdır. Yeni dizilim dört banttır. Küçük ekranda bantlar alt alta iner; menü bugünkü üst başlık ve alt çubuk olarak kalır.
+
+| Bant | LGS karşılığı | Veri |
+| --- | --- | --- |
+| Üst yol | Dört durak: Yeni arkadaş, Alışıyor, Birlikte büyüyor, Yol arkadaşı. Güncel durak seçili karakterle işaretlenir | `STAGE_LEVELS` ve mevcut puan. Ada, palmiye ve "Level 32" çizilmez |
+| Günlük hedefler | İşaretli liste: bugünkü kayıt, günlük soru hedefi, varsa kazanım eşleştirme | `tasksFor`. Tamamlanan satır işaretlidir |
+| Ders karoları | Katalogdaki dersler. Her karo bir derse gider | Gerçek ders adı. "Adventure" veya kelime kartı yok |
+| Alt özet | Bu haftanın soru ve dakikası, son deneme neti, koçluk önerisi, gizlilik ve veli bağlantısı | Mevcut kayıt, deneme ve koçluk |
+
+**Hedef tamamlama ekranı**
+
+Kayıt yazılırken bugünkü soru hedefi ilk kez tamamlanırsa, yeni bir rozet kazanılırsa veya aşama yukarı çıkarsa açılır. Yerleşik bir penceredir: odak içinde kalır, Esc ve "Tamam" kapatır, kapanınca adres çubuğundaki tek kullanımlık işaret silinir.
+
+Penceredeki düzen ikinci görsele benzer, içeriği LGS'dir:
+
+- Üstte aynı dört durak. Güncel durağın adı hap içinde: "Alışıyor".
+- Solda bugünün hedefleri; tamamlananlar işaretli.
+- Sağda madalya, kısa tebrik ve açılan şeyin gerçek adı. Örnek: "Hedefe ulaştın. Bugünkü soru hedefin tamam." Aşama için: "Birlikte büyüyor aşamasına geldin."
+- Tek düğme: "Tamam".
+
+**Alınmayanlar**
+
+- Örnekteki ada haritası, palmiye, "Level 32: Explorer", "LEVEL UP!" ve kelime kartları.
+- NFT, jeton, ücretli plan, Telegram, ruh hâli ve İngilizce arayüz.
+- Uydurma yüzde. Soru, dakika, net ve hedef kendi birimiyle yazılır.
+- Boş günü sıfırlayan seri. `mascot-v1` boş günü silmez; aşama geri gitmez. Yeni bir ceza sayacı eklenmez.
+- Saatli ders programı. Böyle bir kayıt yoktur.
+- Mor marka. Zemin yumuşayabilir; metin ve birincil düğme teal/mürekkep token'ında kalır.
+
+**İşler**
+- [x] 14.0 Proje sahibi 24 Ekim 2026'da dizilimi örnek, hedef tamamlama ekranını ikinci görsele benzer istedi
+- [x] 14.1 Yumuşak tuval ve ders karosu zemin token'ları `src/app/globals.css` içinde. Ham hex yok. Yeni çiftler `src/lib/contrast.test.ts` içine girer — kontrast testi geçti (24 Ekim 2026)
+- [x] 14.2 `/ogrenci` dört bant: yol, günlük hedefler, ders karoları, alt özet. Menü ve öğe sayısı değişmez — `getNavItems` aynı. Uçtan uca ana sayfa başlıklarını gördü
+- [x] 14.3 Tamamlama penceresi: duraklar, işaretli hedefler, madalya, gerçek ad, "Tamam". Metin `supportiveCopyIssues` testini geçer — `celebration.test.ts`
+- [x] 14.4 Pencere yalnızca eşiğin bu kayıtta aşıldığında açılır. Aynı gün sayfayı yenilemek pencereyi tekrar açmaz. Hedef yoksa veya henüz tamamlanmadıysa açılmaz — birim test ve `tests/e2e/home-celebration.spec.ts`
+- [x] 14.5 Hareket azaltma açıkken konfeti ve yol animasyonu durur. Renk tek başına "tamam" demez; işaret ve "Tamam" metni durur — uçtan uca `display: none` ve `animation-name: none`
+- [x] 14.6 Birim testler ve uçtan uca: eşik aşımı pencereyi açar, aşılmayan kayıt açmaz, 320 px taşma yok, Esc kapatır — 24 Ekim 2026, 320 px ve masaüstü geçti
+
+**Bitti sayılması için**
+- [x] 14.0 karar yazılı
+- [x] Yeni tablo, ada çizimi, kelime kartı veya sıfırlanan seri yok — puan kuralı `mascot-v1` duruyor; kutlama işareti tablosuz, imzalı adres parametresi
+- [x] Kontrast, destekleyici metin ve ilgili uçtan uca test geçti — `contrast.test.ts`, `celebration.test.ts`, `home-celebration.spec.ts`, `study.spec.ts`, `coaching.spec.ts`, `release.spec.ts` (24 Ekim 2026)
+- [x] Ana sayfa ve tamamlama penceresi 320 px ile masaüstünde yatay taşmaz — aynı uçtan uca koşu
 
 ---
 

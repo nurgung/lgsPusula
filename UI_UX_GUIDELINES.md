@@ -29,12 +29,15 @@ Renk token'ları merkezi tema dosyasında tanımlanmalı; bileşenlere rastgele 
 ## Bilgi mimarisi
 
 ### Öğrenci ana sayfası
-- Selamlama ve seçilmiş karakter.
-- Bugünün hedefi ve ilerleme göstergesi.
-- Hızlı günlük kayıt girişi.
-- Öncelikli çalışma önerisi.
-- Yaklaşan veya tamamlanmamış görevler.
-- Son deneme özeti.
+
+Hedef yerleşim `roadmap.md` Faz 14'tedir. Örnek görseller dizilimin örneğidir; bölümleri birebir kopyalanmaz. Küçük ekranda bantlar alt alta iner. Menü değişmez.
+
+- Üst yol: dört aşama durağı. Güncel durak, seçili karakterle işaretlenir.
+- Günlük hedefler: bugünkü kayıt, soru hedefi ve varsa kazanım işi. Tamamlanan satır işaretlidir.
+- Ders karoları: katalogdaki gerçek dersler.
+- Alt özet: haftalık soru ve dakika, son deneme neti, koçluk önerisi, gizlilik ve veli bağlantısı.
+
+Hedef, rozet veya aşama bu kayıtta ilk kez tamamlanırsa bir pencere açılır. Pencerede aynı yol, işaretli hedefler, madalya, kazanılanın gerçek adı ve "Tamam" düğmesi vardır. Ada haritası, İngilizce seviye adı, kelime kartı, NFT, jeton, ücretli plan, ruh hâli, uydurma yüzde ve boş günü sıfırlayan seri yoktur. Bir gün ara vermek karakteri geriletmez.
 
 ### Günlük çalışma
 - Ders seçimi.

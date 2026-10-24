@@ -412,3 +412,9 @@ Karar 0.12, 22 Ekim 2026'da yeniden bakıldı. İstek yalnızca `https://api.gro
 İçe aktarma `/ogrenci/ice-aktar` üzerindedir. Öğrenci kimliği oturumdandır. CSV ve xlsx 500 KB ve 100 satırla sınırlıdır. Formül hücresi reddedilir. PDF modele gitmez; metin katmanındaki `tarih:` satırları okunur, yoksa satır uydurulmaz. Kayıt, önizlemeden sonra `confirm=evet` ile yazılır. Aynı satır aynı `request_id` üretir.
 
 Word raporu PDF ile aynı bloklardandır. Dosya `report_jobs` tablosuna yazılmaz; veli bağlantısı kontrol edildikten sonra tarayıcıya iner. Production migration `20261022100000_ai_preferences.sql` henüz gönderilmedi.
+
+## Öğrenci ana sayfa görünümü (Faz 14)
+
+`/ogrenci` dört banttır: aşama yolu, bugünün hedefleri, ders karoları, özet. `lg` altında bantlar alt alta iner; geniş ekranda hedefler ve dersler yan yanadır. Menü `getNavItems` ile aynı kalır. Hızlı kayıt kartı kalkmıştır. Ders karosu `/ogrenci/calisma/yeni?ders=<ders kimliği>` adresine gider; kimlik katalogda yoksa form dersi boş açar.
+
+Kutlama penceresi yeni bir tablo açmaz. Kayıt, deneme veya kazanım yazısı hedefi, rozeti ya da aşamayı ilk kez geçirirse adreste imzalı `kutlama` işareti durur. İmza `AUTH_SECRET` ile doğrulanır, 15 dakika yaşar ve cümleyi taşımaz. Cümle, pencere açılırken öğrencinin kendi satırlarından kurulur. "Tamam" ve Esc işareti siler. Aynı gün sayfayı işaretsiz yenilemek pencereyi açmaz. Hedef yoksa veya henüz dolmamışsa hedef cümlesi çıkmaz. Boş gün aşamayı geri götürmez. Konfeti ve durak hareketi yalnızca `prefers-reduced-motion: no-preference` iken çalışır.

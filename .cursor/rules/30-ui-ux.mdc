@@ -19,3 +19,4 @@ alwaysApply: true
 - Hedef, net ve kazanım bilgilerini yanıltıcı görselleştirme; tarih aralığı ve ölçü birimini belirt.
 - Mobilde tabloların önemli sütunlarını kaybetme; uygun kart görünümü veya kontrollü kaydırma sun.
 - Gerçek veri yerine örnek veri kullanıyorsan bunu geliştirme ortamında açıkça belirt.
+- Öğrenci ana sayfasını ve hedef tamamlama penceresini Faz 14 ile `40-student-dashboard.mdc` dışında değiştirme.

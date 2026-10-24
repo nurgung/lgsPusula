@@ -29,6 +29,36 @@ const PAIRS: { name: string; foreground: string; background: string; minimum: nu
     { name: "success text", foreground: "#166534", background: "#effbf3", minimum: 4.5 },
     { name: "info text", foreground: "#1d4ed8", background: "#eff5ff", minimum: 4.5 },
     { name: "warning text", foreground: "#92400e", background: "#fff8eb", minimum: 4.5 },
+    {
+      name: "ink on soft canvas",
+      foreground: "#0f1b2d",
+      background: "#e7f3f0",
+      minimum: 4.5,
+    },
+    {
+      name: "secondary text on soft canvas",
+      foreground: "#2b3a52",
+      background: "#e7f3f0",
+      minimum: 4.5,
+    },
+    { name: "ink on tile 1", foreground: "#0f1b2d", background: "#e5f4f1", minimum: 4.5 },
+    { name: "ink on tile 2", foreground: "#0f1b2d", background: "#fff3e0", minimum: 4.5 },
+    { name: "ink on tile 3", foreground: "#0f1b2d", background: "#e7eefb", minimum: 4.5 },
+    { name: "ink on tile 4", foreground: "#0f1b2d", background: "#f1f6e6", minimum: 4.5 },
+    { name: "ink on tile 5", foreground: "#0f1b2d", background: "#f8efe6", minimum: 4.5 },
+    { name: "ink on tile 6", foreground: "#0f1b2d", background: "#e5f4f8", minimum: 4.5 },
+    {
+      name: "ink on stage pill",
+      foreground: "#0f1b2d",
+      background: "#cdf5ef",
+      minimum: 4.5,
+    },
+    {
+      name: "ink on medal",
+      foreground: "#0f1b2d",
+      background: "#fff8eb",
+      minimum: 4.5,
+    },
   ];
 
 describe("design token contrast", () => {

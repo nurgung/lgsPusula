@@ -3,6 +3,9 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireStudent } from "@/features/access/guards";
+import { withCelebrationParam } from "@/features/home/celebration-token";
+import { celebrationToken, readCelebrationBaseline } from "@/features/home/issue-celebration";
+import { istanbulToday } from "@/features/study/calendar";
 import { loadCatalog } from "@/features/curriculum/load-catalog";
 import { createSessionClient } from "@/services/supabase/server-client";
 import { getExam } from "@/services/supabase/exam-store";
@@ -50,8 +53,11 @@ export async function replaceExamMistakesAction(
     });
   }
 
+  let celebration: string | null = null;
   try {
     const session = await createSessionClient({ writable: true });
+    const today = istanbulToday();
+    const before = await readCelebrationBaseline(session, user.id, today);
     const exam = await getExam(session, user.id, examId);
     if (!exam) return { status: "error", message: OUTCOME_MESSAGES.notFound };
 
@@ -99,12 +105,18 @@ export async function replaceExamMistakesAction(
       budgets.map((row) => row.resultId),
       parsed.rows,
     );
+    celebration = await celebrationToken(session, user.id, today, before);
   } catch (error) {
     return providerError(error);
   }
 
   refresh();
-  redirect(`/ogrenci/denemeler/${examId}/kazanimlar?durum=kaydedildi`);
+  redirect(
+    withCelebrationParam(
+      `/ogrenci/denemeler/${examId}/kazanimlar?durum=kaydedildi`,
+      celebration,
+    ),
+  );
 }
 
 function zUuid(value: string): boolean {

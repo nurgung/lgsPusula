@@ -129,6 +129,10 @@ test("a student sets a goal, records work, edits it and cannot save an inconsist
   await page.getByRole("button", { name: "Kaydı ekle" }).click();
 
   await expect(page).toHaveURL(/\/ogrenci\/calisma\?durum=kaydedildi/);
+  const celebration = page.getByRole("dialog");
+  await expect(celebration).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(celebration).toHaveCount(0);
   await expect(page.getByText("Çalışma kaydın eklendi.")).toBeVisible();
   await expect(page.getByText("5 soru · 4 doğru, 1 yanlış, 0 boş")).toBeVisible();
   await expect(page.getByText(catalog.topicName)).toBeVisible();
