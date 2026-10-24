@@ -8,10 +8,11 @@ import { requireStudent } from "@/features/access/guards";
 import { ExamList } from "@/features/exams/components/exam-list";
 import { EXAM_MESSAGES } from "@/features/exams/messages";
 import { loadExamList } from "@/features/exams/load-exams";
+import { examChartWindow } from "@/features/outcomes/window";
 import {
-  formatTurkishDateRange,
+  formatTurkishDate,
   istanbulToday,
-  recentListWindow,
+  STUDY_DATE_MIN,
 } from "@/features/study/calendar";
 
 export const metadata: Metadata = { title: "Denemeler" };
@@ -43,7 +44,7 @@ async function ExamsContent({
   const user = await requireStudent();
   const params = await searchParams;
   const today = istanbulToday();
-  const listWindow = recentListWindow(today);
+  const listWindow = examChartWindow(today);
   const exams = await loadExamList(user.id, listWindow);
   const status = STATUS[one(params.durum)];
 
@@ -51,7 +52,7 @@ async function ExamsContent({
     <>
       <PageHeader
         title="Denemeler"
-        description={`Son ${formatTurkishDateRange(listWindow)} arası denemelerin. Net = doğru − (yanlış ÷ 3). Toplam net eksi olursa 0 alınır.`}
+        description={`${formatTurkishDate(STUDY_DATE_MIN)} tarihinden bugüne denemelerin. Net = doğru − (yanlış ÷ 3). Toplam net eksi olursa 0 alınır.`}
       />
       {status ? <StateMessage variant="success" title={status} /> : null}
       <div className="mb-4 flex flex-wrap gap-2">

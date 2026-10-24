@@ -85,6 +85,24 @@ describe("SelectField", () => {
     const select = screen.getByRole("combobox", { name: "Ders" });
     expect(select.querySelectorAll("option")).toHaveLength(3);
   });
+
+  it("groups options under headings", () => {
+    render(
+      <SelectField
+        label="1. yanlış"
+        placeholder="Kazanım seç"
+        groups={[
+          {
+            label: "Okuma",
+            options: [{ value: "outcome:1", label: "T.8.3.13 Okuduklarını özetler." }],
+          },
+        ]}
+      />,
+    );
+    const select = screen.getByRole("combobox", { name: "1. yanlış" });
+    expect(select.querySelector("optgroup")?.getAttribute("label")).toBe("Okuma");
+    expect(select.querySelectorAll("option")).toHaveLength(2);
+  });
 });
 
 describe("FormErrorSummary", () => {

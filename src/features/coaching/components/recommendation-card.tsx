@@ -4,6 +4,7 @@ import { formatTurkishDateRange } from "@/features/study/calendar";
 import { COACHING_MESSAGES } from "../messages";
 import { studentVisibleEvidence, studentVisibleReason } from "../present";
 import type { CoachingReport } from "../rules";
+import { CompletePracticeButton } from "./complete-practice-button";
 
 export function RecommendationCard({
   report,
@@ -37,6 +38,9 @@ export function RecommendationCard({
         >
           {item.message}
         </p>
+        {audience === "student" && item.practice ? (
+          <CompletePracticeButton outcomeId={item.practice.outcomeId} />
+        ) : null}
         <section aria-labelledby="oneri-neden" className="grid min-w-0 gap-2">
           <h3 id="oneri-neden" className="text-base font-bold text-ink-900">
             {COACHING_MESSAGES.whyHeading}

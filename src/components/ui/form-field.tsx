@@ -184,7 +184,11 @@ export function NumberField({
             ids,
             [unitId, externalDescribedBy].filter(Boolean).join(" "),
           )}
-          className={cn(controlClassName, controlState(error), "max-w-40 tabular-nums")}
+          className={cn(
+            controlClassName,
+            controlState(error),
+            "max-w-40 tabular-nums read-only:bg-canvas",
+          )}
           {...inputProps}
         />
         {unit ? (
@@ -197,9 +201,14 @@ export function NumberField({
   );
 }
 
+type SelectOption = { value: string; label: string };
+type SelectGroup = { label: string; options: readonly SelectOption[] };
+
 type SelectFieldProps = FieldOwnProps &
   Omit<ComponentProps<"select">, "className" | "children"> & {
-    options: readonly { value: string; label: string }[];
+    options?: readonly SelectOption[];
+    /** Topic or other headings. Used when a flat list would be too long to scan. */
+    groups?: readonly SelectGroup[];
     /** Text for an empty first option; omit when a value is always selected. */
     placeholder?: string;
   };
@@ -211,7 +220,8 @@ export function SelectField({
   error,
   optional,
   className,
-  options,
+  options = [],
+  groups = [],
   placeholder,
   "aria-describedby": externalDescribedBy,
   ...selectProps
@@ -231,6 +241,15 @@ export function SelectField({
           <option key={option.value} value={option.value}>
             {option.label}
           </option>
+        ))}
+        {groups.map((group) => (
+          <optgroup key={group.label} label={group.label}>
+            {group.options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </optgroup>
         ))}
       </select>
     </FieldShell>

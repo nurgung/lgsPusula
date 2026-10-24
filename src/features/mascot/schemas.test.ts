@@ -4,6 +4,8 @@ import { notificationPreferencesSchema, speciesSchema } from "./schemas";
 describe("mascot schemas", () => {
   it("accepts a known species and rejects an empty choice", () => {
     expect(speciesSchema.safeParse({ species: "daisy" }).success).toBe(true);
+    expect(speciesSchema.safeParse({ species: "platypus" }).success).toBe(true);
+    expect(speciesSchema.safeParse({ species: "capybara" }).success).toBe(true);
     expect(speciesSchema.safeParse({ species: "dragon" }).success).toBe(false);
   });
 

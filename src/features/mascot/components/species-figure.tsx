@@ -97,6 +97,38 @@ function Daisy() {
   );
 }
 
+function Platypus() {
+  return (
+    <>
+      <span className="species-shadow" />
+      <span className="species-platypus-tail" />
+      <Ball className="species-ball species-fill-amber-dark species-platypus-body" />
+      <Ball className="species-ball species-fill-amber species-platypus-head" />
+      <span className="species-platypus-bill" />
+      <span className="species-eye species-platypus-eye" />
+      <Ball className="species-ball species-fill-amber-dark species-platypus-foot-l" />
+      <Ball className="species-ball species-fill-amber-dark species-platypus-foot-r" />
+    </>
+  );
+}
+
+function Capybara() {
+  return (
+    <>
+      <span className="species-shadow" />
+      <Ball className="species-ball species-fill-amber-dark species-capybara-body" />
+      <Ball className="species-ball species-fill-amber species-capybara-head" />
+      <Ball className="species-ball species-fill-amber-dark species-capybara-snout" />
+      <span className="species-ear species-capybara-ear-l" />
+      <span className="species-ear species-capybara-ear-r" />
+      <span className="species-eye species-capybara-eye" />
+      <span className="species-nose species-capybara-nose" />
+      <Ball className="species-ball species-fill-amber-dark species-capybara-paw-l" />
+      <Ball className="species-ball species-fill-amber-dark species-capybara-paw-r" />
+    </>
+  );
+}
+
 function Sapling() {
   return (
     <>
@@ -118,15 +150,29 @@ const FIGURES = {
   cat: Cat,
   turtle: Turtle,
   sparrow: Sparrow,
+  platypus: Platypus,
+  capybara: Capybara,
   daisy: Daisy,
   sapling: Sapling,
 } as const;
 
 /** Layered mascot. Motion is CSS, so the figure is visible before any script runs. */
-export function SpeciesFigure({ code }: { code: SpeciesCode }) {
+export function SpeciesFigure({
+  code,
+  size = "regular",
+}: {
+  code: SpeciesCode;
+  /** `compact` fits the current stop on the stage path. */
+  size?: "regular" | "compact";
+}) {
   const Figure = FIGURES[code];
   return (
-    <span className="species-stage" data-species-figure={code} aria-hidden="true">
+    <span
+      className="species-stage"
+      data-species-figure={code}
+      data-figure-size={size}
+      aria-hidden="true"
+    >
       <span className={`species-rig species-rig-${code}`}>
         <Figure />
       </span>

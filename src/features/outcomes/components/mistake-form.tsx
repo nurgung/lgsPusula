@@ -4,11 +4,16 @@ import { useActionState, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormErrorSummary, SelectField } from "@/components/ui/form-field";
 import { StateMessage } from "@/components/ui/state-message";
-import { CurriculumPicker } from "@/features/curriculum/components/curriculum-picker";
 import type { CatalogSubject } from "@/features/curriculum/catalog";
 import { replaceExamMistakesAction } from "../actions";
 import { initialOutcomeFormState, type OutcomeFormState } from "../form-state";
 import { OUTCOME_MESSAGES } from "../messages";
+import {
+  buildMistakeSlots,
+  outcomeOptionGroups,
+  type MistakeSlot,
+  type MistakeSlotKind,
+} from "../mistake-slots";
 
 type SubjectSlot = {
   resultId: string;
@@ -17,22 +22,6 @@ type SubjectSlot = {
   wrongCount: number;
   blankCount: number;
 };
-
-type DraftRow = {
-  key: string;
-  resultId: string;
-  subjectId: string;
-  kind: "wrong" | "blank";
-  catalogItem: string;
-};
-
-function countKind(
-  rows: readonly DraftRow[],
-  resultId: string,
-  kind: "wrong" | "blank",
-): number {
-  return rows.filter((row) => row.resultId === resultId && row.kind === kind).length;
-}
 
 export function MistakeForm({
   examId,
@@ -45,7 +34,7 @@ export function MistakeForm({
   catalog: readonly CatalogSubject[];
   initialRows: readonly {
     resultId: string;
-    kind: "wrong" | "blank";
+    kind: MistakeSlotKind;
     outcomeId: string;
   }[];
 }) {
@@ -63,17 +52,8 @@ export function MistakeForm({
     message,
   }));
 
-  const [rows, setRows] = useState<DraftRow[]>(() =>
-    initialRows.map((row, index) => {
-      const subject = subjects.find((item) => item.resultId === row.resultId);
-      return {
-        key: `${row.resultId}-${index}`,
-        resultId: row.resultId,
-        subjectId: subject?.subjectId ?? "",
-        kind: row.kind,
-        catalogItem: `outcome:${row.outcomeId}`,
-      };
-    }),
+  const [rows, setRows] = useState<MistakeSlot[]>(() =>
+    buildMistakeSlots(subjects, initialRows),
   );
 
   const mappable = subjects.filter(
@@ -90,23 +70,10 @@ export function MistakeForm({
     );
   }
 
-  const addRow = (subject: SubjectSlot, kind: "wrong" | "blank") => {
-    const limit = kind === "wrong" ? subject.wrongCount : subject.blankCount;
-    if (countKind(rows, subject.resultId, kind) >= limit) return;
-    setRows((current) => [
-      ...current,
-      {
-        key: `${subject.resultId}-${kind}-${crypto.randomUUID()}`,
-        resultId: subject.resultId,
-        subjectId: subject.subjectId,
-        kind,
-        catalogItem: "",
-      },
-    ]);
-  };
-
-  const removeRow = (key: string) => {
-    setRows((current) => current.filter((row) => row.key !== key));
+  const setCatalogItem = (key: string, catalogItem: string) => {
+    setRows((current) =>
+      current.map((row) => (row.key === key ? { ...row, catalogItem } : row)),
+    );
   };
 
   return (
@@ -119,13 +86,24 @@ export function MistakeForm({
         <StateMessage variant="error" title={state.message} />
       ) : null}
 
+      <p className="text-sm text-ink-700">
+        Her yanlış ve her boş soru için bir liste açılır. İstediğin kadarını seç.
+        Seçmediğin soru bağlanmamış kalır.
+      </p>
+
       {mappable.map((subject) => {
         const subjectRows = rows
           .map((row, index) => ({ row, index }))
           .filter(({ row }) => row.resultId === subject.resultId);
-        const wrongUsed = countKind(rows, subject.resultId, "wrong");
-        const blankUsed = countKind(rows, subject.resultId, "blank");
-        const subjectCatalog = catalog.filter((item) => item.id === subject.subjectId);
+        const groups = outcomeOptionGroups(
+          catalog.find((item) => item.id === subject.subjectId),
+        );
+        const wrongChosen = subjectRows.filter(
+          ({ row }) => row.kind === "wrong" && row.catalogItem,
+        ).length;
+        const blankChosen = subjectRows.filter(
+          ({ row }) => row.kind === "blank" && row.catalogItem,
+        ).length;
 
         return (
           <section
@@ -141,101 +119,38 @@ export function MistakeForm({
                 {subject.subjectName}
               </h3>
               <p className="text-sm text-ink-700">
-                Yanlış {subject.wrongCount}, boş {subject.blankCount}. Bağlanan: yanlış{" "}
-                {wrongUsed}/{subject.wrongCount}, boş {blankUsed}/{subject.blankCount}.
+                Yanlış {wrongChosen} / {subject.wrongCount}, boş {blankChosen} /{" "}
+                {subject.blankCount} bağlandı.
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              <Button
-                type="button"
-                variant="secondary"
-                disabled={pending || wrongUsed >= subject.wrongCount}
-                onClick={() => addRow(subject, "wrong")}
-              >
-                Yanlış ekle
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                disabled={pending || blankUsed >= subject.blankCount}
-                onClick={() => addRow(subject, "blank")}
-              >
-                Boş ekle
-              </Button>
-            </div>
-
-            {subjectRows.length === 0 ? (
-              <p className="text-sm text-ink-700">
-                Henüz eşleştirme yok. İstersen hepsini boş bırakabilirsin; o zaman kazanım
-                analizi yapılmış sayılmaz.
-              </p>
+            {groups.length === 0 ? (
+              <p className="text-sm text-ink-700">Bu dersin kazanımları henüz eklenmedi.</p>
             ) : (
-              <ul className="grid min-w-0 gap-4">
+              <ul className="grid min-w-0 gap-3">
                 {subjectRows.map(({ row, index }) => (
-                  <li
-                    key={row.key}
-                    className="grid min-w-0 gap-3 rounded-xl border border-border bg-canvas p-3"
-                  >
+                  <li key={row.key} className="min-w-0">
                     <input
                       type="hidden"
                       name={`rows.${index}.resultId`}
                       value={row.resultId}
                     />
+                    <input type="hidden" name={`rows.${index}.kind`} value={row.kind} />
                     <input
                       type="hidden"
                       name={`rows.${index}.sortOrder`}
                       value={String(index)}
                     />
                     <SelectField
-                      id={`${prefix}-kind-${row.key}`}
-                      name={`rows.${index}.kind`}
-                      label="Tür"
-                      value={row.kind}
-                      onChange={(event) => {
-                        const next = event.target.value === "blank" ? "blank" : "wrong";
-                        setRows((current) =>
-                          current.map((item) =>
-                            item.key === row.key ? { ...item, kind: next } : item,
-                          ),
-                        );
-                      }}
-                      options={[
-                        { value: "wrong", label: "Yanlış" },
-                        { value: "blank", label: "Boş" },
-                      ]}
-                      error={fieldErrors[`row${index}.kind`]}
-                    />
-                    <CurriculumPicker
-                      catalog={subjectCatalog}
+                      id={`row${index}.catalogItem`}
                       name={`rows.${index}.catalogItem`}
-                      legend="Kazanım"
-                      fixedSubjectId={subject.subjectId}
-                      outcomesOnly
-                      defaultValue={row.catalogItem}
-                      onChange={(selection) => {
-                        const value =
-                          selection?.kind === "outcome" ? `outcome:${selection.id}` : "";
-                        setRows((current) =>
-                          current.map((item) =>
-                            item.key === row.key ? { ...item, catalogItem: value } : item,
-                          ),
-                        );
-                      }}
+                      label={row.label}
+                      value={row.catalogItem}
+                      onChange={(event) => setCatalogItem(row.key, event.target.value)}
+                      placeholder="Kazanım seç"
+                      groups={groups}
+                      error={fieldErrors[`row${index}.catalogItem`]}
                     />
-                    {fieldErrors[`row${index}.catalogItem`] ? (
-                      <p className="text-sm text-danger-700" role="alert">
-                        {fieldErrors[`row${index}.catalogItem`]}
-                      </p>
-                    ) : null}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={() => removeRow(row.key)}
-                      disabled={pending}
-                    >
-                      Bu satırı kaldır
-                    </Button>
                   </li>
                 ))}
               </ul>

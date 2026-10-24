@@ -40,6 +40,20 @@ export function MascotMark({
           <path d="M30 26 L42 22 L30 32 Z" fill="currentColor" />
         </>
       ) : null}
+      {code === "platypus" ? (
+        <>
+          <ellipse cx="20" cy="28" rx="12" ry="8" fill="currentColor" />
+          <ellipse cx="36" cy="28" rx="8" ry="3" fill="currentColor" />
+          <path d="M6 26 L14 22 L14 32 Z" fill="currentColor" />
+        </>
+      ) : null}
+      {code === "capybara" ? (
+        <>
+          <ellipse cx="22" cy="30" rx="14" ry="10" fill="currentColor" />
+          <circle cx="34" cy="20" r="8" fill="currentColor" />
+          <ellipse cx="42" cy="22" rx="5" ry="3" fill="currentColor" />
+        </>
+      ) : null}
       {code === "daisy" ? (
         <>
           <circle

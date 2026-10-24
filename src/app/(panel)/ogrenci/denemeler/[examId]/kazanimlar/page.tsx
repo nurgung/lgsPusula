@@ -53,7 +53,7 @@ async function Content({
     <>
       <PageHeader
         title="Kazanım eşleştirme"
-        description={`${loaded.exam.title} · ${formatTurkishDate(loaded.exam.takenOn)}. Yanlış veya boş soruları bir kazanıma bağla. Bağlamadığın sorular için kazanım tespiti yapılmış sayılmaz.`}
+        description={`${loaded.exam.title} · ${formatTurkishDate(loaded.exam.takenOn)}. Her yanlış ve her boş soru için bir kazanım listesi açılır. Seçmediğin soru bağlanmamış kalır.`}
       />
       {status ? <StateMessage variant="success" title={status} /> : null}
       <Card className="mb-4">

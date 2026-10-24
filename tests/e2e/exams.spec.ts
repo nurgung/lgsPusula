@@ -105,7 +105,7 @@ test("a student records a branch exam, edits nets and parents only read", async 
   await page.locator('input[name="branch.questionCount"]').fill("10");
   await page.locator('input[name="branch.correctCount"]').fill("0");
   await page.locator('input[name="branch.wrongCount"]').fill("6");
-  await page.locator('input[name="branch.blankCount"]').fill("4");
+  await expect(page.locator('input[name="branch.blankCount"]')).toHaveValue("4");
   await page.getByRole("button", { name: "Denemeyi kaydet" }).click();
   await expect(page.getByText("Deneme kaydedildi.")).toBeVisible();
   const celebration = page.getByRole("dialog");
@@ -120,7 +120,7 @@ test("a student records a branch exam, edits nets and parents only read", async 
 
   await page.locator('input[name="branch.correctCount"]').fill("6");
   await page.locator('input[name="branch.wrongCount"]').fill("3");
-  await page.locator('input[name="branch.blankCount"]').fill("1");
+  await expect(page.locator('input[name="branch.blankCount"]')).toHaveValue("1");
   await page.getByRole("button", { name: "Değişikliği kaydet" }).click();
   await expect(page.getByText("Deneme güncellendi.")).toBeVisible();
   await expect(page.getByText("Toplam net 5,00")).toBeVisible();

@@ -4,13 +4,13 @@ import { useActionState, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   FormErrorSummary,
-  NumberField,
   SelectField,
   TextField,
 } from "@/components/ui/form-field";
 import { StateMessage } from "@/components/ui/state-message";
 import { STUDY_DATE_MIN } from "@/features/study/calendar";
 import { createExamAction, updateExamAction } from "@/features/exams/actions";
+import { ExamCountFields } from "@/features/exams/components/exam-count-fields";
 import {
   INITIAL_EXAM_FORM_STATE,
   type ExamFormState,
@@ -204,8 +204,8 @@ function ExamFields({
         <fieldset className="grid min-w-0 gap-4 rounded-xl border border-border p-3">
           <legend className="px-1 font-bold text-ink-900">Ders sonuçları</legend>
           <p className="text-sm text-ink-700">
-            Her ders için doğru, yanlış ve boş yaz. Toplamları o dersin soru sayısına
-            eşit olmalı. Net = doğru − (yanlış ÷ 3). Kural: {CURRENT_RULE_VERSION}.
+            Her ders için doğru ve yanlış yaz. Boş sayı, soru sayısından kendiliğinden
+            düşer. Net = doğru − (yanlış ÷ 3). Kural: {CURRENT_RULE_VERSION}.
           </p>
           {rule.examTypes.lgs_full.subjects.map((slot) => {
             const subject = subjects.find((row) => row.code === slot.code);
@@ -222,37 +222,14 @@ function ExamFields({
                 {subject ? (
                   <input type="hidden" name={`${slot.code}.subjectId`} value={subject.id} />
                 ) : null}
-                <input
-                  type="hidden"
-                  name={`${slot.code}.questionCount`}
-                  value={String(slot.questionCount)}
+                <ExamCountFields
+                  idPrefix={`${prefix}-${slot.code}`}
+                  namePrefix={slot.code}
+                  fixedQuestionCount={slot.questionCount}
+                  initialCorrect={saved?.correctCount ?? ""}
+                  initialWrong={saved?.wrongCount ?? ""}
+                  fieldErrors={fieldErrors}
                 />
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                  <NumberField
-                    id={`${prefix}-${slot.code}-correct`}
-                    name={`${slot.code}.correctCount`}
-                    label="Doğru"
-                    defaultValue={saved?.correctCount ?? ""}
-                    required
-                    error={fieldErrors[`${slot.code}.correctCount`]}
-                  />
-                  <NumberField
-                    id={`${prefix}-${slot.code}-wrong`}
-                    name={`${slot.code}.wrongCount`}
-                    label="Yanlış"
-                    defaultValue={saved?.wrongCount ?? ""}
-                    required
-                    error={fieldErrors[`${slot.code}.wrongCount`]}
-                  />
-                  <NumberField
-                    id={`${prefix}-${slot.code}-blank`}
-                    name={`${slot.code}.blankCount`}
-                    label="Boş"
-                    defaultValue={saved?.blankCount ?? String(slot.questionCount)}
-                    required
-                    error={fieldErrors[`${slot.code}.blankCount`]}
-                  />
-                </div>
               </div>
             );
           })}
@@ -261,7 +238,8 @@ function ExamFields({
         <fieldset className="grid min-w-0 gap-3 rounded-xl border border-border p-3">
           <legend className="px-1 font-bold text-ink-900">Branş sonucu</legend>
           <p className="text-sm text-ink-700">
-            Tek ders seç. Soru sayısı 1–100 olabilir. Net = doğru − (yanlış ÷ 3).
+            Tek ders seç. Soru sayısı 1–100 olabilir. Boş sayı, soru sayısından doğru ve
+            yanlış düşünce kendiliğinden düşer. Net = doğru − (yanlış ÷ 3).
           </p>
           <SelectField
             id={`${prefix}-branch-subject`}
@@ -276,40 +254,14 @@ function ExamFields({
               label: subject.name,
             }))}
           />
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <NumberField
-              id={`${prefix}-branch-questions`}
-              name="branch.questionCount"
-              label="Soru sayısı"
-              defaultValue={defaults.branch.questionCount}
-              required
-              error={fieldErrors["branch.questionCount"]}
-            />
-            <NumberField
-              id={`${prefix}-branch-correct`}
-              name="branch.correctCount"
-              label="Doğru"
-              defaultValue={defaults.branch.correctCount}
-              required
-              error={fieldErrors["branch.correctCount"]}
-            />
-            <NumberField
-              id={`${prefix}-branch-wrong`}
-              name="branch.wrongCount"
-              label="Yanlış"
-              defaultValue={defaults.branch.wrongCount}
-              required
-              error={fieldErrors["branch.wrongCount"]}
-            />
-            <NumberField
-              id={`${prefix}-branch-blank`}
-              name="branch.blankCount"
-              label="Boş"
-              defaultValue={defaults.branch.blankCount}
-              required
-              error={fieldErrors["branch.blankCount"]}
-            />
-          </div>
+          <ExamCountFields
+            idPrefix={`${prefix}-branch`}
+            namePrefix="branch"
+            initialQuestionCount={defaults.branch.questionCount}
+            initialCorrect={defaults.branch.correctCount}
+            initialWrong={defaults.branch.wrongCount}
+            fieldErrors={fieldErrors}
+          />
         </fieldset>
       )}
     </div>

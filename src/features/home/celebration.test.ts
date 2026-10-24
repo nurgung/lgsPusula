@@ -91,6 +91,7 @@ describe("celebration copy", () => {
     { reason: "stage", stageId: "settling" },
     { reason: "stage", stageId: "growing" },
     { reason: "stage", stageId: "companion" },
+    { reason: "practice" },
   ];
 
   it("uses the real Turkish name and stays supportive", () => {
@@ -106,6 +107,9 @@ describe("celebration copy", () => {
     expect(celebrationCopy({ reason: "stage", stageId: "growing" }).heading).toBe(
       "Birlikte büyüyor aşamasına geldin.",
     );
+    expect(celebrationCopy({ reason: "practice" }).heading).toBe(
+      "Başarıya bir adım daha yaklaştın.",
+    );
   });
 
   it("drops a goal marker once the goal is no longer met", () => {
@@ -119,6 +123,7 @@ describe("celebration copy", () => {
     expect(celebrationStillHolds(snap({ dailyGoalTarget: null }), { reason: "goal" })).toBe(
       false,
     );
+    expect(celebrationStillHolds(snap({ points: 30 }), { reason: "practice" })).toBe(false);
   });
 });
 
@@ -139,6 +144,16 @@ describe("celebration token", () => {
     expect(readCelebration(token, secret, 2_000)).toBeNull();
     expect(readCelebration(`${token}x`, secret, 1_000)).toBeNull();
     expect(readCelebration(token, "another-secret-another-secret-xx", 1_000)).toBeNull();
+    const practice = signCelebration(
+      {
+        studentId: "student-123456789012345678901234",
+        kind: { reason: "practice" },
+        expiresAt: 2_000,
+      },
+      secret,
+    );
+    expect(readCelebration(practice, secret, 1_000)?.kind).toEqual({ reason: "practice" });
+    expect(withCelebrationParam("/ogrenci", practice, "alkis")).toContain("alkis=");
     expect(withCelebrationParam("/ogrenci/calisma?durum=kaydedildi", token)).toContain(
       "kutlama=",
     );
@@ -151,7 +166,8 @@ describe("celebration token", () => {
 describe("reduced motion styles", () => {
   it("keeps confetti and the path animation inside the no-preference query", () => {
     const css = readFileSync("src/app/globals.css", "utf8");
-    expect(css).toContain(".celebration-confetti {\n  display: none;");
+    expect(css).toContain(".celebration-confetti,\n.practice-confetti {\n  display: none;");
+    expect(css).toContain("@keyframes practice-confetti");
     expect(css).toContain("@media (prefers-reduced-motion: no-preference)");
     expect(css).toContain(".stage-current-motion");
   });

@@ -91,6 +91,26 @@ describe("parseMistakeReplaceInput", () => {
     expect(parsed.fieldErrors["row2.kind"]).toMatch(/fazla eşleştirme/i);
   });
 
+  it("ignores empty slots and keeps the filled wrong mappings", () => {
+    const parsed = parseMistakeReplaceInput(
+      [
+        {
+          resultId,
+          kind: "wrong",
+          catalogItem: `outcome:${outcomeId}`,
+          sortOrder: "0",
+        },
+        { resultId, kind: "wrong", catalogItem: "", sortOrder: "1" },
+        { resultId, kind: "wrong", catalogItem: "   ", sortOrder: "2" },
+      ],
+      budgets,
+      outcomes,
+    );
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.rows).toHaveLength(1);
+  });
+
   it("rejects an outcome from another subject", () => {
     const parsed = parseMistakeReplaceInput(
       [

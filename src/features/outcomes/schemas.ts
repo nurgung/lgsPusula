@@ -76,6 +76,8 @@ export function parseMistakeReplaceInput(
 
   rows.forEach((raw, index) => {
     const prefix = `row${index}`;
+    // An empty slot is a question the student has not linked yet. It is not an error.
+    if (!(raw.catalogItem ?? "").trim()) return;
     const result = mistakeDraftSchema.safeParse({
       resultId: raw.resultId,
       kind: raw.kind,

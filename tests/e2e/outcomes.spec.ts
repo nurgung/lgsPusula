@@ -65,7 +65,7 @@ test("maps mistakes to outcomes, ranks priorities, and shows net trend with tabl
   await page.locator('input[name="branch.questionCount"]').fill("10");
   await page.locator('input[name="branch.correctCount"]').fill("4");
   await page.locator('input[name="branch.wrongCount"]').fill("4");
-  await page.locator('input[name="branch.blankCount"]').fill("2");
+  await expect(page.locator('input[name="branch.blankCount"]')).toHaveValue("2");
   await page.getByRole("button", { name: "Denemeyi kaydet" }).click();
   await expect(page.getByText("Deneme kaydedildi.")).toBeVisible();
   const celebration = page.getByRole("dialog");
@@ -78,9 +78,7 @@ test("maps mistakes to outcomes, ranks priorities, and shows net trend with tabl
   await expect(page.getByRole("heading", { name: "Kazanım eşleştirme" })).toBeVisible();
   await expectNoHorizontalOverflow(page);
 
-  await page.getByRole("button", { name: "Yanlış ekle" }).click();
-  await page.getByLabel("Ara").fill(catalog.outcomeCode);
-  await page.getByRole("radio", { name: new RegExp(catalog.outcomeCode) }).check();
+  await page.getByLabel("1. yanlış").selectOption(`outcome:${catalog.outcomeId}`);
   await page.getByRole("button", { name: "Eşleştirmeleri kaydet" }).click();
   await expect(page.getByText("Kazanım eşleştirmeleri kaydedildi.")).toBeVisible();
 
@@ -99,7 +97,7 @@ test("maps mistakes to outcomes, ranks priorities, and shows net trend with tabl
   await page.locator('input[name="branch.questionCount"]').fill("10");
   await page.locator('input[name="branch.correctCount"]').fill("7");
   await page.locator('input[name="branch.wrongCount"]').fill("2");
-  await page.locator('input[name="branch.blankCount"]').fill("1");
+  await expect(page.locator('input[name="branch.blankCount"]')).toHaveValue("1");
   await page.getByRole("button", { name: "Denemeyi kaydet" }).click();
   await expect(page.getByText("Deneme kaydedildi.")).toBeVisible();
 

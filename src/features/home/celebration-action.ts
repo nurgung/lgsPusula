@@ -10,10 +10,22 @@ import { listStudyGoals, listStudyLogs } from "@/services/supabase/study-store";
 import {
   celebrationCopy,
   celebrationStillHolds,
+  type CelebrationCopy,
   type CelebrationView,
 } from "./celebration";
 import { readCelebration } from "./celebration-token";
 import { readProgressSnapshot } from "./progress";
+
+/**
+ * Confirms the Tamamlandı marker. The sentence is fixed in code.
+ * A goal, badge, or stage marker is rejected here.
+ */
+export async function resolvePracticeCheer(token: string): Promise<CelebrationCopy | null> {
+  const user = await requireStudent();
+  const parsed = readCelebration(token, requireSupabaseConfig().authSecret, Date.now());
+  if (!parsed || parsed.studentId !== user.id || parsed.kind.reason !== "practice") return null;
+  return celebrationCopy(parsed.kind);
+}
 
 /** Confirms the one-time marker and rebuilds the Turkish sentence from live rows. */
 export async function resolveCelebration(token: string): Promise<CelebrationView | null> {

@@ -3,6 +3,7 @@ import { outcomeAnalysisWindow } from "@/features/outcomes/window";
 import { recentListWindow } from "@/features/study/calendar";
 import { listStudyGoals, listStudyLogs } from "@/services/supabase/study-store";
 import { listExams } from "@/services/supabase/exam-store";
+import { listPracticeCompletions } from "@/services/supabase/coaching-store";
 import { listMistakesForStudentWindow } from "@/services/supabase/mistake-store";
 import { createSessionClient } from "@/services/supabase/server-client";
 import { buildCoachingReport, type CoachingReport } from "./rules";
@@ -10,7 +11,7 @@ import { buildCoachingReport, type CoachingReport } from "./rules";
 /**
  * Reads the signed-in student's own rows and builds a recommendation.
  * The student id comes from the session caller. RLS is the second check.
- * No coaching row is written.
+ * Practice completions are read so a marked outcome is skipped.
  */
 export async function loadCoachingReport(
   studentId: string,
@@ -19,11 +20,12 @@ export async function loadCoachingReport(
   const practiceWindow = recentListWindow(today);
   const examWindow = outcomeAnalysisWindow(today);
   const session = await createSessionClient({ writable: false });
-  const [logs, goals, exams, mistakes] = await Promise.all([
+  const [logs, goals, exams, mistakes, completions] = await Promise.all([
     listStudyLogs(session, studentId, practiceWindow),
     listStudyGoals(session, studentId),
     listExams(session, studentId, examWindow),
     listMistakesForStudentWindow(session, studentId, examWindow),
+    listPracticeCompletions(session, studentId),
   ]);
   return buildCoachingReport({
     today,
@@ -37,5 +39,6 @@ export async function loadCoachingReport(
       totalNet: exam.totalNet,
     })),
     mistakes,
+    completions,
   });
 }

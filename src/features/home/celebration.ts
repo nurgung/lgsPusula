@@ -17,7 +17,8 @@ export type ProgressSnapshot = {
 export type CelebrationKind =
   | { reason: "goal" }
   | { reason: "badge"; badgeId: BadgeView["id"] }
-  | { reason: "stage"; stageId: StageId };
+  | { reason: "stage"; stageId: StageId }
+  | { reason: "practice" };
 
 export type CelebrationCopy = {
   heading: string;
@@ -54,6 +55,12 @@ export function crossedCelebration(
 }
 
 export function celebrationCopy(kind: CelebrationKind): CelebrationCopy {
+  if (kind.reason === "practice") {
+    return {
+      heading: "Başarıya bir adım daha yaklaştın.",
+      detail: "Bu kazanımın sorularını bitirdin. Sıradaki yanlış veya boş kazanıma geçebilirsin.",
+    };
+  }
   if (kind.reason === "goal") {
     return {
       heading: "Hedefe ulaştın.",
@@ -84,6 +91,7 @@ export function celebrationStillHolds(
   snapshot: ProgressSnapshot,
   kind: CelebrationKind,
 ): boolean {
+  if (kind.reason === "practice") return false;
   if (kind.reason === "goal") return goalMet(snapshot);
   if (kind.reason === "badge") return snapshot.badgeIds.includes(kind.badgeId);
   return stageStillCurrent(snapshot.points, kind.stageId);

@@ -33,7 +33,7 @@ async function NewExam() {
     <>
       <PageHeader
         title="Yeni deneme"
-        description="Tam LGS veya branş denemesi seç. Her derste doğru + yanlış + boş = soru sayısı olmalı. Uygulama LGS puanı hesaplamaz; yalnızca net gösterir."
+        description="Tam LGS veya branş denemesi seç. Boş sayı, doğru ve yanlıştan sonra kendiliğinden yazılır. Uygulama LGS puanı hesaplamaz; yalnızca net gösterir."
       />
       <Card>
         {subjects.length === 0 ? (

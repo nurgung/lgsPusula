@@ -22,6 +22,7 @@ import {
   supportiveCopyIssues,
 } from "./messages";
 import {
+  acceptedPractice,
   buildCoachingReport,
   COACHING_RULES,
   type CoachingInput,
@@ -91,7 +92,12 @@ describe("coaching copy", () => {
   it("keeps reviewed templates free of shame, fear, and comparison", () => {
     const samples = [
       ...Object.values(COACHING_MESSAGES),
-      repeatOutcomeMessage("M.8.1.1"),
+      repeatOutcomeMessage({
+        subjectName: "Matematik",
+        code: "M.8.1.1",
+        description: "Üslü ifadelerle işlem yapar.",
+        questionCount: 4,
+      }),
       repeatOutcomeReason(),
       practiceSubjectMessage({
         subjectName: "Matematik",
@@ -242,7 +248,13 @@ describe("buildCoachingReport", () => {
       ],
     });
     expect(tagged.recommendation.ruleId).toBe(COACHING_RULES.repeatOutcome);
-    expect(tagged.recommendation.message).toContain("M.8.1.2");
+    expect(tagged.recommendation.message).toContain("Matematik dersinde M.8.1.2");
+    expect(tagged.recommendation.message).toContain("Örnek kazanım");
+    expect(tagged.recommendation.message).toContain("2 soru çöz");
+    expect(tagged.recommendation.practice).toEqual({
+      outcomeId: "out-1",
+      questionCount: 2,
+    });
     expect(tagged.recommendation.reason).toContain(OUTCOME_PRIORITY_RULE_VERSION);
     expect(tagged.recommendation.reason).toContain(COACHING_RULE_VERSION);
     expect(tagged.recommendation.evidence.join("\n")).toContain("1 yanlış, 1 boş");
@@ -265,6 +277,72 @@ describe("buildCoachingReport", () => {
     expect(untagged.metrics.reviewOutcomes).toEqual([]);
     expect(untagged.recommendation.ruleId).not.toBe(COACHING_RULES.repeatOutcome);
     expect(spoken(untagged)).not.toContain("M.8");
+  });
+
+  it("moves to the next outcome after the current question count is marked done", () => {
+    const mistakes = [
+      mistake({
+        outcomeId: "out-high",
+        outcomeCode: "F.8.1.1.1",
+        kind: "wrong",
+        takenOn: "2026-10-18",
+        subjectName: "Fen Bilimleri",
+      }),
+      mistake({
+        outcomeId: "out-next",
+        outcomeCode: "T.8.3.13",
+        kind: "blank",
+        takenOn: "2026-10-16",
+        subjectName: "Türkçe",
+        outcomeDescription: "Okuduklarını özetler.",
+      }),
+    ];
+    const open = report({ mistakes });
+    expect(open.recommendation.practice?.outcomeId).toBe("out-high");
+
+    const done = report({
+      mistakes,
+      completions: [{ outcomeId: "out-high", questionCount: 1 }],
+    });
+    expect(done.recommendation.practice).toEqual({
+      outcomeId: "out-next",
+      questionCount: 1,
+    });
+    expect(done.recommendation.message).toContain("Türkçe dersinde T.8.3.13");
+    expect(done.recommendation.message).toContain("Okuduklarını özetler");
+  });
+
+  it("asks again when new linked questions exceed the completed count", () => {
+    const mistakes = [
+      mistake({
+        outcomeId: "out-1",
+        outcomeCode: "F.8.1.1.1",
+        kind: "wrong",
+        takenOn: "2026-10-18",
+      }),
+      mistake({
+        outcomeId: "out-1",
+        outcomeCode: "F.8.1.1.1",
+        kind: "wrong",
+        takenOn: "2026-10-19",
+      }),
+    ];
+    const stillDone = report({
+      mistakes: [mistakes[0]!],
+      completions: [{ outcomeId: "out-1", questionCount: 1 }],
+    });
+    expect(stillDone.recommendation.practice).toBeNull();
+
+    const again = report({
+      mistakes,
+      completions: [{ outcomeId: "out-1", questionCount: 1 }],
+    });
+    expect(again.recommendation.practice).toEqual({
+      outcomeId: "out-1",
+      questionCount: 2,
+    });
+    expect(acceptedPractice(again, "out-1")?.questionCount).toBe(2);
+    expect(acceptedPractice(again, "out-other")).toBeNull();
   });
 
   it("ignores a tagged mistake outside the 90-day window", () => {

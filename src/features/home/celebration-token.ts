@@ -44,7 +44,7 @@ function isStageId(value: string): value is StageId {
 function isKind(value: unknown): value is CelebrationKind {
   if (!value || typeof value !== "object") return false;
   const kind = value as { reason?: unknown; badgeId?: unknown; stageId?: unknown };
-  if (kind.reason === "goal") return true;
+  if (kind.reason === "goal" || kind.reason === "practice") return true;
   if (kind.reason === "badge" && typeof kind.badgeId === "string" && isBadgeId(kind.badgeId)) {
     return true;
   }
@@ -95,11 +95,15 @@ export function readCelebration(
   }
 }
 
-export function withCelebrationParam(path: string, token: string | null): string {
+export function withCelebrationParam(
+  path: string,
+  token: string | null,
+  name = "kutlama",
+): string {
   if (!token) return path;
   const hashAt = path.indexOf("#");
   const base = hashAt === -1 ? path : path.slice(0, hashAt);
   const hash = hashAt === -1 ? "" : path.slice(hashAt);
   const join = base.includes("?") ? "&" : "?";
-  return `${base}${join}kutlama=${encodeURIComponent(token)}${hash}`;
+  return `${base}${join}${name}=${encodeURIComponent(token)}${hash}`;
 }

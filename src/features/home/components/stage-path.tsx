@@ -1,6 +1,6 @@
 import { ButtonLink } from "@/components/ui/button";
 import { STAGE_LEVELS, type StageId } from "@/features/mascot/constants";
-import { MascotMark } from "@/features/mascot/components/mascot-mark";
+import { SpeciesFigure } from "@/features/mascot/components/species-figure";
 import { MASCOT_MESSAGES } from "@/features/mascot/messages";
 import { speciesByCode, type SpeciesCode } from "@/features/mascot/species";
 import { cn } from "@/lib/cn";
@@ -52,8 +52,8 @@ export function StagePath({
                 <p className="text-sm font-bold break-words text-ink-900">{level.name}</p>
               )}
               {place === "current" ? (
-                <div className="flex min-w-0 items-center gap-2">
-                  {chosen ? <MascotMark code={chosen.code} /> : null}
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  {chosen ? <SpeciesFigure code={chosen.code} size="compact" /> : null}
                   <p className="min-w-0 text-sm break-words text-ink-900">
                     {chosen
                       ? `${chosen.name}. Buradasın.`

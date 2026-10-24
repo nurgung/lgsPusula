@@ -35,6 +35,11 @@ describe("StagePath", () => {
     }
     expect(screen.getByText("Geçildi")).toBeTruthy();
     expect(screen.getByText("Kedi. Buradasın.")).toBeTruthy();
+    expect(
+      document.querySelector('[data-species-figure="cat"][data-figure-size="compact"]'),
+    ).toBeTruthy();
+    expect(document.querySelector(".species-cat-head")).toBeTruthy();
+    expect(document.querySelector("svg")).toBeNull();
     expect(screen.getAllByText("Sırada")).toHaveLength(2);
     expect(screen.getByText("12")).toBeTruthy();
     expect(screen.queryByText(/Level|Explorer/)).toBeNull();

@@ -104,7 +104,7 @@ WCAG 2.2 AA hedeflenmelidir; otomatik araçlar tek başına yeterli değildir.
 
 Tercih edilen:
 - “Bugün için 10 soruluk küçük bir hedef belirleyebilirsin.”
-- “Bu kazanımı tekrar etmek faydalı olabilir.”
+- “Fen Bilimleri dersinde F.8.1.1.1 kazanımı şunu söyler: Mevsimlerin oluşumuna yönelik tahminlerde bulunur. Bu kazanım için 10 soru çöz. Bitirince Tamamlandı düğmesine bas; sıradaki yanlış veya boş kazanıma geçilir.”
 - “Çalışma kaydını henüz eklemedin. İstersen şimdi kaydedebilirsin.”
 - “Bu öneri, son deneme kayıtlarına dayanıyor.”
 

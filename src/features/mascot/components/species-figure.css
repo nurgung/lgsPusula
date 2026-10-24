@@ -142,7 +142,9 @@
 .species-stem,
 .species-leaf,
 .species-petal,
-.species-daisy-center {
+.species-daisy-center,
+.species-platypus-bill,
+.species-platypus-tail {
   position: absolute;
   display: block;
 }
@@ -543,10 +545,154 @@
   transform: translateZ(8px);
 }
 
+.species-platypus-body {
+  left: 18%;
+  bottom: 18%;
+  width: 52%;
+  height: 32%;
+}
+
+.species-platypus-head {
+  left: 46%;
+  bottom: 28%;
+  width: 28%;
+  height: 24%;
+  transform: translateZ(10px);
+}
+
+.species-platypus-bill {
+  left: 66%;
+  bottom: 32%;
+  width: 26%;
+  height: 12%;
+  border-radius: 30% 70% 70% 30%;
+  background: var(--color-warning-500);
+  transform: translateZ(22px);
+}
+
+.species-platypus-eye {
+  left: 56%;
+  bottom: 40%;
+  width: 8%;
+  height: 9%;
+}
+
+.species-platypus-tail {
+  left: 4%;
+  bottom: 30%;
+  width: 24%;
+  height: 14%;
+  border-radius: 46% 20% 20% 46%;
+  background: var(--color-warning-800);
+  transform: rotateZ(6deg) translateZ(-6px);
+}
+
+.species-platypus-foot-l,
+.species-platypus-foot-r {
+  bottom: 10%;
+  width: 16%;
+  height: 8%;
+  transform: translateZ(8px);
+}
+
+.species-platypus-foot-l {
+  left: 28%;
+}
+
+.species-platypus-foot-r {
+  left: 48%;
+}
+
+.species-capybara-body {
+  left: 14%;
+  bottom: 12%;
+  width: 64%;
+  height: 40%;
+}
+
+.species-capybara-head {
+  left: 38%;
+  bottom: 40%;
+  width: 40%;
+  height: 34%;
+  transform: translateZ(8px);
+}
+
+.species-capybara-snout {
+  left: 62%;
+  bottom: 42%;
+  width: 22%;
+  height: 16%;
+  transform: translateZ(18px);
+}
+
+.species-ear.species-capybara-ear-l,
+.species-ear.species-capybara-ear-r {
+  width: 12%;
+  height: 10%;
+  border-radius: 50% 50% 40% 40%;
+  clip-path: none;
+  background: linear-gradient(var(--color-warning-800), var(--color-warning-500));
+}
+
+.species-capybara-ear-l {
+  left: 44%;
+  bottom: 68%;
+  transform: translateZ(12px);
+}
+
+.species-capybara-ear-r {
+  left: 62%;
+  bottom: 68%;
+  transform: translateZ(14px);
+}
+
+.species-capybara-eye {
+  left: 56%;
+  bottom: 54%;
+  width: 8%;
+  height: 9%;
+}
+
+.species-capybara-nose {
+  left: 72%;
+  bottom: 46%;
+  width: 6%;
+  height: 5%;
+}
+
+.species-capybara-paw-l,
+.species-capybara-paw-r {
+  bottom: 8%;
+  width: 16%;
+  height: 10%;
+  transform: translateZ(12px);
+}
+
+.species-capybara-paw-l {
+  left: 26%;
+}
+
+.species-capybara-paw-r {
+  left: 50%;
+}
+
 @media (min-width: 640px) {
   .species-stage {
     width: 7rem;
     height: 8rem;
+  }
+}
+
+.species-stage[data-figure-size="compact"] {
+  width: 4.75rem;
+  height: 5.5rem;
+}
+
+@media (min-width: 640px) {
+  .species-stage[data-figure-size="compact"] {
+    width: 4.75rem;
+    height: 5.5rem;
   }
 }
 

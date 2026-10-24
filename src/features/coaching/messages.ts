@@ -21,6 +21,10 @@ export const COACHING_MESSAGES = {
   actionExam: "Gelişimi gör",
   actionGoal: "Kayıt yaz",
   actionSuggestGoal: "Hedef belirle",
+  completeLabel: "Tamamlandı",
+  completePending: "Kaydediliyor...",
+  completeStale: "Bu kazanım artık sırada değil. Sayfayı yenile.",
+  completeFailed: "Kayıt tamamlanamadı. Sayfayı yenileyip tekrar dene.",
 } as const;
 
 const BANNED_FRAGMENTS = [
@@ -51,8 +55,15 @@ export function supportiveCopyIssues(text: string): readonly string[] {
   return BANNED_FRAGMENTS.filter((fragment) => folded.includes(fragment));
 }
 
-export function repeatOutcomeMessage(code: string): string {
-  return `${code} kazanımını tekrar etmek faydalı olabilir.`;
+export function repeatOutcomeMessage(input: {
+  subjectName: string;
+  code: string;
+  description: string;
+  questionCount: number;
+}): string {
+  const meaning = input.description.trim().replace(/[.!?]+$/u, "");
+  const questions = `${input.questionCount} soru`;
+  return `${input.subjectName} dersinde ${input.code} kazanımı şunu söyler: ${meaning}. Bu kazanım için ${questions} çöz. Bitirince Tamamlandı düğmesine bas; sıradaki yanlış veya boş kazanıma geçilir.`;
 }
 
 export function repeatOutcomeReason(): string {

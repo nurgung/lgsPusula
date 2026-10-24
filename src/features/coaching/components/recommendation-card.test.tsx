@@ -84,5 +84,64 @@ describe("RecommendationCard", () => {
     expect(screen.getByRole("heading", { name: "Neden?" })).toBeTruthy();
     expect(screen.queryByRole("link", { name: "Hedef belirle" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Kayıt yaz" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Tamamlandı" })).toBeNull();
+  });
+
+  it("lets the student mark the current outcome practice done", () => {
+    render(
+      <RecommendationCard
+        report={buildCoachingReport({
+          today: "2026-10-20",
+          logs: [],
+          goals: [],
+          exams: [],
+          mistakes: [
+            {
+              outcomeId: "11111111-1111-4111-8111-111111111111",
+              outcomeCode: "F.8.1.1.1",
+              outcomeDescription: "Mevsimlerin oluşumuna yönelik tahminlerde bulunur.",
+              subjectId: "sub-fen",
+              subjectName: "Fen Bilimleri",
+              kind: "wrong",
+              takenOn: "2026-10-18",
+            },
+            {
+              outcomeId: "11111111-1111-4111-8111-111111111111",
+              outcomeCode: "F.8.1.1.1",
+              outcomeDescription: "Mevsimlerin oluşumuna yönelik tahminlerde bulunur.",
+              subjectId: "sub-fen",
+              subjectName: "Fen Bilimleri",
+              kind: "wrong",
+              takenOn: "2026-10-16",
+            },
+          ],
+        })}
+      />,
+    );
+    expect(screen.getByText(/2 soru çöz/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Tamamlandı" })).toBeTruthy();
+  });
+
+  it("hides Tamamlandı when a parent is reading the same outcome", () => {
+    const report = buildCoachingReport({
+      today: "2026-10-20",
+      logs: [],
+      goals: [],
+      exams: [],
+      mistakes: [
+        {
+          outcomeId: "11111111-1111-4111-8111-111111111111",
+          outcomeCode: "F.8.1.1.1",
+          outcomeDescription: "Mevsimlerin oluşumuna yönelik tahminlerde bulunur.",
+          subjectId: "sub-fen",
+          subjectName: "Fen Bilimleri",
+          kind: "wrong",
+          takenOn: "2026-10-18",
+        },
+      ],
+    });
+    render(<RecommendationCard audience="parent" report={report} />);
+    expect(screen.getByText(/1 soru çöz/)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Tamamlandı" })).toBeNull();
   });
 });

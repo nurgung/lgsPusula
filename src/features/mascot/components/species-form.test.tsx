@@ -15,6 +15,8 @@ describe("SpeciesForm", () => {
     expect(document.querySelector("canvas")).toBeNull();
     expect(document.querySelector(".species-cat-head")).toBeTruthy();
     expect(document.querySelector(".species-turtle-shell")).toBeTruthy();
+    expect(document.querySelector(".species-platypus-bill")).toBeTruthy();
+    expect(document.querySelector(".species-capybara-snout")).toBeTruthy();
     expect(document.querySelectorAll(".species-petal")).toHaveLength(8);
     const turtle = screen.getByRole("radio", { name: /Kaplumbağa/ });
     expect(turtle).toBeInstanceOf(HTMLInputElement);

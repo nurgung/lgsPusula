@@ -12,6 +12,7 @@ Ayrıntı `roadmap.md` Faz 14. Örnek görseller dizilim içindir; ekran birebir
 - Menü `getNavItems` ile kalır. Yeni öğe ve koyu yan menü ekleme.
 - Renk yalnızca `globals.css` token'ıdır. Yeni çift `src/lib/contrast.test.ts` içine girer. Satır içi `style` yok.
 - Tamamlama penceresi yalnızca bu kayıtta hedef, rozet veya aşama eşiği aşılınca açılır. İçinde dört durak, işaretli hedefler, madalya, gerçek Türkçe ad ve "Tamam" vardır.
+- Kazanım önerisindeki Tamamlandı bu pencereyi açmaz. Kısa alkış penceresi `alkis` işaretiyle açılır; puan yazılmaz. Konfeti yine yalnızca hareket tercihi açıksa görünür.
 - Pencere odak içinde kalır, Esc kapatır, kapanınca tek kullanımlık adres işareti silinir. Aynı gün yenilemek tekrar açmaz.
 - Aşama adları `STAGE_LEVELS` içindedir: Yeni arkadaş, Alışıyor, Birlikte büyüyor, Yol arkadaşı. Boş gün aşamayı geri götürmez.
 - Alma: ada haritası, "Level 32", "LEVEL UP!", kelime kartı, NFT, jeton, ücretli plan, ruh hâli, uydurma yüzde, sıfırlanan seri.

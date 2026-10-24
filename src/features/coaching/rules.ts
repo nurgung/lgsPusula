@@ -60,6 +60,16 @@ export type CoachingRecommendation = {
   evidence: readonly string[];
   href: string | null;
   actionLabel: string | null;
+  /**
+   * Set only for the outcome rule. The student marks this many linked questions done.
+   * Absent means the card has no Tamamlandı button.
+   */
+  practice: { outcomeId: string; questionCount: number } | null;
+};
+
+export type PracticeCompletion = {
+  outcomeId: string;
+  questionCount: number;
 };
 
 export type CoachingMetrics = {
@@ -84,6 +94,8 @@ export type CoachingInput = {
   goals: readonly StudyGoalView[];
   exams: readonly CoachingExamPoint[];
   mistakes: readonly PrioritisableMistake[];
+  /** Outcomes the student already marked done, and for how many linked questions. */
+  completions?: readonly PracticeCompletion[];
 };
 
 function withRule(reason: string, extraRule?: string): string {
@@ -109,7 +121,42 @@ function recommendation(
     evidence,
     href,
     actionLabel,
+    practice: null,
   };
+}
+
+/**
+ * Only the outcome currently shown may be marked done.
+ * A posted id for a later or earlier outcome is ignored.
+ */
+export function acceptedPractice(
+  report: CoachingReport,
+  outcomeId: string,
+): { outcomeId: string; questionCount: number } | null {
+  const practice = report.recommendation.practice;
+  if (!practice || practice.outcomeId !== outcomeId) return null;
+  return practice;
+}
+
+/** Linked wrong and blank questions the student is asked to solve for this outcome. */
+export function practiceQuestionCount(outcome: OutcomePriority): number {
+  return outcome.wrongCount + outcome.blankCount;
+}
+
+/**
+ * The first outcome whose linked questions are not already covered by a completion.
+ * A completion for 10 questions does not cover a later total of 11.
+ */
+export function openReviewOutcome(
+  outcomes: readonly OutcomePriority[],
+  completions: readonly PracticeCompletion[],
+): OutcomePriority | null {
+  return (
+    outcomes.find((outcome) => {
+      const done = completions.find((row) => row.outcomeId === outcome.outcomeId);
+      return !done || done.questionCount < practiceQuestionCount(outcome);
+    }) ?? null
+  );
 }
 
 function pickPracticeSubject(rows: readonly SubjectAccuracy[]): SubjectAccuracy | null {
@@ -146,12 +193,19 @@ function chooseRecommendation(
   today: string,
   practiceWindow: DateWindow,
   examWindow: DateWindow,
+  completions: readonly PracticeCompletion[],
 ): CoachingRecommendation {
-  const outcome = metrics.reviewOutcomes[0];
+  const outcome = openReviewOutcome(metrics.reviewOutcomes, completions);
   if (outcome) {
-    return recommendation(
+    const questionCount = practiceQuestionCount(outcome);
+    const chosen = recommendation(
       COACHING_RULES.repeatOutcome,
-      repeatOutcomeMessage(outcome.outcomeCode),
+      repeatOutcomeMessage({
+        subjectName: outcome.subjectName,
+        code: outcome.outcomeCode,
+        description: outcome.outcomeDescription,
+        questionCount,
+      }),
       withRule(repeatOutcomeReason(), OUTCOME_PRIORITY_RULE_VERSION),
       [
         `${outcome.outcomeCode} · ${outcome.outcomeDescription}`,
@@ -163,6 +217,7 @@ function chooseRecommendation(
       "/ogrenci/kazanimlar",
       COACHING_MESSAGES.actionOutcome,
     );
+    return { ...chosen, practice: { outcomeId: outcome.outcomeId, questionCount } };
   }
 
   const subject = pickPracticeSubject(metrics.subjectAccuracy);
@@ -315,6 +370,7 @@ export function buildCoachingReport(input: CoachingInput): CoachingReport {
       input.today,
       practiceWindow,
       examWindow,
+      input.completions ?? [],
     ),
   };
 }

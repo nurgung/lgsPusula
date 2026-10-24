@@ -320,22 +320,22 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 
 ## Kural tabanlı koçluk (Faz 9)
 
-Öğrenci ana sayfası her istekte tek bir öneri üretir. Öneri yazılmaz; neden ve kanıt, sonuç nesnesinde durur. Böylece eski bir cümle yeni kaydın önüne geçmez.
+Öğrenci ana sayfası her istekte tek bir öneri üretir. Öneri cümlesi yazılmaz; neden ve kanıt, sonuç nesnesinde durur. Böylece eski bir cümle yeni kaydın önüne geçmez. Öğrenci karttaki soru sayısını bitirince yalnızca o kazanım için bir tamamlanma satırı yazılır.
 
 | Katman | Dosyalar | Görev |
 | --- | --- | --- |
 | Metrik | `src/features/coaching/metrics.ts` | Hedef tamamlama, ders doğruluğu, tam LGS net farkı, tekrar kazanımları. |
 | Kural | `src/features/coaching/rules.ts` | `coaching-v1`. İlk uyan kural tek kart olur. Supabase'i bilmez. |
 | Metin | `messages.ts` | Gözden geçirilmiş cümleler. Utandırma, korkutma ve kıyas yok. |
-| Adaptör | `load-coaching.ts` | Oturum istemcisiyle öğrencinin zaten okuyabildiği satırları okur. Yazmaz. |
-| Sayfa | `/ogrenci` | `RecommendationCard`: mesaj, "Neden?" ve kanıt listesi. |
+| Adaptör | `load-coaching.ts`, `actions.ts`, `coaching-store.ts` | Oturum istemcisiyle kayıtları ve tamamlanma satırlarını okur. Yazma yalnızca öğrencinin gördüğü kazanımı işaretler. |
+| Sayfa | `/ogrenci` | `RecommendationCard`: mesaj, soru sayısı, Tamamlandı, "Neden?" ve kanıt listesi. |
 
 - **Sıra.** Bağlı kazanım, sonra düşük doğru sayısı, sonra son iki tam LGS netinin azalması, sonra bugünkü hedefin kalanı, sonra hedef daveti. Hiçbiri uymazsa kart sonuç çıkarmaz.
 - **Örneklem.** Bir derste 14 günde 10 sorudan az kayıt varsa doğru oranı saklanmaz ve söylenmez. Oran, doğru ÷ soru yarının altındaysa o ders önerilir. Tam yarı sorun sayılmaz.
 - **Deneme.** Yalnızca son iki `lgs_full` karşılaştırılır. Branş denemeleri karışmaz. Hangi dersin neti değiştiği bu kartta söylenmez. Pencere 90 gündür.
-- **Kazanım.** `outcome-priority-v1` ile aynı 90 gün. Bağlanmamış yanlıştan kazanım adı üretilmez.
+- **Kazanım.** `outcome-priority-v1` ile aynı 90 gün. Bağlanmamış yanlıştan kazanım adı üretilmez. Soru sayısı, o kazanıma bağlı yanlış ve boşların toplamıdır. Tamamlandı, sunucunun o anda seçtiği kazanımı ve sayıyı yazar; formdaki başka bir kazanım kimliği kabul edilmez. Kayıtlı sayı, güncel bağlı soru sayısından azsa aynı kazanım yeniden açılır. Puan yazılmaz. Veli aynı sıradaki kazanımı okur; düğmeyi görmez ve yazamaz.
 - **Hedef.** Kart yalnızca günlük hedefi kullanır. Haftalık hedef ana sayfadaki hedef kartında kalır. Birim soru. Gün sınırı Europe/Istanbul.
-- **Yetki.** Öğrenci kimliği oturumdan gelir. Aynı kart, öğrencinin işlem bağlantısı olmadan veli sayfasında da gösterilir (Faz 11). Yönetici rolü ek erişim vermez. Yeni tablo ve yeni yazma yoktur.
+- **Yetki.** Öğrenci kimliği oturumdan gelir. Aynı kart, öğrencinin işlem bağlantısı olmadan veli sayfasında da gösterilir (Faz 11). Yönetici rolü ek erişim vermez. Tamamlanma tablosu `coaching_practice_completions`; veli yalnızca aktif bağlantıyla okur.
 - **Durumlar.** Sayfa yüklenirken mevcut `Suspense` metni görünür. Kural uymazsa kart bunu "Neden?" altında söyler. Okuma hatası sayfa hata durumuna düşer.
 
 ## Karakter, görev ve bildirimler (Faz 10)
@@ -417,4 +417,4 @@ Word raporu PDF ile aynı bloklardandır. Dosya `report_jobs` tablosuna yazılma
 
 `/ogrenci` dört banttır: aşama yolu, bugünün hedefleri, ders karoları, özet. `lg` altında bantlar alt alta iner; geniş ekranda hedefler ve dersler yan yanadır. Menü `getNavItems` ile aynı kalır. Hızlı kayıt kartı kalkmıştır. Ders karosu `/ogrenci/calisma/yeni?ders=<ders kimliği>` adresine gider; kimlik katalogda yoksa form dersi boş açar.
 
-Kutlama penceresi yeni bir tablo açmaz. Kayıt, deneme veya kazanım yazısı hedefi, rozeti ya da aşamayı ilk kez geçirirse adreste imzalı `kutlama` işareti durur. İmza `AUTH_SECRET` ile doğrulanır, 15 dakika yaşar ve cümleyi taşımaz. Cümle, pencere açılırken öğrencinin kendi satırlarından kurulur. "Tamam" ve Esc işareti siler. Aynı gün sayfayı işaretsiz yenilemek pencereyi açmaz. Hedef yoksa veya henüz dolmamışsa hedef cümlesi çıkmaz. Boş gün aşamayı geri götürmez. Konfeti ve durak hareketi yalnızca `prefers-reduced-motion: no-preference` iken çalışır.
+Kutlama penceresi yeni bir tablo açmaz. Kayıt, deneme veya kazanım yazısı hedefi, rozeti ya da aşamayı ilk kez geçirirse adreste imzalı `kutlama` işareti durur. Kazanım önerisindeki Tamamlandı ayrıdır: puan yazmaz, aşama penceresini açmaz ve adreste imzalı `alkis` işaretiyle kısa bir alkış penceresi gösterir. İmza `AUTH_SECRET` ile doğrulanır, 15 dakika yaşar ve cümleyi taşımaz. Aşama penceresinin cümlesi, pencere açılırken öğrencinin kendi satırlarından kurulur. Alkış cümlesi kodda sabittir. "Tamam" ve Esc işareti siler. Aynı gün sayfayı işaretsiz yenilemek pencereyi açmaz. Hedef yoksa veya henüz dolmamışsa hedef cümlesi çıkmaz. Boş gün aşamayı geri götürmez. Konfeti ve durak hareketi yalnızca `prefers-reduced-motion: no-preference` iken çalışır.

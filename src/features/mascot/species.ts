@@ -21,6 +21,20 @@ export const SPECIES = [
     description: "Küçük bir serçe.",
   },
   {
+    code: "platypus",
+    kind: "animal",
+    kindLabel: "Hayvan",
+    name: "Ornitorenk",
+    description: "Geniş gagalı bir ornitorenk.",
+  },
+  {
+    code: "capybara",
+    kind: "animal",
+    kindLabel: "Hayvan",
+    name: "Kapibara",
+    description: "Sakin ve iri bir kapibara.",
+  },
+  {
     code: "daisy",
     kind: "plant",
     kindLabel: "Bitki",
