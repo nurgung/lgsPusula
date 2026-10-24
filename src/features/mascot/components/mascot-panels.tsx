@@ -4,7 +4,13 @@ import { ProgressMeter } from "@/components/ui/progress-meter";
 import { StateMessage } from "@/components/ui/state-message";
 import { dismissReminderAction } from "../actions";
 import { MASCOT_MESSAGES } from "../messages";
-import { badgesFor, stageForPoints, tasksFor, totalPoints, type TaskFacts } from "../rules";
+import {
+  badgesFor,
+  stageForPoints,
+  tasksFor,
+  totalPoints,
+  type TaskFacts,
+} from "../rules";
 import { speciesByCode, type SpeciesCode } from "../species";
 import type { RewardEvent } from "../rules";
 import { MascotMark } from "./mascot-mark";
@@ -48,10 +54,7 @@ export function MascotSummaryCard({
   const badges = badgesFor(rewards);
 
   return (
-    <Card
-      title={chosen ? chosen.name : "Karakterin"}
-      description={MASCOT_MESSAGES.ruleLabel}
-    >
+    <Card title={chosen ? chosen.name : "Karakterin"}>
       <div className="grid min-w-0 gap-4">
         {chosen ? (
           <div className="flex min-w-0 items-center gap-3">
@@ -97,7 +100,11 @@ export function MascotSummaryCard({
                   <p className="font-semibold text-ink-900">
                     {badge.name}{" "}
                     <span className="font-normal text-ink-600">
-                      ({badge.earned ? MASCOT_MESSAGES.badgeEarned : MASCOT_MESSAGES.badgePending})
+                      (
+                      {badge.earned
+                        ? MASCOT_MESSAGES.badgeEarned
+                        : MASCOT_MESSAGES.badgePending}
+                      )
                     </span>
                   </p>
                   <p className="text-sm text-ink-600">{badge.description}</p>
@@ -112,7 +119,10 @@ export function MascotSummaryCard({
               {chosen ? "Karaktere bak" : "Karakter seç"}
             </ButtonLink>
           )}
-          <ButtonLink href="/ogrenci/bildirimler" variant={detailed ? "secondary" : "ghost"}>
+          <ButtonLink
+            href="/ogrenci/bildirimler"
+            variant={detailed ? "secondary" : "ghost"}
+          >
             Hatırlatma ayarları
           </ButtonLink>
         </div>
@@ -124,37 +134,76 @@ export function MascotSummaryCard({
 export function TaskList({ facts }: { facts: TaskFacts }) {
   const tasks = tasksFor(facts);
   const open = tasks.filter((task) => !task.done);
+  const done = tasks.filter((task) => task.done);
   return (
     <Card
       title={MASCOT_MESSAGES.tasksTitle}
-      description="Görevler bugünün kayıtlarına bakarak yenilenir. Birim, soru hedefinde sorudur."
+      description="Açık görevler üstte, tamamlananlar altta. Bugünün kayıtlarına göre yenilenir."
     >
-      {open.length === 0 ? (
-        <StateMessage
-          variant="empty"
-          title={MASCOT_MESSAGES.tasksEmptyTitle}
-          description={MASCOT_MESSAGES.tasksEmptyDescription}
-        />
-      ) : (
-        <ul className="grid min-w-0 gap-3">
-          {tasks.map((task) => (
-            <li key={task.id} className="flex min-w-0 flex-wrap items-center justify-between gap-2">
-              <p className="min-w-0 break-words text-ink-900">
-                {task.title}{" "}
-                <span className="text-ink-600">
-                  ({task.done ? MASCOT_MESSAGES.taskDone : MASCOT_MESSAGES.taskOpen})
-                </span>
+      <div className="grid min-w-0 gap-4">
+        {open.length === 0 ? (
+          <StateMessage
+            variant="success"
+            title={MASCOT_MESSAGES.tasksAllDoneTitle}
+            description={MASCOT_MESSAGES.tasksEmptyDescription}
+          />
+        ) : (
+          <TaskGroup title="Açık" tasks={open} />
+        )}
+        {done.length > 0 ? <TaskGroup title="Tamamlanan" tasks={done} /> : null}
+      </div>
+    </Card>
+  );
+}
+
+function TaskGroup({
+  title,
+  tasks,
+}: {
+  title: string;
+  tasks: ReturnType<typeof tasksFor>;
+}) {
+  const headingId = title === "Açık" ? "acik-gorevler" : "tamamlanan-gorevler";
+  return (
+    <section className="grid min-w-0 gap-3" aria-labelledby={headingId}>
+      <h3 id={headingId} className="text-base font-bold text-ink-900">
+        {title}
+      </h3>
+      <ul className="grid min-w-0 gap-3">
+        {tasks.map((task) => (
+          <li
+            key={task.id}
+            className={
+              task.done
+                ? "grid min-w-0 gap-2 rounded-xl border border-success-700/40 bg-success-50 p-3"
+                : "grid min-w-0 gap-2 rounded-xl border border-border bg-surface p-3"
+            }
+          >
+            <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
+              <p className="min-w-0 font-semibold break-words text-ink-900">
+                {task.title}
               </p>
-              {task.done ? null : (
+              <span
+                className={
+                  task.done
+                    ? "text-sm font-bold text-success-700"
+                    : "text-sm font-bold text-ink-700"
+                }
+              >
+                {task.done ? MASCOT_MESSAGES.taskDone : MASCOT_MESSAGES.taskOpen}
+              </span>
+            </div>
+            {task.done ? null : (
+              <div>
                 <ButtonLink href={task.href} variant="secondary">
                   {task.id === "review_outcome" ? "Kazanımlara bak" : "Kayıt ekle"}
                 </ButtonLink>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </Card>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

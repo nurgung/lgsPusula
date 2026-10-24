@@ -1,14 +1,26 @@
 import type { SpeciesCode } from "../species";
 
+const SIZE_CLASS = {
+  48: "h-12 w-12",
+  96: "h-24 w-24",
+  112: "h-28 w-28",
+} as const;
+
 /** Shape distinguishes the species. The name next to it carries the meaning. */
-export function MascotMark({ code }: { code: SpeciesCode }) {
+export function MascotMark({
+  code,
+  size = 48,
+}: {
+  code: SpeciesCode;
+  size?: keyof typeof SIZE_CLASS;
+}) {
   return (
     <svg
       viewBox="0 0 48 48"
-      width="48"
-      height="48"
+      width={size}
+      height={size}
       aria-hidden="true"
-      className="shrink-0 text-brand-700"
+      className={`shrink-0 text-brand-700 ${SIZE_CLASS[size]}`}
     >
       {code === "cat" ? (
         <>
@@ -30,10 +42,38 @@ export function MascotMark({ code }: { code: SpeciesCode }) {
       ) : null}
       {code === "daisy" ? (
         <>
-          <circle cx="24" cy="14" r="6" fill="none" stroke="currentColor" strokeWidth="3" />
-          <circle cx="34" cy="24" r="6" fill="none" stroke="currentColor" strokeWidth="3" />
-          <circle cx="24" cy="34" r="6" fill="none" stroke="currentColor" strokeWidth="3" />
-          <circle cx="14" cy="24" r="6" fill="none" stroke="currentColor" strokeWidth="3" />
+          <circle
+            cx="24"
+            cy="14"
+            r="6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+          />
+          <circle
+            cx="34"
+            cy="24"
+            r="6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+          />
+          <circle
+            cx="24"
+            cy="34"
+            r="6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+          />
+          <circle
+            cx="14"
+            cy="24"
+            r="6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+          />
           <circle cx="24" cy="24" r="4" fill="currentColor" />
         </>
       ) : null}

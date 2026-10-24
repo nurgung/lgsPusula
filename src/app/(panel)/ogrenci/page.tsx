@@ -8,23 +8,24 @@ import { requireStudent } from "@/features/access/guards";
 import { loadCoachingExplanation } from "@/features/ai/load-explanation";
 import { RecommendationCard } from "@/features/coaching/components/recommendation-card";
 import { loadCoachingReport } from "@/features/coaching/load-coaching";
-import {
-  MascotSummaryCard,
-  ReminderCard,
-  TaskList,
-} from "@/features/mascot/components/mascot-panels";
-import { loadOwnMascot } from "@/features/mascot/load-mascot";
 import { loadCatalog } from "@/features/curriculum/load-catalog";
+import { loadExamList } from "@/features/exams/load-exams";
 import { CreateInviteForm } from "@/features/family/components/create-invite-form";
 import { RespondLinkForms } from "@/features/family/components/respond-link-forms";
 import { RevokeLinkButton } from "@/features/family/components/revoke-link-button";
 import { loadOwnFamilyLinks } from "@/features/family/load-links";
-import { formatTurkishDate, goalWindow, istanbulToday } from "@/features/study/calendar";
-import { GoalProgressList } from "@/features/study/components/goal-progress-list";
-import { StudyLogForm } from "@/features/study/components/study-log-form";
-import { StudyLogList } from "@/features/study/components/study-log-list";
+import { CharacterHero } from "@/features/home/components/character-hero";
+import { EarnedBadges } from "@/features/home/components/earned-badges";
+import { GoalBoard } from "@/features/home/components/goal-board";
+import { WeekAndExamSummary } from "@/features/home/components/week-and-exam";
+import { ReminderCard, TaskList } from "@/features/mascot/components/mascot-panels";
+import { loadOwnMascot } from "@/features/mascot/load-mascot";
+import { examChartWindow } from "@/features/outcomes/window";
 import { STUDENT_DATA_NOTICE } from "@/features/privacy/notice";
+import { formatTurkishDate, goalWindow, istanbulToday } from "@/features/study/calendar";
+import { StudyLogForm } from "@/features/study/components/study-log-form";
 import { loadStudyRecords } from "@/features/study/load-study";
+import { summarizeLogs } from "@/features/study/summary";
 
 export const metadata: Metadata = { title: "Ana sayfa" };
 export const instant = false;
@@ -41,16 +42,19 @@ async function StudentHome() {
   const user = await requireStudent();
   const today = istanbulToday();
   const week = goalWindow("week", today);
-  const [links, catalog, study, coaching, mascot] = await Promise.all([
+  const [links, catalog, study, coaching, mascot, exams] = await Promise.all([
     loadOwnFamilyLinks(),
     loadCatalog({ includeArchived: false }),
     loadStudyRecords(user.id, { from: week.from, to: today }),
     loadCoachingReport(user.id, today),
     loadOwnMascot(user.id, { openReminder: true }),
+    loadExamList(user.id, examChartWindow(today)),
   ]);
   const explained = await loadCoachingExplanation(user, user.id, coaching, [], today);
   const subjects = catalog.map((subject) => ({ id: subject.id, name: subject.name }));
   const todayLogs = study.logs.filter((log) => log.studiedOn === today);
+  const weekSummary = summarizeLogs(study.logs, { from: week.from, to: today });
+  const latest = exams[0];
   const active = links.find((link) => link.status === "active");
   const pending = links.find((link) => link.status === "pending");
 
@@ -58,144 +62,146 @@ async function StudentHome() {
     <>
       <PageHeader
         title={`Merhaba, ${user.displayName}`}
-        description={`Bugün ${formatTurkishDate(today)}. Gün, Türkiye saatiyle (İstanbul) gece yarısı değişir.`}
+        description={`Bugün ${formatTurkishDate(today)}. Küçük bir adım da ilerleme sayılır.`}
       />
-      <div className="grid gap-6">
-        {mascot.reminderId ? <ReminderCard noticeId={mascot.reminderId} /> : null}
-        <MascotSummaryCard species={mascot.species} rewards={mascot.rewards} />
-        <RecommendationCard
-          report={explained.report}
-          explanation={explained.explanation}
-        />
-        <TaskList
-          facts={{
-            todayLogCount: todayLogs.length,
-            todayQuestionCount: todayLogs.reduce(
-              (sum, log) => sum + log.questionCount,
-              0,
-            ),
-            dailyGoalTarget:
-              study.goals.find((goal) => goal.period === "day" && goal.subjectId == null)
-                ?.targetQuestions ?? null,
-            reviewExamId: mascot.reviewExamId,
-          }}
-        />
-
-        <Card
-          title="Bugünün hedefi"
-          description={`${formatTurkishDate(today)} · birim: soru`}
-        >
-          <div className="grid gap-4">
-            <GoalProgressList
-              goals={study.goals}
-              logs={study.logs}
-              today={today}
-              period="day"
-              emptyTitle="Bugün için hedefin yok."
-              emptyDescription="İstersen bir soru sayısı seç. Seçmezsen de kayıt yazabilirsin."
-            />
-            <div>
-              <ButtonLink href="/ogrenci/hedefler" variant="secondary">
-                Hedefi düzenle
-              </ButtonLink>
-            </div>
-          </div>
-        </Card>
-
-        <Card
-          title="Bu haftanın hedefi"
-          description="Hafta pazartesi başlar, pazar biter."
-        >
-          <GoalProgressList
-            goals={study.goals}
-            logs={study.logs}
-            today={today}
-            period="week"
-            emptyTitle="Bu hafta için hedefin yok."
-            emptyDescription="Haftalık hedef, pazartesiden pazara kadar çözdüğün soruları sayar."
+      {mascot.reminderId ? (
+        <div className="mb-6">
+          <ReminderCard noticeId={mascot.reminderId} />
+        </div>
+      ) : null}
+      {/*
+        Source order is the mobile priority. From lg, placement puts the character
+        and today's suggestion in the first column, and goals with the week summary
+        in the second. Later sections stay full width.
+      */}
+      <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+        <div className="min-w-0 lg:col-start-1 lg:row-start-1">
+          <CharacterHero species={mascot.species} rewards={mascot.rewards} />
+        </div>
+        <div className="min-w-0 lg:col-start-1 lg:row-start-2">
+          <RecommendationCard
+            report={explained.report}
+            explanation={explained.explanation}
           />
-        </Card>
-
-        <Card
-          title="Hızlı kayıt"
-          description="Dersini ve soru sayılarını yaz. Konu seçmek istersen ayrıntılı formu kullan."
-        >
-          {subjects.length === 0 ? (
-            <StateMessage
-              variant="empty"
-              title="Ders listesi henüz hazır değil."
-              description="Yönetici dersleri ekleyince buradan kayıt yazabilirsin."
-            />
-          ) : (
-            <div className="grid gap-4">
-              <StudyLogForm
-                mode="create"
-                catalog={catalog}
-                subjects={subjects}
-                today={today}
-                showPicker={false}
-              />
-              <div>
-                <ButtonLink href="/ogrenci/calisma/yeni" variant="secondary">
-                  Konu seçerek kaydet
-                </ButtonLink>
-              </div>
-            </div>
-          )}
-        </Card>
-
-        <Card
-          title="Bugünün kayıtları"
-          description={`${formatTurkishDate(today)} · birim: soru ve dakika`}
-        >
-          <StudyLogList logs={todayLogs} editable />
-        </Card>
-
-        <Card title={STUDENT_DATA_NOTICE.title}>
-          <ul className="grid list-disc gap-1 pl-5 text-ink-900">
-            {STUDENT_DATA_NOTICE.kept.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-          <p className="mt-3 text-ink-900">{STUDENT_DATA_NOTICE.notKept}</p>
-          <p className="mt-3 text-ink-900">{STUDENT_DATA_NOTICE.parent}</p>
-          <p className="mt-3 text-ink-900">{STUDENT_DATA_NOTICE.device}</p>
-          <p className="mt-3 text-ink-900">{STUDENT_DATA_NOTICE.ai}</p>
-        </Card>
-
-        {active ? (
-          <Card title="Bağlı velin" description="Çalışmalarını görebilir, değiştiremez.">
-            <div className="grid gap-4">
-              <p className="font-semibold text-ink-900">{active.parent_display_name}</p>
-              <RevokeLinkButton
-                linkId={active.id}
-                description="Kaldırınca velin çalışmalarını göremez. İstersen sonra yeni bir kodla yine bağlanabilirsiniz."
-              />
-            </div>
-          </Card>
-        ) : null}
-
-        {pending ? (
+        </div>
+        <div className="min-w-0 lg:col-start-2 lg:row-start-1">
+          <GoalBoard goals={study.goals} logs={study.logs} today={today} />
+        </div>
+        <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-3">
+          <TaskList
+            facts={{
+              todayLogCount: todayLogs.length,
+              todayQuestionCount: todayLogs.reduce(
+                (sum, log) => sum + log.questionCount,
+                0,
+              ),
+              dailyGoalTarget:
+                study.goals.find(
+                  (goal) => goal.period === "day" && goal.subjectId == null,
+                )?.targetQuestions ?? null,
+              reviewExamId: mascot.reviewExamId,
+            }}
+          />
+        </div>
+        <div className="min-w-0 lg:col-start-2 lg:row-start-2">
+          <WeekAndExamSummary
+            summary={weekSummary}
+            exam={
+              latest
+                ? {
+                    id: latest.id,
+                    title: latest.title,
+                    takenOn: latest.takenOn,
+                    examType: latest.examType,
+                    totalNet: latest.totalNet,
+                  }
+                : null
+            }
+          />
+        </div>
+        <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-4">
           <Card
-            title="Bağlantı isteği"
-            description={`${pending.parent_display_name} velin olarak bağlanmak istiyor.`}
+            title="Hızlı kayıt"
+            description="Bugün için kısa kayıt. Konu seçmek istersen ayrıntılı formu kullan."
           >
-            <RespondLinkForms linkId={pending.id} />
-          </Card>
-        ) : null}
-
-        {!active && !pending ? (
-          <Card title="Veli bağlantısı">
-            <div className="grid gap-4">
+            {subjects.length === 0 ? (
               <StateMessage
                 variant="empty"
-                title="Henüz bir velin bağlı değil."
-                description="Kod üret, veline söyle. Veli kodu girince isteği burada görürsün. Onaylamadan bağlantı kurulmaz."
+                title="Ders listesi henüz hazır değil."
+                description="Yönetici dersleri ekleyince buradan kayıt yazabilirsin."
               />
-              <CreateInviteForm />
-            </div>
+            ) : (
+              <div className="grid gap-4">
+                <StudyLogForm
+                  mode="create"
+                  catalog={catalog}
+                  subjects={subjects}
+                  today={today}
+                  showPicker={false}
+                  compact
+                />
+                <div>
+                  <ButtonLink href="/ogrenci/calisma/yeni" variant="secondary">
+                    Konu seçerek kaydet
+                  </ButtonLink>
+                </div>
+              </div>
+            )}
           </Card>
-        ) : null}
+        </div>
+        <div className="min-w-0 lg:col-span-2 lg:col-start-1 lg:row-start-5">
+          <EarnedBadges rewards={mascot.rewards} />
+        </div>
+        <div className="grid min-w-0 gap-6 lg:col-span-2 lg:col-start-1 lg:row-start-6">
+          <Card variant="quiet" title={STUDENT_DATA_NOTICE.title}>
+            <ul className="grid list-disc gap-1 pl-5 text-ink-900">
+              {STUDENT_DATA_NOTICE.kept.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <p className="mt-3 text-ink-900">{STUDENT_DATA_NOTICE.notKept}</p>
+            <p className="mt-3 text-ink-900">{STUDENT_DATA_NOTICE.parent}</p>
+            <p className="mt-3 text-ink-900">{STUDENT_DATA_NOTICE.device}</p>
+            <p className="mt-3 text-ink-900">{STUDENT_DATA_NOTICE.ai}</p>
+          </Card>
+
+          {active ? (
+            <Card
+              title="Bağlı velin"
+              description="Çalışmalarını görebilir, değiştiremez."
+            >
+              <div className="grid gap-4">
+                <p className="font-semibold text-ink-900">{active.parent_display_name}</p>
+                <RevokeLinkButton
+                  linkId={active.id}
+                  description="Kaldırınca velin çalışmalarını göremez. İstersen sonra yeni bir kodla yine bağlanabilirsiniz."
+                />
+              </div>
+            </Card>
+          ) : null}
+
+          {pending ? (
+            <Card
+              title="Bağlantı isteği"
+              description={`${pending.parent_display_name} velin olarak bağlanmak istiyor.`}
+            >
+              <RespondLinkForms linkId={pending.id} />
+            </Card>
+          ) : null}
+
+          {!active && !pending ? (
+            <Card title="Veli bağlantısı">
+              <div className="grid gap-4">
+                <StateMessage
+                  variant="empty"
+                  title="Henüz bir velin bağlı değil."
+                  description="Kod üret, veline söyle. Veli kodu girince isteği burada görürsün. Onaylamadan bağlantı kurulmaz."
+                />
+                <CreateInviteForm />
+              </div>
+            </Card>
+          ) : null}
+        </div>
       </div>
     </>
   );

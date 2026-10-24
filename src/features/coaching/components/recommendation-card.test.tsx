@@ -19,6 +19,9 @@ describe("RecommendationCard", () => {
     expect(screen.getByRole("heading", { name: "Bugünkü öneri" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Neden?" })).toBeTruthy();
     expect(screen.getByText(/küçük bir soru hedefi/)).toBeTruthy();
+    expect(screen.queryByText(/Kural:/)).toBeNull();
+    expect(screen.queryByText(/Europe\/Istanbul/)).toBeNull();
+    expect(screen.queryByText(/coaching-v1/)).toBeNull();
     expect(screen.getByRole("link", { name: "Hedef belirle" }).getAttribute("href")).toBe(
       "/ogrenci/hedefler",
     );

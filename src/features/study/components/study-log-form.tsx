@@ -50,6 +50,7 @@ export function StudyLogForm({
   today,
   defaults,
   showPicker = true,
+  compact = false,
   keptSelectionLabel,
 }: {
   mode: "create" | "edit";
@@ -60,6 +61,8 @@ export function StudyLogForm({
   defaults?: LogDefaults;
   /** Quick entry skips the topic picker. The full form keeps it optional. */
   showPicker?: boolean;
+  /** Home page: shorter hints and a tighter count grid. Validation is unchanged. */
+  compact?: boolean;
   /** Shown when the saved topic is archived and no longer listed. */
   keptSelectionLabel?: string;
 }) {
@@ -105,6 +108,7 @@ export function StudyLogForm({
         subjects={subjects}
         today={today}
         showPicker={showPicker}
+        compact={compact}
         keptSelectionLabel={keptSelectionLabel}
         fieldErrors={fieldErrors}
         defaults={values}
@@ -130,6 +134,7 @@ function StudyLogFields({
   defaults,
   fieldErrors,
   showPicker,
+  compact,
   keptSelectionLabel,
 }: {
   prefix: string;
@@ -139,6 +144,7 @@ function StudyLogFields({
   defaults: Required<LogDefaults>;
   fieldErrors: Record<string, string>;
   showPicker: boolean;
+  compact: boolean;
   keptSelectionLabel?: string;
 }) {
   const [subjectId, setSubjectId] = useState(defaults.subjectId);
@@ -146,27 +152,38 @@ function StudyLogFields({
 
   return (
     <div className="grid min-w-0 gap-4">
-      <TextField
-        id={`${prefix}-studiedOn`}
-        name="studiedOn"
-        type="date"
-        label="Tarih"
-        hint="Türkiye saati (İstanbul). Gün, gece yarısı değişir."
-        min={STUDY_DATE_MIN}
-        max={today}
-        error={fieldErrors.studiedOn}
-        defaultValue={defaults.studiedOn}
-      />
-      <SelectField
-        id={`${prefix}-subjectId`}
-        name="subjectId"
-        label="Ders"
-        placeholder="Ders seç"
-        options={subjects.map((subject) => ({ value: subject.id, label: subject.name }))}
-        value={subjectId}
-        onChange={(event) => setSubjectId(event.target.value)}
-        error={fieldErrors.subjectId}
-      />
+      <div
+        className={compact ? "grid min-w-0 gap-4 sm:grid-cols-2" : "grid min-w-0 gap-4"}
+      >
+        <TextField
+          id={`${prefix}-studiedOn`}
+          name="studiedOn"
+          type="date"
+          label="Tarih"
+          hint={
+            compact
+              ? "Varsayılan bugün. Daha eski bir günü de seçebilirsin."
+              : "Türkiye saati (İstanbul). Gün, gece yarısı değişir."
+          }
+          min={STUDY_DATE_MIN}
+          max={today}
+          error={fieldErrors.studiedOn}
+          defaultValue={defaults.studiedOn}
+        />
+        <SelectField
+          id={`${prefix}-subjectId`}
+          name="subjectId"
+          label="Ders"
+          placeholder="Ders seç"
+          options={subjects.map((subject) => ({
+            value: subject.id,
+            label: subject.name,
+          }))}
+          value={subjectId}
+          onChange={(event) => setSubjectId(event.target.value)}
+          error={fieldErrors.subjectId}
+        />
+      </div>
       {showPicker ? (
         <div id={`${prefix}-catalogItem`} className="min-w-0">
           {fieldErrors.catalogItem ? (
@@ -198,7 +215,11 @@ function StudyLogFields({
       ) : (
         <input type="hidden" name="catalogItem" value="" />
       )}
-      <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+      <div
+        className={
+          compact ? "grid min-w-0 grid-cols-2 gap-3" : "grid min-w-0 gap-4 sm:grid-cols-2"
+        }
+      >
         <NumberField
           id={`${prefix}-questionCount`}
           name="questionCount"
@@ -207,6 +228,7 @@ function StudyLogFields({
           hint="Doğru, yanlış ve boş sayılarının toplamı bu sayı olmalı."
           error={fieldErrors.questionCount}
           defaultValue={defaults.questionCount}
+          className={compact ? "col-span-2" : undefined}
         />
         <NumberField
           id={`${prefix}-correctCount`}
@@ -232,16 +254,29 @@ function StudyLogFields({
           error={fieldErrors.blankCount}
           defaultValue={defaults.blankCount}
         />
+        {compact ? (
+          <NumberField
+            id={`${prefix}-durationMinutes`}
+            name="durationMinutes"
+            label="Süre"
+            unit="dk"
+            hint="Ölçmediysen 0 yaz."
+            error={fieldErrors.durationMinutes}
+            defaultValue={defaults.durationMinutes}
+          />
+        ) : null}
       </div>
-      <NumberField
-        id={`${prefix}-durationMinutes`}
-        name="durationMinutes"
-        label="Süre"
-        unit="dakika"
-        hint="Ölçmediysen 0 yazabilirsin."
-        error={fieldErrors.durationMinutes}
-        defaultValue={defaults.durationMinutes}
-      />
+      {compact ? null : (
+        <NumberField
+          id={`${prefix}-durationMinutes`}
+          name="durationMinutes"
+          label="Süre"
+          unit="dakika"
+          hint="Ölçmediysen 0 yazabilirsin."
+          error={fieldErrors.durationMinutes}
+          defaultValue={defaults.durationMinutes}
+        />
+      )}
     </div>
   );
 }

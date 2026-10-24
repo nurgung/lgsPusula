@@ -1,8 +1,8 @@
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { formatTurkishDateRange } from "@/features/study/calendar";
-import { COACHING_RULE_VERSION } from "../constants";
 import { COACHING_MESSAGES } from "../messages";
+import { studentVisibleEvidence, studentVisibleReason } from "../present";
 import type { CoachingReport } from "../rules";
 
 export function RecommendationCard({
@@ -17,29 +17,42 @@ export function RecommendationCard({
   explanation?: string | null;
 }) {
   const item = report.recommendation;
+  const reason = studentVisibleReason(item.reason);
+  const evidence = studentVisibleEvidence(item.evidence);
   return (
-    <Card
-      title={COACHING_MESSAGES.cardTitle}
-      description={`Kural: ${COACHING_RULE_VERSION}`}
-    >
+    <Card title={COACHING_MESSAGES.cardTitle}>
       <div className="grid min-w-0 gap-4">
-        <p className="text-sm text-ink-700">
-          Çalışma: {formatTurkishDateRange(report.practiceWindow)}. Deneme ve kazanım:{" "}
-          {formatTurkishDateRange(report.examWindow)}.
+        {audience === "parent" ? (
+          <p className="text-sm text-ink-700">
+            Çalışma: {formatTurkishDateRange(report.practiceWindow)}. Deneme ve kazanım:{" "}
+            {formatTurkishDateRange(report.examWindow)}.
+          </p>
+        ) : null}
+        <p
+          className={
+            audience === "student"
+              ? "min-w-0 rounded-xl bg-brand-50 p-4 text-lg font-semibold leading-snug break-words text-ink-900"
+              : "min-w-0 break-words text-ink-900"
+          }
+        >
+          {item.message}
         </p>
-        <p className="min-w-0 break-words text-ink-900">{item.message}</p>
         <section aria-labelledby="oneri-neden" className="grid min-w-0 gap-2">
           <h3 id="oneri-neden" className="text-base font-bold text-ink-900">
             {COACHING_MESSAGES.whyHeading}
           </h3>
-          <p className="min-w-0 break-words text-sm text-ink-700">{item.reason}</p>
-          <ul className="grid min-w-0 list-disc gap-1 pl-5 text-sm text-ink-700">
-            {item.evidence.map((line) => (
-              <li key={line} className="min-w-0 break-words">
-                {line}
-              </li>
-            ))}
-          </ul>
+          {reason ? (
+            <p className="min-w-0 break-words text-sm text-ink-700">{reason}</p>
+          ) : null}
+          {evidence.length > 0 ? (
+            <ul className="grid min-w-0 list-disc gap-1 pl-5 text-sm text-ink-700">
+              {evidence.map((line) => (
+                <li key={line} className="min-w-0 break-words">
+                  {line}
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </section>
         {explanation ? (
           <section aria-labelledby="oneri-sade" className="grid min-w-0 gap-2">
@@ -48,16 +61,13 @@ export function RecommendationCard({
             </h3>
             <p className="min-w-0 break-words text-ink-900">{explanation}</p>
             <p className="text-sm text-ink-700">
-              Bu cümle yapay zekâdan gelir. Öneri ve neden satırı yine kuraldan gelir. Bu
-              cümle puanı, kaydı ve yetkiyi değiştirmez.
+              Bu cümle bir öneridir. Kayıtlarını ve puanını değiştirmez.
             </p>
           </section>
         ) : null}
         {audience === "student" && item.href && item.actionLabel ? (
           <div>
-            <ButtonLink href={item.href} variant="secondary">
-              {item.actionLabel}
-            </ButtonLink>
+            <ButtonLink href={item.href}>{item.actionLabel}</ButtonLink>
           </div>
         ) : null}
         {audience === "parent" && readOnlyNote ? (

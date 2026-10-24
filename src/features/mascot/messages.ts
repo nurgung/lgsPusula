@@ -9,7 +9,8 @@ export const MASCOT_MESSAGES = {
   ruleLabel: `Kural: ${MASCOT_RULE_VERSION}`,
   pointsUnit: "karakter puanı",
   noSpeciesTitle: "Henüz bir karakter seçmedin.",
-  noSpeciesDescription: "Bir hayvan ya da bitki seçebilirsin. Seçmek puanını değiştirmez.",
+  noSpeciesDescription:
+    "Bir hayvan ya da bitki seçebilirsin. Seçmek puanını değiştirmez.",
   changeSpeciesHint: "Karakteri değiştirmek puanını değiştirmez.",
   noRegression: "Bir gün ara vermek puanı düşürmez ve karakteri geri götürmez.",
   savedSpecies: "Karakterin kaydedildi.",
@@ -17,12 +18,14 @@ export const MASCOT_MESSAGES = {
   providerError: "Kayıt şu anda tamamlanamadı. Biraz sonra tekrar deneyebilirsin.",
   formInvalid: "Seçimleri kontrol edip yeniden dene.",
   reminderTitle: "Hatırlatma",
-  reminderBody: "Bugün henüz bir çalışma kaydı yok. İstersen şimdi kısaca ekleyebilirsin.",
+  reminderBody:
+    "Bugün henüz bir çalışma kaydı yok. İstersen şimdi kısaca ekleyebilirsin.",
   reminderAction: "Kayıt ekle",
   reminderDismiss: "Bugün gösterme",
   tasksTitle: "Bugünün görevleri",
   tasksEmptyTitle: "Bugün için açık görevin yok.",
   tasksEmptyDescription: "İstersen yine de bir çalışma kaydı ekleyebilirsin.",
+  tasksAllDoneTitle: "Bugünkü görevlerin tamam.",
   taskLog: "Bugün bir çalışma kaydı ekle.",
   taskGoal: "Bugünkü soru hedefine ulaş.",
   taskReview: "İstersen bir denemendeki soruları kazanımla eşleştirebilirsin.",
@@ -35,7 +38,8 @@ export const MASCOT_MESSAGES = {
   notificationsHint:
     "Hatırlatma yalnızca bu uygulamada görünür. E-posta gönderilmez. Sessiz saatler Türkiye saatiyledir (İstanbul).",
   parentEmptyTitle: "Henüz bir karakter seçilmedi.",
-  parentEmptyDescription: "Öğrenci bir karakter seçerse burada görürsün. Puanı değiştiremezsin.",
+  parentEmptyDescription:
+    "Öğrenci bir karakter seçerse burada görürsün. Puanı değiştiremezsin.",
   parentReadOnly: "Karakteri ve puanı görebilirsin, değiştiremezsin.",
 } as const;
 
@@ -65,7 +69,14 @@ export function supportiveCopyIssues(text: string): readonly string[] {
 }
 
 /** Exam results, nets and scores stay out of a reminder (decision 0.8). */
-const SENSITIVE_REMINDER_FRAGMENTS = ["net", "puan", "yanlış", "doğru", "sınav", "deneme"] as const;
+const SENSITIVE_REMINDER_FRAGMENTS = [
+  "net",
+  "puan",
+  "yanlış",
+  "doğru",
+  "sınav",
+  "deneme",
+] as const;
 
 export function reminderSensitiveIssues(text: string): readonly string[] {
   const folded = text.toLocaleLowerCase("tr-TR");
