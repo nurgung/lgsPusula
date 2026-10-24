@@ -9,7 +9,11 @@ import {
   type CelebrationKind,
   type ProgressSnapshot,
 } from "./celebration";
-import { readCelebration, signCelebration, withCelebrationParam } from "./celebration-token";
+import {
+  readCelebration,
+  signCelebration,
+  withCelebrationParam,
+} from "./celebration-token";
 
 const secret = "test-secret-test-secret-test-secret";
 
@@ -19,6 +23,7 @@ function snap(partial: Partial<ProgressSnapshot> = {}): ProgressSnapshot {
     badgeIds: [],
     dailyGoalTarget: null,
     todayQuestionCount: 0,
+    stageId: "new",
     ...partial,
   };
 }
@@ -26,7 +31,10 @@ function snap(partial: Partial<ProgressSnapshot> = {}): ProgressSnapshot {
 describe("crossedCelebration", () => {
   it("stays closed when there is no goal and nothing else is new", () => {
     expect(
-      crossedCelebration(snap({ todayQuestionCount: 0 }), snap({ todayQuestionCount: 4 })),
+      crossedCelebration(
+        snap({ todayQuestionCount: 0 }),
+        snap({ todayQuestionCount: 4 }),
+      ),
     ).toBeNull();
   });
 
@@ -69,12 +77,18 @@ describe("crossedCelebration", () => {
     ).toEqual({ reason: "badge", badgeId: "first_step" });
   });
 
-  it("names a forward stage and ignores a lower point total", () => {
-    const before = snap({ points: 5, badgeIds: ["first_step"] });
-    const after = snap({ points: 10, badgeIds: ["first_step"] });
+  it("does not open a stage when only the point total crosses a threshold", () => {
+    const before = snap({ points: 5, badgeIds: ["first_step"], stageId: "new" });
+    const after = snap({ points: 10, badgeIds: ["first_step"], stageId: "new" });
+    expect(crossedCelebration(before, after)).toBeNull();
+  });
+
+  it("names a forward stage and ignores a move back to an earlier stage", () => {
+    const before = snap({ points: 35, badgeIds: ["first_step"], stageId: "settling" });
+    const after = snap({ points: 40, badgeIds: ["first_step"], stageId: "growing" });
     expect(crossedCelebration(before, after)).toEqual({
       reason: "stage",
-      stageId: "settling",
+      stageId: "growing",
     });
     expect(crossedCelebration(after, before)).toBeNull();
   });
@@ -103,7 +117,9 @@ describe("celebration copy", () => {
       expect(text).not.toMatch(/level|explorer|nft|telegram/i);
       expect(text).not.toContain("LEVEL UP");
     }
-    expect(celebrationCopy({ reason: "goal" }).detail).toBe("Bugünkü soru hedefin tamam.");
+    expect(celebrationCopy({ reason: "goal" }).detail).toBe(
+      "Bugünkü soru hedefin tamam.",
+    );
     expect(celebrationCopy({ reason: "stage", stageId: "growing" }).heading).toBe(
       "Birlikte büyüyor aşamasına geldin.",
     );
@@ -120,10 +136,12 @@ describe("celebration copy", () => {
         reason: "goal",
       }),
     ).toBe(false);
-    expect(celebrationStillHolds(snap({ dailyGoalTarget: null }), { reason: "goal" })).toBe(
+    expect(
+      celebrationStillHolds(snap({ dailyGoalTarget: null }), { reason: "goal" }),
+    ).toBe(false);
+    expect(celebrationStillHolds(snap({ points: 30 }), { reason: "practice" })).toBe(
       false,
     );
-    expect(celebrationStillHolds(snap({ points: 30 }), { reason: "practice" })).toBe(false);
   });
 });
 
@@ -152,7 +170,9 @@ describe("celebration token", () => {
       },
       secret,
     );
-    expect(readCelebration(practice, secret, 1_000)?.kind).toEqual({ reason: "practice" });
+    expect(readCelebration(practice, secret, 1_000)?.kind).toEqual({
+      reason: "practice",
+    });
     expect(withCelebrationParam("/ogrenci", practice, "alkis")).toContain("alkis=");
     expect(withCelebrationParam("/ogrenci/calisma?durum=kaydedildi", token)).toContain(
       "kutlama=",
@@ -166,7 +186,9 @@ describe("celebration token", () => {
 describe("reduced motion styles", () => {
   it("keeps confetti and the path animation inside the no-preference query", () => {
     const css = readFileSync("src/app/globals.css", "utf8");
-    expect(css).toContain(".celebration-confetti,\n.practice-confetti {\n  display: none;");
+    expect(css).toContain(
+      ".celebration-confetti,\n.practice-confetti {\n  display: none;",
+    );
     expect(css).toContain("@keyframes practice-confetti");
     expect(css).toContain("@media (prefers-reduced-motion: no-preference)");
     expect(css).toContain(".stage-current-motion");

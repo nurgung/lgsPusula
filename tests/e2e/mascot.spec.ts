@@ -14,7 +14,10 @@ import {
 } from "./support/auth.ts";
 import { seedCatalog, type SeededCatalog } from "./support/catalog.ts";
 
-test.skip(!isAuthConfigured(), "Supabase is not configured (see README: yerel Supabase).");
+test.skip(
+  !isAuthConfigured(),
+  "Supabase is not configured (see README: yerel Supabase).",
+);
 
 test.beforeEach(async ({ page }) => {
   await useFreshClientIp(page);
@@ -38,7 +41,9 @@ async function signInClient(account: TestAccount) {
 }
 
 async function activateLink(studentId: string, parentId: string) {
-  const hash = (randomUUID().replaceAll("-", "") + randomUUID().replaceAll("-", "")).slice(0, 64);
+  const hash = (
+    randomUUID().replaceAll("-", "") + randomUUID().replaceAll("-", "")
+  ).slice(0, 64);
   const { error: inviteError } = await admin().rpc("create_family_invite", {
     p_student_id: studentId,
     p_code_hash: hash,
@@ -130,7 +135,9 @@ test("a student chooses a character and can turn reminders off", async ({ page }
   await page.getByRole("button", { name: "Ayarları kaydet" }).click();
   await expect(page.getByText("Hatırlatma ayarların kaydedildi.")).toBeVisible();
   await page.goto("/ogrenci");
-  await expect(page.getByRole("heading", { name: "Hatırlatma", level: 2 })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Hatırlatma", level: 2 })).toHaveCount(
+    0,
+  );
 });
 
 test("the same study log awards points once and a deleted log does not take them back", async ({
@@ -209,8 +216,8 @@ test("the same study log awards points once and a deleted log does not take them
 
   const parentBefore = await signInClient(parent);
   expect(
-    (await parentBefore.from("reward_events").select("id").eq("student_id", student.id)).data ??
-      [],
+    (await parentBefore.from("reward_events").select("id").eq("student_id", student.id))
+      .data ?? [],
   ).toEqual([]);
   await activateLink(student.id, parent.id);
   const parentRead = await parentBefore
@@ -267,7 +274,10 @@ test("quiet hours and the daily cap block extra reminders", async () => {
   expect(first.error).toBeNull();
   expect(second.data).toBe(first.data);
   expect(first.data).toBeTruthy();
-  const rows = await client.from("in_app_notices").select("id").eq("student_id", student.id);
+  const rows = await client
+    .from("in_app_notices")
+    .select("id")
+    .eq("student_id", student.id);
   expect(rows.data).toHaveLength(1);
 
   const { error: customNotice } = await client.from("in_app_notices").insert({
@@ -301,4 +311,77 @@ test("quiet hours and the daily cap block extra reminders", async () => {
   expect(cleared).toBeNull();
   const whileOff = await client.rpc("open_study_reminder");
   expect(whileOff.data).toBeNull();
+});
+
+test("growth notices stay on the student who earned them and do not duplicate", async () => {
+  const catalog = await seedCatalog();
+  const student = await createTestAccount({ displayName: "Seri Öğrencisi" });
+  const other = await createTestAccount({ displayName: "Başka Seri" });
+  const parent = await createTestAccount({
+    roles: ["parent"],
+    displayName: "Seri Velisi",
+  });
+  const client = await signInClient(student);
+  const today = istanbulToday();
+
+  const first = await client.rpc("open_growth_notice", {
+    p_kind: "streak_broken",
+    p_notice_date: today,
+  });
+  const second = await client.rpc("open_growth_notice", {
+    p_kind: "streak_broken",
+    p_notice_date: today,
+  });
+  expect(first.error).toBeNull();
+  expect(second.data).toBe(first.data);
+  const rows = await client
+    .from("in_app_notices")
+    .select("id, kind")
+    .eq("student_id", student.id);
+  expect(rows.data).toEqual([{ id: first.data, kind: "streak_broken" }]);
+
+  const { error: forged } = await client.from("in_app_notices").insert({
+    student_id: student.id,
+    kind: "mascot_sick",
+    notice_date: today,
+    sequence: 1,
+  });
+  expect(forged).not.toBeNull();
+
+  const { error: dismissed } = await client
+    .from("in_app_notices")
+    .update({ dismissed_at: new Date().toISOString() })
+    .eq("id", first.data as string);
+  expect(dismissed).toBeNull();
+  const again = await client.rpc("open_growth_notice", {
+    p_kind: "streak_broken",
+    p_notice_date: today,
+  });
+  expect(again.data).toBeNull();
+  expect(
+    (await client.from("in_app_notices").select("id").eq("student_id", student.id)).data,
+  ).toHaveLength(1);
+
+  const otherClient = await signInClient(other);
+  const hidden = await otherClient
+    .from("in_app_notices")
+    .select("id")
+    .eq("student_id", student.id);
+  expect(hidden.data ?? []).toEqual([]);
+  const { error: otherLog } = await otherClient
+    .from("study_logs")
+    .insert(logRow(student.id, catalog, randomUUID()));
+  expect(otherLog).not.toBeNull();
+
+  const parentClient = await signInClient(parent);
+  const parentCall = await parentClient.rpc("open_growth_notice", {
+    p_kind: "stage_earned",
+    p_notice_date: today,
+  });
+  expect(parentCall.error).not.toBeNull();
+  const parentRead = await parentClient
+    .from("in_app_notices")
+    .select("id")
+    .eq("student_id", student.id);
+  expect(parentRead.data ?? []).toEqual([]);
 });

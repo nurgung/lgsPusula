@@ -32,16 +32,18 @@ Renk token'ları merkezi tema dosyasında tanımlanmalı; bileşenlere rastgele 
 
 Hedef yerleşim `roadmap.md` Faz 14'tedir. Örnek görseller dizilimin örneğidir; bölümleri birebir kopyalanmaz. Küçük ekranda bantlar alt alta iner. Menü değişmez.
 
-- Üst yol: dört aşama durağı. Güncel durak, seçili karakterle işaretlenir. Karakter puanı ve sonraki aşamaya kalan puan yazıyla durur.
+- Üst yol: dört aşama durağı. Güncel durak, seçili karakterle işaretlenir. Karakter puanı, çalışma serisi, en uzun seri, sağlık durumu ve sonraki aşamanın eksik şartı yazıyla durur.
+- Görünür aşama yalnızca puana bakmaz. Seri, farklı gün, geçerli soru ve mevcut puan eşiği birlikte gerekir. Bir günde en fazla bir aşama ilerler. Boş gün seriyi yeniden başlatır; kazanılan aşamayı, puanı ve rozeti silmez.
 - Günlük hedefler: bugünkü kayıt, soru hedefi ve varsa kazanım işi. Açık görev, tamamlanandan daha belirgindir. Tamamlanan satır işaretlidir. Günlük ve haftalık soru hedefleri aynı bölümde, ayrı başlıklarla durur.
 - Ders karoları: katalogdaki gerçek dersler. Kutuda bu haftanın soru sayısı ve varsa o derse ait hedef vardır. Veri yoksa boş durum gösterilir. Başarı yüzdesi, performans puanı veya sıralama üretilmez.
 - Alt özet: haftalık soru ve dakika toplamı, son deneme neti, koçluk önerisi, gizlilik ve veli bağlantısı.
 
 Koçluk kartının ilk görünümünde kısa öneri, sıradaki işlem, kısa gerekçe ve bağlantı durur. Kazanım kodu, uzun açıklama, yanlış ve boş sayıları ile tarih aralığı "Neden bu öneri?" içindedir. Yapay zekâ cümlesi varsa "Sade anlatım" başlığıyla kural cümlesinden ayrı durur. Sayfa zemini nötr kalır; kartlar yüzey rengindedir. Ders kutuları tek renktir.
 
-Hedef, rozet veya aşama bu kayıtta ilk kez tamamlanırsa bir pencere açılır. Pencerede aynı yol, işaretli hedefler, madalya, kazanılanın gerçek adı ve "Tamam" düğmesi vardır. Ada haritası, İngilizce seviye adı, kelime kartı, NFT, jeton, ücretli plan, ruh hâli, uydurma yüzde ve boş günü sıfırlayan seri yoktur. Bir gün ara vermek karakteri geriletmez.
+Hedef, rozet veya görünür aşama bu kayıtta ilk kez tamamlanırsa bir pencere açılır. Aşama penceresi, seri ve soru şartları da tamamlanmadan açılmaz. Pencerede aynı yol, işaretli hedefler, madalya, kazanılanın gerçek adı ve "Tamam" düğmesi vardır. Ada haritası, İngilizce seviye adı, kelime kartı, NFT, jeton, ücretli plan, ruh hâli ve uydurma yüzde yoktur. Bir gün ara vermek puanı ve kazanılan aşamayı geri götürmez. Çalışma serisi o gün yeniden başlar. Karakterin dinlenmesi puanı ve rozeti silmez.
 
 ### Günlük çalışma
+
 - Ders seçimi.
 - Konu/kazanım seçimi isteğe bağlı ve aranabilir.
 - Soru sayısı, doğru, yanlış, boş ve süre alanları.
@@ -49,6 +51,7 @@ Hedef, rozet veya aşama bu kayıtta ilk kez tamamlanırsa bir pencere açılır
 - Önceki kayıtları düzeltme imkânı.
 
 ### Deneme analizi
+
 - Deneme adı/tarihi ve deneme türü.
 - Ders bazında doğru, yanlış, boş ve net.
 - Önceki denemelerle kıyaslama.
@@ -56,6 +59,7 @@ Hedef, rozet veya aşama bu kayıtta ilk kez tamamlanırsa bir pencere açılır
 - Grafik yanında erişilebilir tablo alternatifi.
 
 ### Veli paneli
+
 - Bağlı öğrenci seçimi.
 - Haftalık/aylık özet.
 - Gelişim eğilimleri ve destekleyici öneriler.
@@ -63,6 +67,7 @@ Hedef, rozet veya aşama bu kayıtta ilk kez tamamlanırsa bir pencere açılır
 - Bildirim ve ilişki ayarları.
 
 ### Ayarlar
+
 - Profil ve hesap güvenliği.
 - Veli-öğrenci bağlantıları.
 - Bildirim sıklığı ve sessiz saatler.
@@ -105,12 +110,14 @@ WCAG 2.2 AA hedeflenmelidir; otomatik araçlar tek başına yeterli değildir.
 ## İçerik ve mikro metin
 
 Tercih edilen:
+
 - “Bugün için 10 soruluk küçük bir hedef belirleyebilirsin.”
 - “Fen Bilimleri dersinde F.8.1.1.1 kazanımı şunu söyler: Mevsimlerin oluşumuna yönelik tahminlerde bulunur. Bu kazanım için 10 soru çöz. Bitirince Tamamlandı düğmesine bas; sıradaki yanlış veya boş kazanıma geçilir.”
 - “Çalışma kaydını henüz eklemedin. İstersen şimdi kaydedebilirsin.”
 - “Bu öneri, son deneme kayıtlarına dayanıyor.”
 
 Kaçınılması gereken:
+
 - “Yine çalışmadın!”
 - “Herkes senden daha iyi.”
 - “Bu tempoyla kazanamazsın.”

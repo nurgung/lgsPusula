@@ -192,6 +192,39 @@ export async function listStudyLogs(
   }
 }
 
+const contributionRowSchema = z.object({
+  studied_on: z.string(),
+  question_count: z.number().int(),
+});
+
+/** Question totals by Istanbul day. The caller still filters by student id; RLS does too. */
+export async function listStudyContributions(
+  client: SupabaseClient,
+  studentId: string,
+  window: DateWindow,
+): Promise<{ studiedOn: string; questionCount: number }[]> {
+  const rows: { studiedOn: string; questionCount: number }[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await client
+      .from("study_logs")
+      .select("studied_on, question_count")
+      .eq("student_id", studentId)
+      .gte("studied_on", window.from)
+      .lte("studied_on", window.to)
+      .order("studied_on", { ascending: true })
+      .range(from, from + PAGE_SIZE - 1);
+    if (error) throw new StudyStoreError("list_study_contributions", error.code);
+    const page = z.array(contributionRowSchema).parse(data ?? []);
+    rows.push(
+      ...page.map((row) => ({
+        studiedOn: row.studied_on,
+        questionCount: row.question_count,
+      })),
+    );
+    if (page.length < PAGE_SIZE) return rows;
+  }
+}
+
 export async function getStudyLog(
   client: SupabaseClient,
   studentId: string,

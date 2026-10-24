@@ -5,6 +5,8 @@ import { CelebrationDialog } from "./celebration-dialog";
 import { DailyGoals } from "./daily-goals";
 import { StagePath } from "./stage-path";
 import { SubjectTiles } from "./subject-tiles";
+import { addCalendarDays } from "@/features/study/calendar";
+import { evaluateGrowth, type StudyContribution } from "@/features/mascot/growth";
 
 beforeAll(() => {
   HTMLDialogElement.prototype.showModal = function showModal(this: HTMLDialogElement) {
@@ -28,31 +30,54 @@ const view: CelebrationView = {
 
 describe("StagePath", () => {
   it("marks the current stop with the character and names every stop", () => {
-    render(<StagePath stageId="settling" species="cat" points={12} detailed />);
+    const logs: StudyContribution[] = Array.from({ length: 7 }, (_, index) => ({
+      studiedOn: addCalendarDays("2026-10-24", index - 6),
+      questionCount: 1,
+    }));
+    const growth = evaluateGrowth({
+      today: "2026-10-24",
+      logs,
+      rewards: logs.map((log) => ({ points: 5, sourceDate: log.studiedOn })),
+    });
+    render(<StagePath stageId={growth.stageId} species="cat" growth={growth} detailed />);
     expect(screen.getByRole("heading", { name: "Aşama yolun" })).toBeTruthy();
     for (const name of ["Yeni arkadaş", "Alışıyor", "Birlikte büyüyor", "Yol arkadaşı"]) {
       expect(screen.getByText(name)).toBeTruthy();
     }
     expect(screen.getByText("Geçildi")).toBeTruthy();
-    expect(screen.getByText("Kedi. Buradasın.")).toBeTruthy();
+    expect(screen.getByText("Hayvan: Kedi. Buradasın.")).toBeTruthy();
     expect(
-      document.querySelector('[data-species-figure="cat"][data-figure-size="compact"]'),
+      document.querySelector(
+        '[data-species-figure="cat"][data-health="healthy"][data-growth-stage="settling"]',
+      ),
     ).toBeTruthy();
     expect(document.querySelector(".species-cat-head")).toBeTruthy();
     expect(document.querySelector("svg")).toBeNull();
     expect(screen.getAllByText("Sırada")).toHaveLength(2);
-    expect(screen.getByText("12")).toBeTruthy();
-    expect(screen.getByText("Kalan 18 karakter puanı.")).toBeTruthy();
-    expect(screen.getByText("12 / 30 karakter puanı")).toBeTruthy();
+    expect(screen.getByText("Toplam 35 karakter puanı. Aşama: Alışıyor.")).toBeTruthy();
+    expect(screen.getByText("14 günlük seriyi tamamlaman gerekiyor")).toBeTruthy();
+    expect(screen.getByText(/Çalışma serisi: 7 gün/)).toBeTruthy();
     expect(screen.queryByText(/Level|Explorer/)).toBeNull();
     expect(screen.getByRole("link", { name: "Karaktere bak" }).getAttribute("href")).toBe(
       "/ogrenci/karakter",
     );
   });
 
-  it("names the top stage without a remaining-point line", () => {
-    render(<StagePath stageId="companion" species="cat" points={60} detailed />);
-    expect(screen.getByText("Bu en yüksek aşama.")).toBeTruthy();
+  it("names the top stage without asking for another step", () => {
+    const logs: StudyContribution[] = Array.from({ length: 30 }, (_, index) => ({
+      studiedOn: addCalendarDays("2026-10-24", index - 29),
+      questionCount: 25,
+    }));
+    const growth = evaluateGrowth({
+      today: "2026-10-24",
+      logs,
+      rewards: logs.map((log) => ({ points: 5, sourceDate: log.studiedOn })),
+    });
+    render(<StagePath stageId={growth.stageId} species="cat" growth={growth} detailed />);
+    expect(growth.stageId).toBe("companion");
+    expect(
+      screen.getByText("Bu en yüksek aşama. Kazandığın aşama sende kalır."),
+    ).toBeTruthy();
     expect(screen.queryByText(/Kalan/)).toBeNull();
   });
 });

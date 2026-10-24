@@ -1,19 +1,12 @@
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ProgressMeter } from "@/components/ui/progress-meter";
 import { StateMessage } from "@/components/ui/state-message";
 import { dismissReminderAction } from "../actions";
+import type { GrowthView } from "../growth";
 import { MASCOT_MESSAGES } from "../messages";
-import {
-  badgesFor,
-  stageForPoints,
-  tasksFor,
-  totalPoints,
-  type TaskFacts,
-} from "../rules";
+import { badgesFor, tasksFor, type RewardEvent, type TaskFacts } from "../rules";
 import { speciesByCode, type SpeciesCode } from "../species";
-import type { RewardEvent } from "../rules";
-import { MascotMark } from "./mascot-mark";
+import { CharacterStatus } from "./character-status";
 
 export function ReminderCard({ noticeId }: { noticeId: string }) {
   return (
@@ -42,53 +35,21 @@ export function ReminderCard({ noticeId }: { noticeId: string }) {
 export function MascotSummaryCard({
   species,
   rewards,
+  growth,
   detailed,
 }: {
   species: SpeciesCode | null;
   rewards: readonly RewardEvent[];
+  growth: GrowthView;
   detailed?: boolean;
 }) {
   const chosen = species ? speciesByCode(species) : undefined;
-  const points = totalPoints(rewards);
-  const stage = stageForPoints(points);
   const badges = badgesFor(rewards);
 
   return (
     <Card title={chosen ? chosen.name : "Karakterin"}>
       <div className="grid min-w-0 gap-4">
-        {chosen ? (
-          <div className="flex min-w-0 items-center gap-3">
-            <MascotMark code={chosen.code} />
-            <p className="min-w-0">
-              <span className="block font-semibold text-ink-900">
-                {chosen.kindLabel}: {chosen.name}
-              </span>
-              <span className="block text-sm text-ink-600">Aşama: {stage.name}</span>
-            </p>
-          </div>
-        ) : (
-          <StateMessage
-            variant="empty"
-            title={MASCOT_MESSAGES.noSpeciesTitle}
-            description={MASCOT_MESSAGES.noSpeciesDescription}
-          />
-        )}
-        <p className="text-ink-900">
-          Toplam {points} {MASCOT_MESSAGES.pointsUnit}. Aşama: {stage.name}.
-        </p>
-        {stage.nextAt != null && stage.nextName ? (
-          <ProgressMeter
-            label={`Sonraki aşama: ${stage.nextName}`}
-            value={points}
-            max={stage.nextAt}
-            unit={MASCOT_MESSAGES.pointsUnit}
-          />
-        ) : (
-          <p className="text-sm text-ink-700">
-            {stage.name} en yüksek aşama. Puanın durur; bir gün ara vermek onu düşürmez.
-          </p>
-        )}
-        <p className="text-sm text-ink-600">{MASCOT_MESSAGES.noRegression}</p>
+        <CharacterStatus species={species} growth={growth} />
         {detailed ? (
           <section className="grid min-w-0 gap-2" aria-labelledby="rozetler-baslik">
             <h3 id="rozetler-baslik" className="text-base font-bold text-ink-900">
@@ -209,15 +170,13 @@ function TaskGroup({
 
 export function ParentMascotCard({
   species,
-  rewards,
+  growth,
 }: {
   species: SpeciesCode | null;
-  rewards: readonly RewardEvent[];
+  growth: GrowthView;
 }) {
   const chosen = species ? speciesByCode(species) : undefined;
-  const points = totalPoints(rewards);
-  const stage = stageForPoints(points);
-  if (!chosen && points === 0) {
+  if (!chosen && growth.points === 0 && growth.studyDays === 0) {
     return (
       <Card title="Karakter">
         <StateMessage
@@ -230,25 +189,7 @@ export function ParentMascotCard({
   }
   return (
     <Card title="Karakter" description={MASCOT_MESSAGES.parentReadOnly}>
-      <div className="grid min-w-0 gap-3">
-        {chosen ? (
-          <div className="flex min-w-0 items-center gap-3">
-            <MascotMark code={chosen.code} />
-            <p className="min-w-0">
-              <span className="block font-semibold text-ink-900">
-                {chosen.kindLabel}: {chosen.name}
-              </span>
-              <span className="block text-sm text-ink-600">Aşama: {stage.name}</span>
-            </p>
-          </div>
-        ) : (
-          <p className="text-ink-700">Henüz bir karakter seçilmedi.</p>
-        )}
-        <p className="text-ink-900">
-          Toplam {points} {MASCOT_MESSAGES.pointsUnit}. Aşama: {stage.name}.
-        </p>
-        <p className="text-sm text-ink-600">{MASCOT_MESSAGES.noRegression}</p>
-      </div>
+      <CharacterStatus species={species} growth={growth} />
     </Card>
   );
 }

@@ -16,6 +16,7 @@ import { formatTurkishDateRange, istanbulToday } from "@/features/study/calendar
 import { ExamList } from "@/features/exams/components/exam-list";
 import { loadExamList } from "@/features/exams/load-exams";
 import { ParentMascotCard } from "@/features/mascot/components/mascot-panels";
+import { evaluateGrowth } from "@/features/mascot/growth";
 import { loadMascotSummary } from "@/features/mascot/load-mascot";
 import { PeriodSummaryPanel } from "@/features/reports/components/period-summary";
 import { DocxDownload } from "@/features/reports/components/docx-download";
@@ -30,7 +31,7 @@ import { purgeExpiredReportJobs } from "@/services/supabase/report-store";
 import { createServiceClient } from "@/services/supabase/server-client";
 import { GoalProgressList } from "@/features/study/components/goal-progress-list";
 import { StudyLogList } from "@/features/study/components/study-log-list";
-import { loadStudyRecords } from "@/features/study/load-study";
+import { loadStudyContributions, loadStudyRecords } from "@/features/study/load-study";
 import { summarizeLogs } from "@/features/study/summary";
 
 export const metadata: Metadata = { title: "Öğrenci" };
@@ -70,11 +71,12 @@ async function ParentStudent({
   const weeks = weekWindows(today);
   const months = monthWindows(today);
   await purgeExpiredReportJobs(createServiceClient());
-  const [study, exams, mascot, coaching] = await Promise.all([
+  const [study, exams, mascot, coaching, contributions] = await Promise.all([
     loadStudyRecords(studentId, overview),
     loadExamList(studentId, overview),
     loadMascotSummary(studentId),
     loadCoachingReport(studentId, today),
+    loadStudyContributions(studentId, today),
   ]);
   const explained = await loadCoachingExplanation(
     user,
@@ -108,7 +110,14 @@ async function ParentStudent({
           title="Kayıtları değiştiremezsin."
           description="Çalışma, hedef, deneme ve karakter özetini okuyabilirsin. Değiştirme yalnızca öğrenci hesabındadır."
         />
-        <ParentMascotCard species={mascot.species} rewards={mascot.rewards} />
+        <ParentMascotCard
+          species={mascot.species}
+          growth={evaluateGrowth({
+            today,
+            logs: contributions,
+            rewards: mascot.rewards,
+          })}
+        />
         <RecommendationCard
           report={explained.report}
           audience="parent"

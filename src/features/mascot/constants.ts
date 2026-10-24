@@ -1,7 +1,8 @@
 /**
  * mascot-v1. The database function `sync_mascot_rewards_for` inserts these point
  * values. This file is the explanation the app shows; it does not grant points.
- * A missed day never removes a row, so the stage cannot move backwards.
+ * A missed day never removes a row, so these points cannot move backwards.
+ * The visible stage is growth-v1, which also requires a streak and questions.
  */
 
 export const MASCOT_RULE_VERSION = "mascot-v1" as const;

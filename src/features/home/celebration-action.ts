@@ -1,7 +1,7 @@
 "use server";
 
 import { requireStudent } from "@/features/access/guards";
-import { stageForPoints, tasksFor } from "@/features/mascot/rules";
+import { tasksFor } from "@/features/mascot/rules";
 import { readMascotSpecies, readOpenReviewExam } from "@/services/supabase/mascot-store";
 import { requireSupabaseConfig } from "@/services/supabase/config";
 import { createSessionClient } from "@/services/supabase/server-client";
@@ -20,10 +20,13 @@ import { readProgressSnapshot } from "./progress";
  * Confirms the Tamamlandı marker. The sentence is fixed in code.
  * A goal, badge, or stage marker is rejected here.
  */
-export async function resolvePracticeCheer(token: string): Promise<CelebrationCopy | null> {
+export async function resolvePracticeCheer(
+  token: string,
+): Promise<CelebrationCopy | null> {
   const user = await requireStudent();
   const parsed = readCelebration(token, requireSupabaseConfig().authSecret, Date.now());
-  if (!parsed || parsed.studentId !== user.id || parsed.kind.reason !== "practice") return null;
+  if (!parsed || parsed.studentId !== user.id || parsed.kind.reason !== "practice")
+    return null;
   return celebrationCopy(parsed.kind);
 }
 
@@ -46,7 +49,9 @@ export async function resolveCelebration(token: string): Promise<CelebrationView
     if (!celebrationStillHolds(snapshot, parsed.kind)) return null;
 
     const copy = celebrationCopy(parsed.kind);
-    const dailyGoal = goals.find((goal) => goal.period === "day" && goal.subjectId == null);
+    const dailyGoal = goals.find(
+      (goal) => goal.period === "day" && goal.subjectId == null,
+    );
     const tasks = tasksFor({
       todayLogCount: logs.length,
       todayQuestionCount: snapshot.todayQuestionCount,
@@ -56,7 +61,7 @@ export async function resolveCelebration(token: string): Promise<CelebrationView
     return {
       heading: copy.heading,
       detail: copy.detail,
-      stageId: stageForPoints(snapshot.points).id,
+      stageId: snapshot.stageId,
       species,
       tasks: tasks.map((task) => ({ id: task.id, title: task.title, done: task.done })),
     };

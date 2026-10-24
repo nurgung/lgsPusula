@@ -41,16 +41,16 @@
 
 ## Uygulanan altyapı kararları (Faz 1)
 
-| Konu                | Karar                                                                                                                                                                      |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Çatı                | Next.js 16.4 (App Router, Turbopack), React 19.3, TypeScript 5.9 (strict + `noUncheckedIndexedAccess`)                                                                     |
-| Önbellek modeli     | `cacheComponents` ve `partialPrefetching` açık. Oturum/çerez okuyan bileşenler `<Suspense>` arkasında olmalı; oturuma bağlı veri paylaşılan önbelleğe alınmamalı.          |
-| Stil                | Tailwind CSS 4; renk/gölge/köşe token'ları yalnızca `src/app/globals.css` içindeki `@theme` bloğunda                                                                       |
-| Doğrulama           | Zod 4. Sunucu ortam değişkenleri `src/lib/env/server.ts` içinde doğrulanır; hata mesajı yalnızca değişken adını içerir, değeri içermez.                                    |
-| Sunucu sınırı       | Sunucuya özel modüller `import "server-only"` ile işaretlenir; istemci paketine girerse build hata verir.                                                                  |
+| Konu                | Karar                                                                                                                                                                                          |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Çatı                | Next.js 16.4 (App Router, Turbopack), React 19.3, TypeScript 5.9 (strict + `noUncheckedIndexedAccess`)                                                                                         |
+| Önbellek modeli     | `cacheComponents` ve `partialPrefetching` açık. Oturum/çerez okuyan bileşenler `<Suspense>` arkasında olmalı; oturuma bağlı veri paylaşılan önbelleğe alınmamalı.                              |
+| Stil                | Tailwind CSS 4; renk/gölge/köşe token'ları yalnızca `src/app/globals.css` içindeki `@theme` bloğunda                                                                                           |
+| Doğrulama           | Zod 4. Sunucu ortam değişkenleri `src/lib/env/server.ts` içinde doğrulanır; hata mesajı yalnızca değişken adını içerir, değeri içermez.                                                        |
+| Sunucu sınırı       | Sunucuya özel modüller `import "server-only"` ile işaretlenir; istemci paketine girerse build hata verir.                                                                                      |
 | Güvenlik başlıkları | `src/lib/security-headers.ts` her yanıtta nosniff, çerçeveleme yasağı, referrer, izin politikası ve HSTS gönderir. Betik/stil CSP'si istek başına nonce ile `src/proxy.ts` içindedir (Faz 12). |
-| Testler             | Vitest + Testing Library (birim/bileşen, test dosyaları kaynağın yanında `*.test.ts(x)`), Playwright (`tests/e2e`, 320 px mobil ve masaüstü).                              |
-| Biçim               | Prettier; ESLint `eslint-config-next` + `any`/`@ts-ignore` yasağı + `NEXT_PUBLIC_` gizli ad yasağı                                                                         |
+| Testler             | Vitest + Testing Library (birim/bileşen, test dosyaları kaynağın yanında `*.test.ts(x)`), Playwright (`tests/e2e`, 320 px mobil ve masaüstü).                                                  |
+| Biçim               | Prettier; ESLint `eslint-config-next` + `any`/`@ts-ignore` yasağı + `NEXT_PUBLIC_` gizli ad yasağı                                                                                             |
 
 ### Klasör yapısı
 
@@ -176,10 +176,10 @@ Sınırlayıcıya ulaşılamazsa istek reddedilir (fail closed). Parola sıfırl
 
 ### Bulut ortamlarının durumu
 
-| Ortam      | Supabase                      | Vercel                                                                                       | Durum                                                                                                                                                                                      |
-| ---------- | ----------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Production | `lgs-pusula-prod` (Frankfurt) | Production değişkenleri girildi; adres `https://lgs-pusula.vercel.app` (fonksiyonlar `fra1`) | Bu uygulamanın tek bulut veri tabanı. 22 Ekim 2026: dokuz migration yerel listeyle aynı. Kayıt kapalı; parola kuralı 10 karakter, harf + rakam. Yerel `config.toml` basılmadı |
-| Staging    | Ayrı proje yok. Önizleme `lgs-pusula-prod` kullanır | Preview değişkenleri girildi (`APP_ENV=staging`). `AUTH_SECRET` production'dan ayrı. GitHub bağlı | Proje sahibi kararı, 22 Ekim 2026. İkinci ücretsiz yer `velitakipnew` ve duraklatılmaz. Önizleme, production ile aynı veritabanına yazar. Kalıcı staging dalı henüz yok |
+| Ortam      | Supabase                                            | Vercel                                                                                            | Durum                                                                                                                                                                         |
+| ---------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Production | `lgs-pusula-prod` (Frankfurt)                       | Production değişkenleri girildi; adres `https://lgs-pusula.vercel.app` (fonksiyonlar `fra1`)      | Bu uygulamanın tek bulut veri tabanı. 22 Ekim 2026: dokuz migration yerel listeyle aynı. Kayıt kapalı; parola kuralı 10 karakter, harf + rakam. Yerel `config.toml` basılmadı |
+| Staging    | Ayrı proje yok. Önizleme `lgs-pusula-prod` kullanır | Preview değişkenleri girildi (`APP_ENV=staging`). `AUTH_SECRET` production'dan ayrı. GitHub bağlı | Proje sahibi kararı, 22 Ekim 2026. İkinci ücretsiz yer `velitakipnew` ve duraklatılmaz. Önizleme, production ile aynı veritabanına yazar. Kalıcı staging dalı henüz yok       |
 
 - Önizleme dağıtım adresleri Vercel Authentication ile korunuyor (oturumsuz istek Vercel girişine yönlenir).
 - Vercel projesi 22 Ekim 2026'da `nurgung/lgsPusula` deposuna bağlandı (`vercel git connect` → Connected). Bağlama komutu yeni bir dağıtım başlatmadı. Sıradaki GitHub push'u dağıtımı dener.
@@ -267,11 +267,11 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 
 Öğrenci kendi çalışmasını kaydeder ve hedefini seçer. Veli, aktif bağlantısı varsa bunları okur; yazamaz. Yönetici rolü ek erişim vermez.
 
-| Katman | Dosyalar | Görev |
-| --- | --- | --- |
-| Takvim | `src/features/study/calendar.ts` | Europe/Istanbul sivil günü, pazartesi başlangıçlı hafta, karşılaştırma aralıkları. |
-| Kurallar | `schemas.ts`, `placement.ts`, `summary.ts`, `commit-log.ts`, `access.ts` | Soru sayısı kuralları, katalog yerleşimi, özet, tek gönderim, kim yazabilir. Supabase'i bilmez. |
-| Adaptör | `src/services/supabase/study-store.ts` | Okuma ve yazma oturumdaki kullanıcı olarak yapılır, böylece RLS ikinci savunma katmanı olur. |
+| Katman   | Dosyalar                                                                                                                              | Görev                                                                                                       |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Takvim   | `src/features/study/calendar.ts`                                                                                                      | Europe/Istanbul sivil günü, pazartesi başlangıçlı hafta, karşılaştırma aralıkları.                          |
+| Kurallar | `schemas.ts`, `placement.ts`, `summary.ts`, `commit-log.ts`, `access.ts`                                                              | Soru sayısı kuralları, katalog yerleşimi, özet, tek gönderim, kim yazabilir. Supabase'i bilmez.             |
+| Adaptör  | `src/services/supabase/study-store.ts`                                                                                                | Okuma ve yazma oturumdaki kullanıcı olarak yapılır, böylece RLS ikinci savunma katmanı olur.                |
 | Sayfalar | `/ogrenci`, `/ogrenci/calisma`, `/ogrenci/calisma/yeni`, `/ogrenci/calisma/[logId]`, `/ogrenci/hedefler`, `/veli/ogrenci/[studentId]` | Hızlı kayıt, ayrıntılı form, düzenleme/silme, hedef, iki aralığın karşılaştırması. Veli ekranı salt okunur. |
 
 - **Gün.** `studied_on` öğrencinin seçtiği İstanbul takvim günüdür. Varsayılan bugündür. İleri tarih ve 1 Eylül 2024'ten eski tarih hem şemada hem tetikleyicide reddedilir. Hesap `Europe/Istanbul` kuşağıyla yapılır; bugün bu kuşak UTC+3 olduğu için gece yarısı 21:00 UTC'dir.
@@ -287,12 +287,12 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 
 Öğrenci deneme sonucunu girer; net tek fonksiyonda hesaplanır (karar 0.7). Veli aktif bağlantıyla okur; yazamaz. Yönetici rolü ek erişim vermez.
 
-| Katman | Dosyalar | Görev |
-| --- | --- | --- |
-| Kural | `src/features/exams/net-rules.ts` | `lgs-v1` dağılımı ve net = doğru − (yanlış ÷ 3); ders neti eksi olabilir, toplam net eksiyse 0. |
-| Kurallar | `schemas.ts`, `commit-exam.ts`, `access.ts` | Form doğrulama, tek gönderim, kim yazabilir. Supabase'i bilmez. |
-| Adaptör | `src/services/supabase/exam-store.ts` | Okuma/yazma oturumdaki kullanıcıyla; düzenlemede ders satırları silinip yeniden yazılır ve net yeniden hesaplanır. |
-| Sayfalar | `/ogrenci/denemeler`, `/yeni`, `/[examId]`, `/veli/ogrenci/[studentId]` | Liste (mobil kart), oluşturma, detay tablosu + düzenleme. Veli salt okunur. |
+| Katman   | Dosyalar                                                                | Görev                                                                                                              |
+| -------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Kural    | `src/features/exams/net-rules.ts`                                       | `lgs-v1` dağılımı ve net = doğru − (yanlış ÷ 3); ders neti eksi olabilir, toplam net eksiyse 0.                    |
+| Kurallar | `schemas.ts`, `commit-exam.ts`, `access.ts`                             | Form doğrulama, tek gönderim, kim yazabilir. Supabase'i bilmez.                                                    |
+| Adaptör  | `src/services/supabase/exam-store.ts`                                   | Okuma/yazma oturumdaki kullanıcıyla; düzenlemede ders satırları silinip yeniden yazılır ve net yeniden hesaplanır. |
+| Sayfalar | `/ogrenci/denemeler`, `/yeni`, `/[examId]`, `/veli/ogrenci/[studentId]` | Liste (mobil kart), oluşturma, detay tablosu + düzenleme. Veli salt okunur.                                        |
 
 - **Türler.** `lgs_full` (6 ders, toplam 90 soru) ve `branch` (tek ders, 1–100 soru). Soru sayıları yalnızca `net-rules.ts` içindedir.
 - **Kural sürümü.** Her denemede `rule_version` saklanır (şimdilik `lgs-v1`). Düzenleme eski sürümü korur.
@@ -305,13 +305,13 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 
 Öğrenci yanlış/boş soruları kazanıma elle bağlar. Öncelik yalnızca bağlanan satırlardan hesaplanır. Denemeler arası net grafiği her zaman tablo alternatifiyle birlikte gösterilir.
 
-| Katman | Dosyalar | Görev |
-| --- | --- | --- |
-| Kural | `src/features/outcomes/prioritize.ts` | `outcome-priority-v1`: yanlış 2, boş 1; bağlanmamış satırdan sıralama üretilmez. |
-| Kurallar | `schemas.ts`, `access.ts` | Eşleştirme doğrulama, yetki. Supabase'i bilmez. |
-| Adaptör | `src/services/supabase/mistake-store.ts` | Okuma/yazma oturumdaki kullanıcıyla; deneme düzenlemede ders satırları yerinde güncellenir (`exam-store`). |
-| Grafik | `components/net-trend-chart.tsx` | Yerleşik SVG çubuk grafik + aynı verinin tablosu. Üçüncü taraf grafik paketi yok (tek seri; tablo zaten zorunlu). |
-| Sayfalar | `/ogrenci/denemeler/[examId]/kazanimlar`, `/ogrenci/kazanimlar`, `/ogrenci/denemeler/gelisim` | Eşleştirme, öncelik listesi, net değişimi. |
+| Katman   | Dosyalar                                                                                      | Görev                                                                                                             |
+| -------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Kural    | `src/features/outcomes/prioritize.ts`                                                         | `outcome-priority-v1`: yanlış 2, boş 1; bağlanmamış satırdan sıralama üretilmez.                                  |
+| Kurallar | `schemas.ts`, `access.ts`                                                                     | Eşleştirme doğrulama, yetki. Supabase'i bilmez.                                                                   |
+| Adaptör  | `src/services/supabase/mistake-store.ts`                                                      | Okuma/yazma oturumdaki kullanıcıyla; deneme düzenlemede ders satırları yerinde güncellenir (`exam-store`).        |
+| Grafik   | `components/net-trend-chart.tsx`                                                              | Yerleşik SVG çubuk grafik + aynı verinin tablosu. Üçüncü taraf grafik paketi yok (tek seri; tablo zaten zorunlu). |
+| Sayfalar | `/ogrenci/denemeler/[examId]/kazanimlar`, `/ogrenci/kazanimlar`, `/ogrenci/denemeler/gelisim` | Eşleştirme, öncelik listesi, net değişimi.                                                                        |
 
 - **Kaynak / güven.** Faz 8 yalnızca `manual` / `high` yazar. İleride içe aktarma veya yapay zekâ ayrı kaynak ve güven düzeyleri ekleyebilir.
 - **Boş durum.** Eşleştirme yoksa öncelik listesi “tespit yapılmış” gibi davranmaz. Net grafiği için en az iki deneme gerekir.
@@ -322,13 +322,13 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 
 Öğrenci ana sayfası her istekte tek bir öneri üretir. Öneri cümlesi yazılmaz; neden ve kanıt, sonuç nesnesinde durur. Böylece eski bir cümle yeni kaydın önüne geçmez. Öğrenci karttaki soru sayısını bitirince yalnızca o kazanım için bir tamamlanma satırı yazılır.
 
-| Katman | Dosyalar | Görev |
-| --- | --- | --- |
-| Metrik | `src/features/coaching/metrics.ts` | Hedef tamamlama, ders doğruluğu, tam LGS net farkı, tekrar kazanımları. |
-| Kural | `src/features/coaching/rules.ts` | `coaching-v1`. İlk uyan kural tek kart olur. Supabase'i bilmez. |
-| Metin | `messages.ts` | Gözden geçirilmiş cümleler. Utandırma, korkutma ve kıyas yok. |
-| Adaptör | `load-coaching.ts`, `actions.ts`, `coaching-store.ts` | Oturum istemcisiyle kayıtları ve tamamlanma satırlarını okur. Yazma yalnızca öğrencinin gördüğü kazanımı işaretler. |
-| Sayfa | `/ogrenci` | `RecommendationCard`: kısa öneri, gerekçe, sıradaki işlem. Kanıt "Neden bu öneri?" içindedir. Varsa sade anlatım ayrıdır. |
+| Katman  | Dosyalar                                              | Görev                                                                                                                     |
+| ------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Metrik  | `src/features/coaching/metrics.ts`                    | Hedef tamamlama, ders doğruluğu, tam LGS net farkı, tekrar kazanımları.                                                   |
+| Kural   | `src/features/coaching/rules.ts`                      | `coaching-v1`. İlk uyan kural tek kart olur. Supabase'i bilmez.                                                           |
+| Metin   | `messages.ts`                                         | Gözden geçirilmiş cümleler. Utandırma, korkutma ve kıyas yok.                                                             |
+| Adaptör | `load-coaching.ts`, `actions.ts`, `coaching-store.ts` | Oturum istemcisiyle kayıtları ve tamamlanma satırlarını okur. Yazma yalnızca öğrencinin gördüğü kazanımı işaretler.       |
+| Sayfa   | `/ogrenci`                                            | `RecommendationCard`: kısa öneri, gerekçe, sıradaki işlem. Kanıt "Neden bu öneri?" içindedir. Varsa sade anlatım ayrıdır. |
 
 - **Sıra.** Bağlı kazanım, sonra düşük doğru sayısı, sonra son iki tam LGS netinin azalması, sonra bugünkü hedefin kalanı, sonra hedef daveti. Hiçbiri uymazsa kart sonuç çıkarmaz.
 - **Örneklem.** Bir derste 14 günde 10 sorudan az kayıt varsa doğru oranı saklanmaz ve söylenmez. Oran, doğru ÷ soru yarının altındaysa o ders önerilir. Tam yarı sorun sayılmaz.
@@ -342,31 +342,33 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 
 Öğrenci bir hayvan veya bitki seçer. Puan sunucuda, `mascot-v1` ile ve yalnızca bir kez yazılır. Hatırlatma e-posta değildir; sınav sonucu içermez.
 
-| Katman | Dosyalar | Görev |
-| --- | --- | --- |
-| Kural | `constants.ts`, `rules.ts`, `notices.ts`, `messages.ts` | Aşama, rozet, görev, sessiz saat ve yasak ifade. Supabase'i bilmez. |
-| Adaptör | `src/services/supabase/mascot-store.ts` | Okuma ve tür/ayar yazması oturumdaki kullanıcıyla. Puan ve hatırlatma satırı SQL fonksiyonundan gelir. |
-| Sayfalar | `/ogrenci`, `/ogrenci/karakter`, `/ogrenci/bildirimler`, `/veli/ogrenci/[studentId]` | Seçim, puan, görev, hatırlatma ayarı. Veli karakteri salt okur; hatırlatmayı görmez. |
+| Katman   | Dosyalar                                                                             | Görev                                                                                                  |
+| -------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| Kural    | `constants.ts`, `rules.ts`, `notices.ts`, `messages.ts`                              | Aşama, rozet, görev, sessiz saat ve yasak ifade. Supabase'i bilmez.                                    |
+| Adaptör  | `src/services/supabase/mascot-store.ts`                                              | Okuma ve tür/ayar yazması oturumdaki kullanıcıyla. Puan ve hatırlatma satırı SQL fonksiyonundan gelir. |
+| Sayfalar | `/ogrenci`, `/ogrenci/karakter`, `/ogrenci/bildirimler`, `/veli/ogrenci/[studentId]` | Seçim, puan, görev, hatırlatma ayarı. Veli karakteri salt okur; hatırlatmayı görmez.                   |
 
-- **Puan.** Çalışma kaydı 5, bugünkü tüm dersler hedefi 10, deneme kaydı 5, kazanım eşleştirmesi 8. Anahtar `study_log:{id}`, `daily_goal:{tarih}`, `exam:{id}`, `outcome_review:{id}`. İkinci çağrı 0 yeni satır döner.
-- **Aşama.** 0 Yeni arkadaş, 10 Alışıyor, 30 Birlikte büyüyor, 60 Yol arkadaşı. Toplam düşmediği için aşama geri gitmez. Bir gün boş kalmak satır silmez.
+- **Puan.** Çalışma kaydı 5, bugünkü tüm dersler hedefi 10, deneme kaydı 5, kazanım eşleştirmesi 8. Anahtar `study_log:{id}`, `daily_goal:{tarih}`, `exam:{id}`, `outcome_review:{id}`. İkinci çağrı 0 yeni satır döner. Bu tablo silinmez ve ikinci bir puan sistemi açılmaz.
+- **Görünür aşama.** `growth-v1` (`src/features/mascot/growth.ts`) puan eşiğini `STAGE_LEVELS` içinden okur ve üzerine seri, farklı gün ve soru şartını ekler. Alışıyor: 7 günlük seri, 5 farklı gün, 10 puan. Birlikte büyüyor: 14 günlük seri, 10 farklı gün, 300 soru, 30 puan. Yol arkadaşı: 30 günlük seri, 20 farklı gün, 750 soru, 60 puan. Bir takvim gününde en fazla bir aşama ilerler. Aşama saklanmaz; kayıtlar değişince hesap yeniden yürür. Boş gün kazanılan aşamayı düşürmez.
+- **Seri ve sağlık.** Geçerli gün, İstanbul takviminde en az bir soruluk kaydı olan gündür. Aynı gün ikinci kayıt seriyi bir daha artırmaz. İleri tarih sayılmaz. Bugün bitmeden boş gün sayılmaz. Bir tam boş gün yorgun, art arda üç tam boş gün dinlenme görünümüdür. İlk yeni kayıttan sonra toparlanma başlar; iki ardışık çalışma günü yine sağlıklı görünüme döner. Arada boş gün olursa toparlanma serisi yeniden sayılır. Puan, rozet ve aşama silinmez.
 - **Görev.** Bugün kayıt, varsa tüm dersler günlük hedefi, varsa bağlanmamış bir deneme. Görev ayrı puan yazmaz; puan kaynak olaydadır.
-- **Rozet.** İlk kayıt, hedef, üç farklı gün, kazanım, deneme kaydı. Üç gün sayacı aradaki boş günde silinmez. Rozet metni sonuç sayısını söylemez.
-- **Hatırlatma.** Varsayılan açık, sessiz saat 21:00–08:00 (İstanbul), günde en fazla 1. Eşit saat sessiz saati kapatır. Cümle sabittir: bugün kayıt yoksa nazik bir davet. Kapalı, sessiz saat, kayıt veya sınır varken görünmez.
+- **Rozet.** İlk kayıt, hedef, üç farklı gün, kazanım, deneme kaydı. Üç gün rozeti aradaki boş günde silinmez. Rozet metni sonuç sayısını söylemez.
+- **Hatırlatma.** Varsayılan açık, sessiz saat 21:00–08:00 (İstanbul), günde en fazla 1. Eşit saat sessiz saati kapatır. Cümle sabittir: bugün kayıt yoksa nazik bir davet. Kapalı, sessiz saat, kayıt veya sınır varken görünmez. Bu, telefon bildirimi değildir.
+- **Durum bildirimi.** Seri bozulunca, dinlenme başlayınca, toparlanma başlayınca ve aşama bugün kazanılınca `in_app_notices` içine bir satır yazılır. Aynı öğrenci, tür ve gün ikinci satır açmaz. Gizlenmiş satır yenilemede geri gelmez. Cümle kodda kalır.
 - **Menü.** Alt çubuk 5 öğeyle dolu olduğu için karakter ve hatırlatma ana sayfadan açılır. Adresler durur.
-- Migration: `20261020140000_mascot.sql`. Yerelde ve production'da uygulandı (20 Ekim 2026, `npx supabase db push`; önce `--dry-run`). Yeni tablolardır; mevcut satırlar değişmedi. Staging ertelendiği için orada henüz yoktur.
+- Migration: `20261020140000_mascot.sql`. Yerelde ve production'da uygulandı (20 Ekim 2026, `npx supabase db push`; önce `--dry-run`). Yeni tablolardır; mevcut satırlar değişmedi. Staging ertelendiği için orada henüz yoktur. `20261024190000_mascot_growth_notices.sql` yeni tablo açmaz; `in_app_notices.kind` kontrolünü genişletir ve `open_growth_notice` ekler. Bu dosya bu çalışmada yazıldı. Yerel ve production veritabanına ayrıca uygulanması gerekir (`npx supabase db push`, önce `--dry-run`). Fonksiyon yokken ana sayfa açılır, karakter durumu görünür, bildirim satırı yazılmaz ve bant gösterilmez. Hata sunucu günlüğüne düşer.
 
 ## Veli paneli ve PDF rapor (Faz 11)
 
 Veli, aktif bağlantısındaki öğrencinin haftalık ve aylık özetini okur. Haftalık PDF'i sunucu üretir. Aylık PDF yoktur. Öğrenci rapor isteyemez ve indiremez. Yönetici rolü, aktif veli bağlantısı olmadan rapor açmaz.
 
-| Katman | Dosyalar | Görev |
-| --- | --- | --- |
-| Dönem | `src/features/reports/periods.ts` | İstanbul haftası ve ayı. Form yalnızca `current` veya `previous` gönderir. |
-| Belge | `document.ts`, `layout.ts`, `pdf.ts` | Metin blokları, sayfa kırılması, gömülü Nunito ile PDF. Diske yazılmaz. |
-| Yetki | `access.ts` | `canRequestReport` ve `canDownloadReport`. Supabase'i bilmez. |
-| Adaptör | `src/services/supabase/report-store.ts` | Yazma `service_role` ile, aktif bağlantı kontrolünden sonra. Okuma da öyle; indirme yeniden kontrol edilir. |
-| Sayfalar | `/veli`, `/veli/ogrenci/[studentId]`, `GET /veli/rapor/[jobId]` | Özet, indirme formu, dosya veya Türkçe ret sayfası. |
+| Katman   | Dosyalar                                                        | Görev                                                                                                       |
+| -------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Dönem    | `src/features/reports/periods.ts`                               | İstanbul haftası ve ayı. Form yalnızca `current` veya `previous` gönderir.                                  |
+| Belge    | `document.ts`, `layout.ts`, `pdf.ts`                            | Metin blokları, sayfa kırılması, gömülü Nunito ile PDF. Diske yazılmaz.                                     |
+| Yetki    | `access.ts`                                                     | `canRequestReport` ve `canDownloadReport`. Supabase'i bilmez.                                               |
+| Adaptör  | `src/services/supabase/report-store.ts`                         | Yazma `service_role` ile, aktif bağlantı kontrolünden sonra. Okuma da öyle; indirme yeniden kontrol edilir. |
+| Sayfalar | `/veli`, `/veli/ogrenci/[studentId]`, `GET /veli/rapor/[jobId]` | Özet, indirme formu, dosya veya Türkçe ret sayfası.                                                         |
 
 - **Dönem.** Bu hafta pazartesiden bugüne kadardır ve bitmediği yazılır. Geçen hafta bir önceki tam pazartesi–pazardır. Bu ay ayın birinden bugüne, geçen ay bir önceki tam takvim ayıdır. Aralık ve birim (soru, dakika, net) ekranda ve PDF'te yazılıdır.
 - **PDF.** `pdf-lib` 1.17.1 ve `@pdf-lib/fontkit` 1.1.1. Standart PDF yazı tipleri ğ, ş, ı ve İ çizemez. Nunito Regular/Bold (latin ve latin-ext, SIL OFL) `src/features/reports/fonts` altındadır. ESM paketi yalnızca varsayılan dışa aktarımı verdiği için yükleyici her iki şekli de kabul eder. Üretim tarihi İstanbul saatidir. Net formülü `Net = doğru - (yanlış / 3)` diye yazılır. Koçluk cümlesi öğrencinin kartındaki metindir; veliye kaydı yalnızca öğrencinin değiştirebileceği söylenir.
@@ -380,15 +382,15 @@ Veli, aktif bağlantısındaki öğrencinin haftalık ve aylık özetini okur. H
 
 Kök yerleşim her istekte `connection()` bekler. Böylece HTML, o isteğin nonce'u ile üretilir. `cacheComponents` açık kalır; oturum sayfaları yine dinamiktir.
 
-| Konu | Karar |
-| --- | --- |
-| PWA | `src/app/manifest.ts`, `public/icons`. Hesap sayfası Android ve iPhone ekleme adımlarını yazar. Chromium `beforeinstallprompt` verirse üstte "Ekle" çıkar. |
-| Çevrimdışı | `public/sw.js` yalnızca `/cevrimdisi` ve simgeleri önbelleğe alır. Gezinme ağdadır; ağ yoksa statik çevrimdışı sayfa gelir. Çalışma, deneme ve hesap HTML'i Cache API'ye yazılmaz. Kayıt sırasında geliştirme ortamında işçi kaydı yapılmaz. |
-| CSP | Production: nonce + `strict-dynamic`, `style-src-attr 'none'`, `upgrade-insecure-requests`. Geliştirme: React için `unsafe-eval` ve `unsafe-inline`. İlerleme çubuğu 5'er puanlık sınıflar kullanır; satır içi `style` yoktur. |
-| Hata izleme | `SENTRY_DSN` boşsa gönderim yoktur. Doluysa yalnızca `o*.ingest.de.sentry.io` kabul edilir. Gövde digest ve temizlenmiş metindir; kullanıcı, çerez ve istek yoktur. Oturum tekrarı kodda yoktur. Production: kuruluş `lgs-pusula`, bölge `de`, plan Developer (30 gün), proje `lgs-pusula-sj`. DSN gizli değişkendir. İstemci anahtarında replay kapalıdır. |
-| Saklama | `purge_retained_rows()` ve `erase_personal_data()` (`20261021160000_retention.sql`). İkisi de yalnızca `service_role`. Silme müfredatı silmez. Betik onay istemeden çağırmaz. Production'a 21 Ekim 2026'da uygulandı; fonksiyonlar çağrılmadı. |
-| Yedek | `npm run backup -- dump` şifreli dosyayı `backups/` altına yazar. AES-256-GCM, parola diske yazılmaz. Düz metin yedek tutulmaz. Saklama 30 gündür; eski dosyayı proje sahibi siler. |
-| Dışa aktarma | `npm run data -- export`. Davet özeti, PDF baytı ve oran sınırı anahtarı yoktur. Dosya depoya girmez. |
+| Konu         | Karar                                                                                                                                                                                                                                                                                                                                                       |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PWA          | `src/app/manifest.ts`, `public/icons`. Hesap sayfası Android ve iPhone ekleme adımlarını yazar. Chromium `beforeinstallprompt` verirse üstte "Ekle" çıkar.                                                                                                                                                                                                  |
+| Çevrimdışı   | `public/sw.js` yalnızca `/cevrimdisi` ve simgeleri önbelleğe alır. Gezinme ağdadır; ağ yoksa statik çevrimdışı sayfa gelir. Çalışma, deneme ve hesap HTML'i Cache API'ye yazılmaz. Kayıt sırasında geliştirme ortamında işçi kaydı yapılmaz.                                                                                                                |
+| CSP          | Production: nonce + `strict-dynamic`, `style-src-attr 'none'`, `upgrade-insecure-requests`. Geliştirme: React için `unsafe-eval` ve `unsafe-inline`. İlerleme çubuğu 5'er puanlık sınıflar kullanır; satır içi `style` yoktur.                                                                                                                              |
+| Hata izleme  | `SENTRY_DSN` boşsa gönderim yoktur. Doluysa yalnızca `o*.ingest.de.sentry.io` kabul edilir. Gövde digest ve temizlenmiş metindir; kullanıcı, çerez ve istek yoktur. Oturum tekrarı kodda yoktur. Production: kuruluş `lgs-pusula`, bölge `de`, plan Developer (30 gün), proje `lgs-pusula-sj`. DSN gizli değişkendir. İstemci anahtarında replay kapalıdır. |
+| Saklama      | `purge_retained_rows()` ve `erase_personal_data()` (`20261021160000_retention.sql`). İkisi de yalnızca `service_role`. Silme müfredatı silmez. Betik onay istemeden çağırmaz. Production'a 21 Ekim 2026'da uygulandı; fonksiyonlar çağrılmadı.                                                                                                              |
+| Yedek        | `npm run backup -- dump` şifreli dosyayı `backups/` altına yazar. AES-256-GCM, parola diske yazılmaz. Düz metin yedek tutulmaz. Saklama 30 gündür; eski dosyayı proje sahibi siler.                                                                                                                                                                         |
+| Dışa aktarma | `npm run data -- export`. Davet özeti, PDF baytı ve oran sınırı anahtarı yoktur. Dosya depoya girmez.                                                                                                                                                                                                                                                       |
 
 **Yerel deneme (21 Ekim 2026):** şifreli yedek alınıp aynı tabloya geri yüklendi. Çevrimdışı gezinme giriş formunu değil, "İnternet yok" sayfasını açtı. Production CSP'de `unsafe-eval` yok ve betik nonce'u başlıkla aynıydı.
 

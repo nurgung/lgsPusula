@@ -19,9 +19,11 @@ import { HomeGoals } from "@/features/home/components/home-goals";
 import { StagePath } from "@/features/home/components/stage-path";
 import { SubjectTiles } from "@/features/home/components/subject-tiles";
 import { WeekAndExamSummary } from "@/features/home/components/week-and-exam";
+import { GrowthNotices } from "@/features/mascot/components/growth-notices";
 import { ReminderCard } from "@/features/mascot/components/mascot-panels";
+import { evaluateGrowth } from "@/features/mascot/growth";
 import { loadOwnMascot } from "@/features/mascot/load-mascot";
-import { stageForPoints, totalPoints } from "@/features/mascot/rules";
+import { openGrowthNotices } from "@/features/mascot/load-growth";
 import { examChartWindow } from "@/features/outcomes/window";
 import { STUDENT_DATA_NOTICE } from "@/features/privacy/notice";
 import {
@@ -30,7 +32,7 @@ import {
   goalWindow,
   istanbulToday,
 } from "@/features/study/calendar";
-import { loadStudyRecords } from "@/features/study/load-study";
+import { loadStudyRecords, loadStudyContributions } from "@/features/study/load-study";
 import { sortGoals, summarizeLogs } from "@/features/study/summary";
 
 export const metadata: Metadata = { title: "Ana sayfa" };
@@ -48,14 +50,16 @@ async function StudentHome() {
   const user = await requireStudent();
   const today = istanbulToday();
   const week = goalWindow("week", today);
-  const [links, catalog, study, coaching, mascot, exams] = await Promise.all([
-    loadOwnFamilyLinks(),
-    loadCatalog({ includeArchived: false }),
-    loadStudyRecords(user.id, { from: week.from, to: today }),
-    loadCoachingReport(user.id, today),
-    loadOwnMascot(user.id, { openReminder: true }),
-    loadExamList(user.id, examChartWindow(today)),
-  ]);
+  const [links, catalog, study, coaching, mascot, exams, contributions] =
+    await Promise.all([
+      loadOwnFamilyLinks(),
+      loadCatalog({ includeArchived: false }),
+      loadStudyRecords(user.id, { from: week.from, to: today }),
+      loadCoachingReport(user.id, today),
+      loadOwnMascot(user.id, { openReminder: true }),
+      loadExamList(user.id, examChartWindow(today)),
+      loadStudyContributions(user.id, today),
+    ]);
   const explained = await loadCoachingExplanation(user, user.id, coaching, [], today);
   const subjects = catalog.map((subject) => ({ id: subject.id, name: subject.name }));
   const todayLogs = study.logs.filter((log) => log.studiedOn === today);
@@ -63,8 +67,12 @@ async function StudentHome() {
   const latest = exams[0];
   const active = links.find((link) => link.status === "active");
   const pending = links.find((link) => link.status === "pending");
-  const points = totalPoints(mascot.rewards);
-  const stage = stageForPoints(points);
+  const growth = evaluateGrowth({
+    today,
+    logs: contributions,
+    rewards: mascot.rewards,
+  });
+  const growthNotices = await openGrowthNotices(growth.notices, growth.stageName);
   const completions = goalCompletions(sortGoals(study.goals), study.logs, today);
   const weekQuestions = new Map(
     weekSummary.bySubject.map((row) => [row.subjectId, row.questionCount]),
@@ -98,6 +106,7 @@ async function StudentHome() {
         title={`Merhaba, ${user.displayName}`}
         description={`Bugün ${formatTurkishDate(today)}. Küçük bir adım da ilerleme sayılır.`}
       />
+      {growthNotices.length > 0 ? <GrowthNotices notices={growthNotices} /> : null}
       {mascot.reminderId ? (
         <div className="mb-6">
           <ReminderCard noticeId={mascot.reminderId} />
@@ -110,9 +119,9 @@ async function StudentHome() {
       */}
       <div className="grid min-w-0 gap-4">
         <StagePath
-          stageId={stage.id}
+          stageId={growth.stageId}
           species={mascot.species}
-          points={points}
+          growth={growth}
           detailed
         />
         <div className="grid min-w-0 items-start gap-4 lg:grid-cols-2">

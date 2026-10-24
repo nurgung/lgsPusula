@@ -810,3 +810,136 @@
     transform: rotateZ(8deg);
   }
 }
+
+/* growth-v1. Stage and health change the pose. The words next to the figure
+   still name the state. These are local shapes, not image files. */
+
+.species-stage[data-health="healthy"] .species-rig {
+  filter: saturate(1);
+}
+
+.species-stage[data-growth-stage="new"] {
+  scale: 0.82;
+}
+
+.species-stage[data-growth-stage="settling"] {
+  scale: 0.92;
+}
+
+.species-stage[data-growth-stage="settling"]::before,
+.species-stage[data-growth-stage="growing"]::before,
+.species-stage[data-growth-stage="companion"]::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+}
+
+.species-stage[data-growth-stage="settling"]::before {
+  top: 8%;
+  left: 8%;
+  width: 16%;
+  height: 16%;
+  border-radius: 50%;
+  background: var(--color-brand-600);
+}
+
+.species-stage[data-growth-stage="growing"]::before {
+  bottom: 16%;
+  left: 0;
+  width: 22%;
+  height: 28%;
+  border-radius: 0 80% 0 80%;
+  background: var(--color-success-700);
+}
+
+.species-stage[data-growth-stage="companion"]::before {
+  inset: 4%;
+  border: 3px solid var(--color-warning-500);
+  border-radius: 999px;
+}
+
+.species-stage[data-health="tired"] .species-rig {
+  translate: 0 12%;
+  filter: saturate(0.5);
+}
+
+.species-stage[data-health="tired"] .species-eye {
+  scale: 1 0.4;
+}
+
+.species-stage[data-health="tired"] .species-leaf,
+.species-stage[data-health="tired"] .species-flower,
+.species-stage[data-health="tired"] .species-petal {
+  rotate: 22deg;
+}
+
+.species-stage[data-health="sick"] .species-rig {
+  translate: 0 16%;
+  rotate: 8deg;
+  filter: saturate(0.15);
+}
+
+.species-stage[data-health="sick"] .species-eye {
+  scale: 1 0.1;
+}
+
+.species-stage[data-health="sick"]::after {
+  content: "";
+  position: absolute;
+  right: 8%;
+  bottom: 4%;
+  left: 8%;
+  height: 18%;
+  border-radius: 999px;
+  background: var(--color-brand-100);
+}
+
+.species-stage[data-health="sick"][data-species-figure="daisy"] .species-rig,
+.species-stage[data-health="sick"][data-species-figure="sapling"] .species-rig {
+  translate: 0 12%;
+  rotate: 16deg;
+  filter: saturate(0.12);
+}
+
+.species-stage[data-health="sick"][data-species-figure="daisy"] .species-petal,
+.species-stage[data-health="sick"][data-species-figure="sapling"] .species-leaf {
+  scale: 0.7 0.35;
+}
+
+.species-stage[data-health="recovering"] .species-rig {
+  translate: 0 4%;
+  filter: saturate(0.85);
+}
+
+.species-stage[data-health="recovering"] .species-leaf,
+.species-stage[data-health="recovering"] .species-flower {
+  rotate: -6deg;
+}
+
+.species-stage[data-health="recovering"]::after {
+  content: "";
+  position: absolute;
+  right: 6%;
+  bottom: 18%;
+  width: 20%;
+  height: 24%;
+  border-radius: 0 80% 0 80%;
+  background: var(--color-success-700);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .species-stage[data-health="tired"] .species-rig,
+  .species-stage[data-health="sick"] .species-rig,
+  .species-stage[data-health="tired"] .species-eye,
+  .species-stage[data-health="sick"] .species-eye,
+  .species-stage[data-health="tired"] .species-flower,
+  .species-stage[data-health="sick"] .species-flower,
+  .species-stage[data-health="tired"] .species-sway-pivot,
+  .species-stage[data-health="sick"] .species-sway-pivot,
+  .species-stage[data-health="tired"] .species-cat-tail,
+  .species-stage[data-health="sick"] .species-cat-tail,
+  .species-stage[data-health="tired"] .species-wing,
+  .species-stage[data-health="sick"] .species-wing {
+    animation: none;
+  }
+}

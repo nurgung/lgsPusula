@@ -160,10 +160,14 @@ const FIGURES = {
 export function SpeciesFigure({
   code,
   size = "regular",
+  health = "healthy",
+  stage = "new",
 }: {
   code: SpeciesCode;
   /** `compact` fits the current stop on the stage path. */
   size?: "regular" | "compact";
+  health?: "healthy" | "tired" | "sick" | "recovering";
+  stage?: "new" | "settling" | "growing" | "companion";
 }) {
   const Figure = FIGURES[code];
   return (
@@ -171,6 +175,8 @@ export function SpeciesFigure({
       className="species-stage"
       data-species-figure={code}
       data-figure-size={size}
+      data-health={health}
+      data-growth-stage={stage}
       aria-hidden="true"
     >
       <span className={`species-rig species-rig-${code}`}>

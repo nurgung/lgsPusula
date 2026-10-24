@@ -1,5 +1,6 @@
 import { STAGE_LEVELS, type StageId } from "@/features/mascot/constants";
-import { badgesFor, stageForPoints, type BadgeView } from "@/features/mascot/rules";
+import { badgesFor, type BadgeView } from "@/features/mascot/rules";
+import { stageRank } from "@/features/mascot/growth";
 import type { SpeciesCode } from "@/features/mascot/species";
 
 /**
@@ -12,6 +13,8 @@ export type ProgressSnapshot = {
   /** Null when the student has no all-subjects daily goal. */
   dailyGoalTarget: number | null;
   todayQuestionCount: number;
+  /** Visible growth stage, not the point ladder by itself. */
+  stageId: StageId;
 };
 
 export type CelebrationKind =
@@ -46,10 +49,8 @@ export function crossedCelebration(
   const badgeId = after.badgeIds.find((id) => !before.badgeIds.includes(id));
   if (badgeId) return { reason: "badge", badgeId };
 
-  const previous = stageForPoints(before.points);
-  const next = stageForPoints(after.points);
-  if (previous.id !== next.id && after.points > before.points) {
-    return { reason: "stage", stageId: next.id };
+  if (stageRank(after.stageId) > stageRank(before.stageId)) {
+    return { reason: "stage", stageId: after.stageId };
   }
   return null;
 }
@@ -58,7 +59,8 @@ export function celebrationCopy(kind: CelebrationKind): CelebrationCopy {
   if (kind.reason === "practice") {
     return {
       heading: "Başarıya bir adım daha yaklaştın.",
-      detail: "Bu kazanımın sorularını bitirdin. Sıradaki yanlış veya boş kazanıma geçebilirsin.",
+      detail:
+        "Bu kazanımın sorularını bitirdin. Sıradaki yanlış veya boş kazanıma geçebilirsin.",
     };
   }
   if (kind.reason === "goal") {
@@ -83,10 +85,6 @@ export function celebrationCopy(kind: CelebrationKind): CelebrationCopy {
   };
 }
 
-export function stageStillCurrent(points: number, stageId: StageId): boolean {
-  return stageForPoints(points).id === stageId;
-}
-
 export function celebrationStillHolds(
   snapshot: ProgressSnapshot,
   kind: CelebrationKind,
@@ -94,7 +92,7 @@ export function celebrationStillHolds(
   if (kind.reason === "practice") return false;
   if (kind.reason === "goal") return goalMet(snapshot);
   if (kind.reason === "badge") return snapshot.badgeIds.includes(kind.badgeId);
-  return stageStillCurrent(snapshot.points, kind.stageId);
+  return snapshot.stageId === kind.stageId;
 }
 
 export type CelebrationTask = {

@@ -131,7 +131,10 @@ export async function saveNotificationPreferences(
   };
   const existing = await readNotificationPreferences(client, studentId);
   const { error } = existing
-    ? await client.from("notification_preferences").update(row).eq("student_id", studentId)
+    ? await client
+        .from("notification_preferences")
+        .update(row)
+        .eq("student_id", studentId)
     : await client
         .from("notification_preferences")
         .insert({ student_id: studentId, ...row });
@@ -150,6 +153,22 @@ export async function openStudyReminder(client: SupabaseClient): Promise<string 
   if (data == null) return null;
   const parsed = z.uuid().safeParse(data);
   if (!parsed.success) throw new MascotStoreError("open_reminder");
+  return parsed.data;
+}
+
+export async function openGrowthNotice(
+  client: SupabaseClient,
+  kind: "streak_broken" | "mascot_sick" | "mascot_recovering" | "stage_earned",
+  noticeDate: string,
+): Promise<string | null> {
+  const { data, error } = await client.rpc("open_growth_notice", {
+    p_kind: kind,
+    p_notice_date: noticeDate,
+  });
+  if (error) fail(error, "open_growth_notice");
+  if (data == null) return null;
+  const parsed = z.uuid().safeParse(data);
+  if (!parsed.success) throw new MascotStoreError("open_growth_notice");
   return parsed.data;
 }
 
