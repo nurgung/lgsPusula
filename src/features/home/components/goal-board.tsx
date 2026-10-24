@@ -13,52 +13,58 @@ export function GoalBoard({
   goals,
   logs,
   today,
+  embedded = false,
 }: {
   goals: readonly StudyGoalView[];
   logs: readonly StudyLogView[];
   today: string;
+  /** Home already has the outer card, so this list skips a second title. */
+  embedded?: boolean;
 }) {
   const rows = goalCompletions(sortGoals(goals), logs, today);
   const daily = rows.filter((row) => row.period === "day");
   const weekly = rows.filter((row) => row.period === "week");
+  const body =
+    rows.length === 0 ? (
+      <div className="grid gap-4">
+        <StateMessage
+          variant="empty"
+          title="Henüz hedefin yok."
+          description="İstersen bir soru sayısı seç. Seçmezsen de kayıt yazabilirsin."
+        />
+        <div>
+          <ButtonLink href="/ogrenci/hedefler">Hedef belirle</ButtonLink>
+        </div>
+      </div>
+    ) : (
+      <div className="grid gap-5">
+        <GoalGroup
+          id="gunluk-hedef"
+          title="Günlük hedef"
+          rows={daily}
+          empty="Bugün için hedefin yok."
+        />
+        <GoalGroup
+          id="haftalik-hedef"
+          title="Haftalık hedef"
+          rows={weekly}
+          empty="Bu hafta için hedefin yok."
+        />
+        <div>
+          <ButtonLink href="/ogrenci/hedefler" variant="secondary">
+            Hedefi düzenle
+          </ButtonLink>
+        </div>
+      </div>
+    );
 
+  if (embedded) return body;
   return (
     <Card
       title="Hedeflerin"
       description="Gün bugünü sayar. Hafta pazartesiden pazara kadar sayılır. Birim: soru."
     >
-      {rows.length === 0 ? (
-        <div className="grid gap-4">
-          <StateMessage
-            variant="empty"
-            title="Henüz hedefin yok."
-            description="İstersen bir soru sayısı seç. Seçmezsen de kayıt yazabilirsin."
-          />
-          <div>
-            <ButtonLink href="/ogrenci/hedefler">Hedef belirle</ButtonLink>
-          </div>
-        </div>
-      ) : (
-        <div className="grid gap-6">
-          <GoalGroup
-            id="gunluk-hedef"
-            title="Günlük hedef"
-            rows={daily}
-            empty="Bugün için hedefin yok."
-          />
-          <GoalGroup
-            id="haftalik-hedef"
-            title="Haftalık hedef"
-            rows={weekly}
-            empty="Bu hafta için hedefin yok."
-          />
-          <div>
-            <ButtonLink href="/ogrenci/hedefler" variant="secondary">
-              Hedefi düzenle
-            </ButtonLink>
-          </div>
-        </div>
-      )}
+      {body}
     </Card>
   );
 }
@@ -77,7 +83,7 @@ function GoalGroup({
   return (
     <section className="grid min-w-0 gap-3" aria-labelledby={id}>
       <h3 id={id} className="text-base font-bold text-ink-900">
-        {title}
+        <span className="rounded-full bg-brand-100 px-2 py-1">{title}</span>
       </h3>
       {rows.length === 0 ? (
         <p className="text-ink-700">{empty}</p>
@@ -86,7 +92,14 @@ function GoalGroup({
           {rows.map((row) => {
             const scope = row.subjectName ?? "Tüm dersler";
             return (
-              <li key={row.goalId} className="grid min-w-0 gap-2">
+              <li
+                key={row.goalId}
+                className={
+                  row.met
+                    ? "grid min-w-0 gap-2 rounded-xl border border-success-700/40 bg-success-50 p-3"
+                    : "grid min-w-0 gap-2"
+                }
+              >
                 <ProgressMeter
                   label={scope}
                   value={row.doneQuestions}

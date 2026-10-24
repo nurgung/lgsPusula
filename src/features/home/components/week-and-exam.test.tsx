@@ -25,9 +25,9 @@ describe("WeekAndExamSummary", () => {
   it("shows subject totals and an empty exam note", () => {
     render(<WeekAndExamSummary summary={summary} exam={null} />);
     expect(screen.getByRole("heading", { name: "Bu hafta" })).toBeTruthy();
-    expect(screen.getByText("Matematik")).toBeTruthy();
-    expect(screen.getByText("10 soru · 25 dakika")).toBeTruthy();
     expect(screen.getByText(/6 doğru, 3 yanlış, 1 boş/)).toBeTruthy();
+    expect(screen.getByText("Derslere göre soru sayısı ders kutularında.")).toBeTruthy();
+    expect(screen.queryByText("10 soru · 25 dakika")).toBeNull();
     expect(screen.getByRole("heading", { name: "Son deneme" })).toBeTruthy();
     expect(screen.getByText("Henüz deneme kaydın yok.")).toBeTruthy();
     expect(screen.queryByText(/lgs-v1/)).toBeNull();

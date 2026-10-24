@@ -27,6 +27,18 @@ const PAIRS: { name: string; foreground: string; background: string; minimum: nu
     },
     { name: "error text", foreground: "#b91c1c", background: "#fef2f2", minimum: 4.5 },
     { name: "success text", foreground: "#166534", background: "#effbf3", minimum: 4.5 },
+    {
+      name: "ink on success wash",
+      foreground: "#0f1b2d",
+      background: "#effbf3",
+      minimum: 4.5,
+    },
+    {
+      name: "secondary text on success wash",
+      foreground: "#2b3a52",
+      background: "#effbf3",
+      minimum: 4.5,
+    },
     { name: "info text", foreground: "#1d4ed8", background: "#eff5ff", minimum: 4.5 },
     { name: "warning text", foreground: "#92400e", background: "#fff8eb", minimum: 4.5 },
     {

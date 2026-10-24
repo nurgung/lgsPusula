@@ -33,3 +33,45 @@ export function studentVisibleEvidence(lines: readonly string[]): string[] {
     return !HIDDEN_EVIDENCE.some((fragment) => folded.includes(fold(fragment)));
   });
 }
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * First-view sentence. Outcome wording and date ranges that already sit in the
+ * evidence list are left for the detail disclosure. Nothing new is added.
+ */
+export function coachingLead(message: string, evidence: readonly string[]): string {
+  const visible = studentVisibleEvidence(evidence);
+  let lead = message.trim();
+
+  for (const line of visible) {
+    const parts = line.split(" · ");
+    if (parts.length < 2) continue;
+    const head = parts[0]?.trim() ?? "";
+    if (fold(head).startsWith("aralik")) continue;
+    const description = parts
+      .slice(1)
+      .join(" · ")
+      .trim()
+      .replace(/[.!?]+$/u, "");
+    if (description.length < 8 || !lead.includes(description)) continue;
+    const sentence = new RegExp(
+      `\\s*${escapeRegExp(head)}\\s+kazanımı şunu söyler:\\s*${escapeRegExp(description)}\\.?`,
+      "u",
+    );
+    lead = lead.replace(sentence, "");
+  }
+
+  if (visible.some((line) => fold(line).startsWith("aralik"))) {
+    lead = lead.replace(
+      /\s*\(?\s*\d{1,2}\s+\p{L}+\s+\d{4}\s+–\s+\d{1,2}\s+\p{L}+\s+\d{4}(?:\s+arasında)?\s*\)?/gu,
+      " ",
+    );
+  }
+
+  lead = lead.replace(/\s+dersinde\s*\.\s*/u, " dersinde ");
+  lead = lead.replace(/dersinde\s+Bu\b/u, "dersinde bu");
+  return lead.replace(/\s{2,}/gu, " ").replace(/\s+([.,])/gu, "$1").trim();
+}

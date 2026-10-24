@@ -42,10 +42,18 @@ describe("StagePath", () => {
     expect(document.querySelector("svg")).toBeNull();
     expect(screen.getAllByText("Sırada")).toHaveLength(2);
     expect(screen.getByText("12")).toBeTruthy();
+    expect(screen.getByText("Kalan 18 karakter puanı.")).toBeTruthy();
+    expect(screen.getByText("12 / 30 karakter puanı")).toBeTruthy();
     expect(screen.queryByText(/Level|Explorer/)).toBeNull();
     expect(screen.getByRole("link", { name: "Karaktere bak" }).getAttribute("href")).toBe(
       "/ogrenci/karakter",
     );
+  });
+
+  it("names the top stage without a remaining-point line", () => {
+    render(<StagePath stageId="companion" species="cat" points={60} detailed />);
+    expect(screen.getByText("Bu en yüksek aşama.")).toBeTruthy();
+    expect(screen.queryByText(/Kalan/)).toBeNull();
   });
 });
 
@@ -78,6 +86,51 @@ describe("SubjectTiles", () => {
   it("explains an empty catalog", () => {
     render(<SubjectTiles subjects={[]} />);
     expect(screen.getByText("Ders listesi henüz hazır değil.")).toBeTruthy();
+  });
+
+  it("shows an empty week without inventing a score", () => {
+    render(
+      <SubjectTiles
+        weekLabel="19 Ekim 2026 – 23 Ekim 2026"
+        subjects={[{ id: "ders-1", name: "Matematik", weekQuestions: 0, goals: [] }]}
+      />,
+    );
+    expect(screen.getByText("Bu hafta henüz ders kaydı yok.")).toBeTruthy();
+    expect(screen.queryByText(/%|başarı|sıralama/i)).toBeNull();
+    expect(screen.getByRole("link", { name: "Matematik" }).getAttribute("href")).toBe(
+      "/ogrenci/calisma/yeni?ders=ders-1",
+    );
+  });
+
+  it("shows this week's questions and a real subject goal", () => {
+    render(
+      <SubjectTiles
+        weekLabel="19 Ekim 2026 – 23 Ekim 2026"
+        subjects={[
+          {
+            id: "ders-1",
+            name: "Matematik",
+            weekQuestions: 8,
+            goals: [
+              {
+                id: "week-1",
+                periodLabel: "Haftalık hedef",
+                doneQuestions: 8,
+                targetQuestions: 20,
+                met: false,
+              },
+            ],
+          },
+        ]}
+      />,
+    );
+    const link = screen.getByRole("link", { name: /Matematik/ });
+    expect(link.getAttribute("href")).toBe("/ogrenci/calisma/yeni?ders=ders-1");
+    expect(link.textContent).toContain("Bu hafta 8 soru");
+    expect(link.textContent).toContain("8 / 20 soru");
+    expect(link.textContent).toContain("Kalan 12 soru.");
+    expect(link.textContent).not.toMatch(/Hedefe ulaştın/);
+    expect(screen.queryByText(/%|sıralama/i)).toBeNull();
   });
 });
 

@@ -37,7 +37,8 @@ test("a new student gets an invitation, not an academic conclusion", async ({ pa
   await expect(page).toHaveURL(/\/ogrenci$/);
 
   const card = suggestion(page);
-  await expect(card.getByRole("heading", { name: "Neden?" })).toBeVisible();
+  await expect(card.getByRole("heading", { name: "Neden bu öneri?" })).toHaveCount(0);
+  await expect(card.getByText(/günlük hedef satırı yok/)).toBeVisible();
   await expect(card.getByText(/küçük bir soru hedefi belirleyebilirsin/)).toBeVisible();
   await expect(card.getByRole("link", { name: "Hedef belirle" })).toHaveAttribute(
     "href",
@@ -74,7 +75,7 @@ test("a low correct count on enough questions explains the subject suggestion", 
     card.getByText(new RegExp(`${catalog.subjectName} dersinde`)),
   ).toBeVisible();
   await expect(card.getByText(/10 sorudan 2 tanesi doğruydu/)).toBeVisible();
-  await expect(card.getByRole("heading", { name: "Neden?" })).toBeVisible();
+  await card.getByRole("heading", { name: "Neden bu öneri?" }).click();
   await expect(card.getByText(/2 doğru \/ 10 soru/)).toBeVisible();
   await expect(card.getByRole("link", { name: "Çalışma kaydı yaz" })).toHaveAttribute(
     "href",

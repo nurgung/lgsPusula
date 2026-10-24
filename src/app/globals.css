@@ -9,11 +9,11 @@
     var(--font-nunito), ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
 
   --color-canvas: #f6f8fb;
-  /* Softer ground for the student home bands. Text stays on ink tokens. */
+  /* Reserved soft wash. The student home sits on the neutral canvas; cards use surface. */
   --color-canvas-soft: #e7f3f0;
   --color-surface: #ffffff;
   --color-border: #d5dde8;
-  /* Lesson tiles. The subject name carries the meaning; the wash does not. */
+  /* Reserved lesson washes. Home tiles stay on surface so a subject is not identified by color. */
   --color-tile-1: #e5f4f1;
   --color-tile-2: #fff3e0;
   --color-tile-3: #e7eefb;

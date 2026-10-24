@@ -32,10 +32,12 @@ Renk token'ları merkezi tema dosyasında tanımlanmalı; bileşenlere rastgele 
 
 Hedef yerleşim `roadmap.md` Faz 14'tedir. Örnek görseller dizilimin örneğidir; bölümleri birebir kopyalanmaz. Küçük ekranda bantlar alt alta iner. Menü değişmez.
 
-- Üst yol: dört aşama durağı. Güncel durak, seçili karakterle işaretlenir.
-- Günlük hedefler: bugünkü kayıt, soru hedefi ve varsa kazanım işi. Tamamlanan satır işaretlidir.
-- Ders karoları: katalogdaki gerçek dersler.
-- Alt özet: haftalık soru ve dakika, son deneme neti, koçluk önerisi, gizlilik ve veli bağlantısı.
+- Üst yol: dört aşama durağı. Güncel durak, seçili karakterle işaretlenir. Karakter puanı ve sonraki aşamaya kalan puan yazıyla durur.
+- Günlük hedefler: bugünkü kayıt, soru hedefi ve varsa kazanım işi. Açık görev, tamamlanandan daha belirgindir. Tamamlanan satır işaretlidir. Günlük ve haftalık soru hedefleri aynı bölümde, ayrı başlıklarla durur.
+- Ders karoları: katalogdaki gerçek dersler. Kutuda bu haftanın soru sayısı ve varsa o derse ait hedef vardır. Veri yoksa boş durum gösterilir. Başarı yüzdesi, performans puanı veya sıralama üretilmez.
+- Alt özet: haftalık soru ve dakika toplamı, son deneme neti, koçluk önerisi, gizlilik ve veli bağlantısı.
+
+Koçluk kartının ilk görünümünde kısa öneri, sıradaki işlem, kısa gerekçe ve bağlantı durur. Kazanım kodu, uzun açıklama, yanlış ve boş sayıları ile tarih aralığı "Neden bu öneri?" içindedir. Yapay zekâ cümlesi varsa "Sade anlatım" başlığıyla kural cümlesinden ayrı durur. Sayfa zemini nötr kalır; kartlar yüzey rengindedir. Ders kutuları tek renktir.
 
 Hedef, rozet veya aşama bu kayıtta ilk kez tamamlanırsa bir pencere açılır. Pencerede aynı yol, işaretli hedefler, madalya, kazanılanın gerçek adı ve "Tamam" düğmesi vardır. Ada haritası, İngilizce seviye adı, kelime kartı, NFT, jeton, ücretli plan, ruh hâli, uydurma yüzde ve boş günü sıfırlayan seri yoktur. Bir gün ara vermek karakteri geriletmez.
 

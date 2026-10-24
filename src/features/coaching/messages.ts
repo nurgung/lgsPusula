@@ -15,7 +15,7 @@ import {
 
 export const COACHING_MESSAGES = {
   cardTitle: "Bugünkü öneri",
-  whyHeading: "Neden?",
+  whyHeading: "Neden bu öneri?",
   actionOutcome: "Kazanımlara bak",
   actionPractice: "Çalışma kaydı yaz",
   actionExam: "Gelişimi gör",

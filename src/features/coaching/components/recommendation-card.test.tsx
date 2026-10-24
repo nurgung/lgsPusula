@@ -17,8 +17,9 @@ describe("RecommendationCard", () => {
       />,
     );
     expect(screen.getByRole("heading", { name: "Bugünkü öneri" })).toBeTruthy();
-    expect(screen.getByRole("heading", { name: "Neden?" })).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "Neden bu öneri?" })).toBeNull();
     expect(screen.getByText(/küçük bir soru hedefi/)).toBeTruthy();
+    expect(screen.getByText(/günlük hedef satırı yok/)).toBeTruthy();
     expect(screen.queryByText(/Kural:/)).toBeNull();
     expect(screen.queryByText(/Europe\/Istanbul/)).toBeNull();
     expect(screen.queryByText(/coaching-v1/)).toBeNull();
@@ -81,7 +82,8 @@ describe("RecommendationCard", () => {
         })}
       />,
     );
-    expect(screen.getByRole("heading", { name: "Neden?" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Neden bu öneri?" })).toBeTruthy();
+    expect(screen.getByText("Bugünkü hedef tamam.")).toBeTruthy();
     expect(screen.queryByRole("link", { name: "Hedef belirle" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Kayıt yaz" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Tamamlandı" })).toBeNull();
@@ -118,8 +120,35 @@ describe("RecommendationCard", () => {
         })}
       />,
     );
-    expect(screen.getByText(/2 soru çöz/)).toBeTruthy();
+    const lead = screen.getByText(/bu kazanım için 2 soru çöz/);
+    expect(lead.textContent).not.toMatch(/Mevsimlerin/);
+    expect(lead.textContent).not.toMatch(/F\.8\.1\.1\.1/);
+    expect(screen.getByText(/Mevsimlerin oluşumuna/)).toBeTruthy();
+    expect(screen.getByText(/2 yanlış, 0 boş/)).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Neden bu öneri?" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Tamamlandı" })).toBeTruthy();
+    expect(screen.queryByText(/Öneri tamamlandı|öneri tamam/i)).toBeNull();
+  });
+
+  it("keeps a model sentence out of the rule lead", () => {
+    render(
+      <RecommendationCard
+        explanation="İstersen bugün kısa bir tekrar yapabilirsin."
+        report={buildCoachingReport({
+          today: "2026-10-20",
+          logs: [],
+          goals: [],
+          exams: [],
+          mistakes: [],
+        })}
+      />,
+    );
+    const lead = screen.getByText(/küçük bir soru hedefi/);
+    expect(lead.textContent).not.toMatch(/kısa bir tekrar/);
+    expect(screen.getByRole("heading", { name: "Sade anlatım" })).toBeTruthy();
+    expect(
+      screen.getByText("Bu cümle bir öneridir. Kayıtlarını ve puanını değiştirmez."),
+    ).toBeTruthy();
   });
 
   it("hides Tamamlandı when a parent is reading the same outcome", () => {

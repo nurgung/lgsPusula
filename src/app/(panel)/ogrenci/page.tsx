@@ -7,15 +7,15 @@ import { requireStudent } from "@/features/access/guards";
 import { loadCoachingExplanation } from "@/features/ai/load-explanation";
 import { RecommendationCard } from "@/features/coaching/components/recommendation-card";
 import { loadCoachingReport } from "@/features/coaching/load-coaching";
+import { goalCompletions } from "@/features/coaching/metrics";
 import { loadCatalog } from "@/features/curriculum/load-catalog";
 import { loadExamList } from "@/features/exams/load-exams";
 import { CreateInviteForm } from "@/features/family/components/create-invite-form";
 import { RespondLinkForms } from "@/features/family/components/respond-link-forms";
 import { RevokeLinkButton } from "@/features/family/components/revoke-link-button";
 import { loadOwnFamilyLinks } from "@/features/family/load-links";
-import { DailyGoals } from "@/features/home/components/daily-goals";
 import { EarnedBadges } from "@/features/home/components/earned-badges";
-import { GoalBoard } from "@/features/home/components/goal-board";
+import { HomeGoals } from "@/features/home/components/home-goals";
 import { StagePath } from "@/features/home/components/stage-path";
 import { SubjectTiles } from "@/features/home/components/subject-tiles";
 import { WeekAndExamSummary } from "@/features/home/components/week-and-exam";
@@ -24,9 +24,14 @@ import { loadOwnMascot } from "@/features/mascot/load-mascot";
 import { stageForPoints, totalPoints } from "@/features/mascot/rules";
 import { examChartWindow } from "@/features/outcomes/window";
 import { STUDENT_DATA_NOTICE } from "@/features/privacy/notice";
-import { formatTurkishDate, goalWindow, istanbulToday } from "@/features/study/calendar";
+import {
+  formatTurkishDate,
+  formatTurkishDateRange,
+  goalWindow,
+  istanbulToday,
+} from "@/features/study/calendar";
 import { loadStudyRecords } from "@/features/study/load-study";
-import { summarizeLogs } from "@/features/study/summary";
+import { sortGoals, summarizeLogs } from "@/features/study/summary";
 
 export const metadata: Metadata = { title: "Ana sayfa" };
 export const instant = false;
@@ -60,6 +65,24 @@ async function StudentHome() {
   const pending = links.find((link) => link.status === "pending");
   const points = totalPoints(mascot.rewards);
   const stage = stageForPoints(points);
+  const completions = goalCompletions(sortGoals(study.goals), study.logs, today);
+  const weekQuestions = new Map(
+    weekSummary.bySubject.map((row) => [row.subjectId, row.questionCount]),
+  );
+  const subjectTiles = subjects.map((subject) => ({
+    id: subject.id,
+    name: subject.name,
+    weekQuestions: weekQuestions.get(subject.id) ?? 0,
+    goals: completions
+      .filter((row) => row.subjectId === subject.id)
+      .map((row) => ({
+        id: row.goalId,
+        periodLabel: row.period === "day" ? "Günlük hedef" : "Haftalık hedef",
+        doneQuestions: row.doneQuestions,
+        targetQuestions: row.targetQuestions,
+        met: row.met,
+      })),
+  }));
   const taskFacts = {
     todayLogCount: todayLogs.length,
     todayQuestionCount: todayLogs.reduce((sum, log) => sum + log.questionCount, 0),
@@ -83,26 +106,32 @@ async function StudentHome() {
       {/*
         Four bands. Source order is the phone: path, today's goals, lesson tiles,
         then the summary. From lg, goals and tiles sit side by side.
+        The page canvas stays neutral; cards carry the surface.
       */}
-      <div className="grid min-w-0 gap-6 rounded-card bg-canvas-soft p-3 sm:p-5">
+      <div className="grid min-w-0 gap-4">
         <StagePath
           stageId={stage.id}
           species={mascot.species}
           points={points}
           detailed
         />
-        <div className="grid min-w-0 gap-6 lg:grid-cols-2 lg:items-start">
-          <div className="grid min-w-0 gap-6">
-            <DailyGoals facts={taskFacts} />
-            <GoalBoard goals={study.goals} logs={study.logs} today={today} />
-          </div>
-          <SubjectTiles subjects={subjects} />
+        <div className="grid min-w-0 items-start gap-4 lg:grid-cols-2">
+          <HomeGoals
+            facts={taskFacts}
+            goals={study.goals}
+            logs={study.logs}
+            today={today}
+          />
+          <SubjectTiles
+            subjects={subjectTiles}
+            weekLabel={formatTurkishDateRange(weekSummary)}
+          />
         </div>
-        <div className="grid min-w-0 gap-6" role="region" aria-labelledby="alt-ozet">
+        <div className="grid min-w-0 gap-4" role="region" aria-labelledby="alt-ozet">
           <h2 id="alt-ozet" className="text-lg font-bold text-ink-900">
             Özet
           </h2>
-          <div className="grid min-w-0 gap-6 lg:grid-cols-2 lg:items-start">
+          <div className="grid min-w-0 items-start gap-4 lg:grid-cols-2">
             <WeekAndExamSummary
               summary={weekSummary}
               exam={

@@ -31,29 +31,17 @@ export function WeekAndExamSummary({
           <StateMessage
             variant="empty"
             title="Bu hafta henüz çalışma kaydı yok."
-            description="Kayıt yazınca derslere göre burada görürsün. Bir gün ara vermen bir sorun değil."
+            description="Kayıt yazınca toplam burada, derslere göre sayılar ders kutularında görünür. Bir gün ara vermen bir sorun değil."
           />
         ) : (
-          <div className="grid min-w-0 gap-3">
-            <ul className="grid min-w-0 gap-2">
-              {summary.bySubject.map((row) => (
-                <li
-                  key={row.subjectId}
-                  className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 border-b border-border pb-2 last:border-b-0 last:pb-0"
-                >
-                  <span className="min-w-0 font-semibold break-words text-ink-900">
-                    {row.subjectName}
-                  </span>
-                  <span className="text-ink-700 tabular-nums">
-                    {row.questionCount} soru · {row.durationMinutes} dakika
-                  </span>
-                </li>
-              ))}
-            </ul>
+          <div className="grid min-w-0 gap-2">
             <p className="font-semibold text-ink-900 tabular-nums">
               Toplam {summary.questionCount} soru · {summary.correctCount} doğru,{" "}
               {summary.wrongCount} yanlış, {summary.blankCount} boş ·{" "}
               {summary.durationMinutes} dakika
+            </p>
+            <p className="text-sm text-ink-700">
+              Derslere göre soru sayısı ders kutularında.
             </p>
           </div>
         )}
