@@ -59,6 +59,18 @@ const PAIRS: { name: string; foreground: string; background: string; minimum: nu
       background: "#fff8eb",
       minimum: 4.5,
     },
+    {
+      name: "ink on brand wash",
+      foreground: "#0f1b2d",
+      background: "#effcfa",
+      minimum: 4.5,
+    },
+    {
+      name: "help text on brand wash",
+      foreground: "#4a5870",
+      background: "#effcfa",
+      minimum: 4.5,
+    },
   ];
 
 describe("design token contrast", () => {

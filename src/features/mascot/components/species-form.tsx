@@ -8,7 +8,7 @@ import { saveSpeciesAction } from "../actions";
 import { INITIAL_MASCOT_FORM_STATE } from "../form-state";
 import { MASCOT_MESSAGES } from "../messages";
 import { SPECIES, type SpeciesCode } from "../species";
-import { MascotMark } from "./mascot-mark";
+import { SpeciesFigure } from "./species-figure";
 
 export function SpeciesForm({ current }: { current: SpeciesCode | null }) {
   const [state, formAction, pending] = useActionState(
@@ -28,7 +28,10 @@ export function SpeciesForm({ current }: { current: SpeciesCode | null }) {
       {state.status === "error" && !speciesError ? (
         <StateMessage variant="error" title={state.message} />
       ) : null}
-      <fieldset className="grid min-w-0 gap-2" aria-describedby={speciesError ? legendId : undefined}>
+      <fieldset
+        className="grid min-w-0 gap-2"
+        aria-describedby={speciesError ? legendId : undefined}
+      >
         <legend id={legendId} className="font-semibold text-ink-900">
           Karakterin
         </legend>
@@ -36,11 +39,11 @@ export function SpeciesForm({ current }: { current: SpeciesCode | null }) {
         {speciesError ? (
           <p className="text-sm font-semibold text-danger-700">{speciesError}</p>
         ) : null}
-        <div className="grid min-w-0 gap-2">
+        <div className="grid min-w-0 gap-3 sm:grid-cols-2">
           {SPECIES.map((species) => (
             <label
               key={species.code}
-              className="flex min-h-11 min-w-0 items-center gap-3 rounded-xl border border-border px-3 py-2"
+              className="flex min-h-11 min-w-0 cursor-pointer items-center gap-3 rounded-xl border-2 border-border bg-surface px-3 py-2 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50"
             >
               <input
                 type="radio"
@@ -50,7 +53,7 @@ export function SpeciesForm({ current }: { current: SpeciesCode | null }) {
                 className="size-5 shrink-0"
                 required
               />
-              <MascotMark code={species.code} />
+              <SpeciesFigure code={species.code} />
               <span className="min-w-0">
                 <span className="block font-semibold text-ink-900">{species.name}</span>
                 <span className="block text-sm text-ink-600">

@@ -1,0 +1,666 @@
+.species-stage {
+  position: relative;
+  display: block;
+  width: 6rem;
+  height: 7rem;
+  flex-shrink: 0;
+  perspective: 340px;
+  pointer-events: none;
+}
+
+.species-rig {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(12deg) rotateY(28deg);
+}
+
+.species-ball,
+.species-cat-tail,
+.species-flower,
+.species-wing,
+.species-leaf {
+  position: absolute;
+  transform-style: preserve-3d;
+}
+
+.species-ball i {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 32% 28%,
+    var(--color-surface),
+    var(--species-fill) 48%,
+    color-mix(in srgb, var(--species-fill) 58%, var(--color-ink-900))
+  );
+}
+
+.species-ball i:nth-child(2) {
+  transform: rotateY(60deg);
+}
+
+.species-ball i:nth-child(3) {
+  transform: rotateY(120deg);
+}
+
+.species-fill-brand {
+  --species-fill: var(--color-brand-600);
+}
+
+.species-fill-brand-dark {
+  --species-fill: var(--color-brand-800);
+}
+
+.species-fill-brand-soft {
+  --species-fill: var(--color-brand-100);
+}
+
+.species-fill-green {
+  --species-fill: var(--color-success-700);
+}
+
+.species-fill-amber {
+  --species-fill: var(--color-warning-500);
+}
+
+.species-fill-amber-dark {
+  --species-fill: var(--color-warning-800);
+}
+
+.species-fill-cream {
+  --species-fill: var(--color-warning-50);
+}
+
+.species-fill-ink {
+  --species-fill: var(--color-ink-700);
+}
+
+.species-shadow {
+  position: absolute;
+  left: 16%;
+  bottom: 5%;
+  width: 68%;
+  height: 14%;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-ink-900) 16%, transparent);
+  transform: rotateX(68deg);
+}
+
+.species-eye {
+  position: absolute;
+  width: 11%;
+  height: 13%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 32%,
+    var(--color-surface) 0 16%,
+    var(--color-ink-900) 18% 100%
+  );
+  transform: translateZ(24px);
+}
+
+.species-ear {
+  position: absolute;
+  width: 16%;
+  height: 20%;
+  background: linear-gradient(var(--color-brand-800), var(--color-brand-600));
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  transform: translateZ(10px);
+}
+
+.species-ear-inner {
+  background: var(--color-warning-50);
+  width: 8%;
+  height: 10%;
+  transform: translateZ(14px);
+}
+
+.species-nose {
+  position: absolute;
+  width: 8%;
+  height: 6%;
+  border-radius: 50%;
+  background: var(--color-warning-500);
+  transform: translateZ(30px);
+}
+
+.species-whisker {
+  position: absolute;
+  width: 18%;
+  height: 2px;
+  background: var(--color-ink-700);
+  transform: translateZ(26px);
+}
+
+.species-spot,
+.species-beak,
+.species-wing,
+.species-tail-feather,
+.species-leg,
+.species-stem,
+.species-leaf,
+.species-petal,
+.species-daisy-center {
+  position: absolute;
+  display: block;
+}
+
+.species-cat-body {
+  left: 24%;
+  bottom: 12%;
+  width: 54%;
+  height: 42%;
+}
+
+.species-cat-chest {
+  left: 36%;
+  bottom: 20%;
+  width: 32%;
+  height: 24%;
+  transform: translateZ(12px);
+}
+
+.species-cat-head {
+  left: 30%;
+  bottom: 42%;
+  width: 46%;
+  height: 40%;
+  transform: translateZ(8px);
+}
+
+.species-cat-ear-l {
+  left: 30%;
+  bottom: 74%;
+  transform: translateZ(12px) rotateZ(-18deg);
+}
+
+.species-cat-ear-r {
+  left: 54%;
+  bottom: 74%;
+  transform: translateZ(14px) rotateZ(16deg);
+}
+
+.species-cat-ear-l-inner {
+  left: 34%;
+  bottom: 76%;
+}
+
+.species-cat-ear-r-inner {
+  left: 58%;
+  bottom: 76%;
+}
+
+.species-cat-eye-l {
+  left: 38%;
+  bottom: 58%;
+}
+
+.species-cat-eye-r {
+  left: 56%;
+  bottom: 59%;
+}
+
+.species-cat-nose {
+  left: 48%;
+  bottom: 50%;
+}
+
+.species-cat-whisker-l {
+  left: 22%;
+  bottom: 50%;
+  transform: translateZ(26px) rotateZ(12deg);
+}
+
+.species-cat-whisker-r {
+  left: 60%;
+  bottom: 51%;
+  transform: translateZ(26px) rotateZ(-10deg);
+}
+
+.species-cat-paw-l,
+.species-cat-paw-r {
+  bottom: 8%;
+  width: 18%;
+  height: 12%;
+  transform: translateZ(16px);
+}
+
+.species-cat-paw-l {
+  left: 30%;
+}
+
+.species-cat-paw-r {
+  left: 54%;
+}
+
+.species-cat-tail {
+  left: 18%;
+  bottom: 18%;
+  width: 22%;
+  height: 30%;
+  transform-origin: 80% 80%;
+  transform: rotateZ(18deg);
+}
+
+.species-cat-tail-a {
+  left: 0;
+  bottom: 10%;
+  width: 80%;
+  height: 55%;
+}
+
+.species-turtle-plastron {
+  left: 18%;
+  bottom: 14%;
+  width: 64%;
+  height: 28%;
+}
+
+.species-turtle-shell {
+  left: 10%;
+  bottom: 22%;
+  width: 76%;
+  height: 52%;
+  transform: scaleY(0.72);
+}
+
+.species-spot {
+  width: 12%;
+  height: 8%;
+  border-radius: 50%;
+  background: var(--color-warning-800);
+  transform: translateZ(18px);
+}
+
+.species-turtle-spot-a {
+  left: 28%;
+  bottom: 48%;
+}
+
+.species-turtle-spot-b {
+  left: 48%;
+  bottom: 54%;
+}
+
+.species-turtle-head {
+  left: 62%;
+  bottom: 24%;
+  width: 28%;
+  height: 26%;
+  transform: translateZ(20px);
+}
+
+.species-turtle-eye {
+  left: 74%;
+  bottom: 36%;
+  width: 8%;
+  height: 9%;
+  transform: translateZ(36px);
+}
+
+.species-turtle-leg-a,
+.species-turtle-leg-b,
+.species-turtle-leg-c,
+.species-turtle-leg-d {
+  bottom: 12%;
+  width: 16%;
+  height: 12%;
+}
+
+.species-turtle-leg-a {
+  left: 16%;
+  transform: translateZ(10px);
+}
+
+.species-turtle-leg-b {
+  left: 66%;
+  transform: translateZ(12px);
+}
+
+.species-turtle-leg-c {
+  left: 22%;
+  transform: translateZ(-8px);
+}
+
+.species-turtle-leg-d {
+  left: 58%;
+  transform: translateZ(-6px);
+}
+
+.species-sparrow-body {
+  left: 28%;
+  bottom: 22%;
+  width: 42%;
+  height: 38%;
+}
+
+.species-sparrow-belly {
+  left: 36%;
+  bottom: 24%;
+  width: 28%;
+  height: 24%;
+  transform: translateZ(12px);
+}
+
+.species-sparrow-head {
+  left: 46%;
+  bottom: 46%;
+  width: 30%;
+  height: 28%;
+  transform: translateZ(10px);
+}
+
+.species-sparrow-eye {
+  left: 58%;
+  bottom: 58%;
+  width: 9%;
+  height: 10%;
+  transform: translateZ(28px);
+}
+
+.species-beak {
+  left: 70%;
+  bottom: 52%;
+  width: 16%;
+  height: 10%;
+  background: var(--color-warning-500);
+  clip-path: polygon(0 20%, 100% 50%, 0 80%);
+  transform: translateZ(22px);
+}
+
+.species-wing {
+  left: 24%;
+  bottom: 32%;
+  width: 34%;
+  height: 22%;
+  border-radius: 50% 40% 50% 40%;
+  background: linear-gradient(var(--color-ink-700), var(--color-warning-800));
+  transform-origin: 80% 50%;
+  transform: rotateZ(-18deg) translateZ(6px);
+}
+
+.species-sparrow-tail {
+  left: 16%;
+  bottom: 40%;
+  width: 22%;
+  height: 12%;
+  border-radius: 40%;
+  background: var(--color-ink-700);
+  transform: rotateZ(24deg) translateZ(-4px);
+}
+
+.species-leg {
+  bottom: 10%;
+  width: 3px;
+  height: 16%;
+  border-radius: 2px;
+  background: var(--color-warning-800);
+}
+
+.species-sparrow-leg-l {
+  left: 42%;
+}
+
+.species-sparrow-leg-r {
+  left: 54%;
+}
+
+.species-stem {
+  left: 48%;
+  bottom: 12%;
+  width: 6%;
+  height: 42%;
+  border-radius: 999px;
+  background: linear-gradient(var(--color-success-700), var(--color-brand-800));
+}
+
+.species-leaf {
+  width: 28%;
+  height: 14%;
+  border-radius: 0 70% 0 70%;
+  background: linear-gradient(135deg, var(--color-tile-4), var(--color-success-700));
+}
+
+.species-daisy-leaf-l {
+  left: 18%;
+  bottom: 28%;
+  transform: rotateZ(-36deg);
+}
+
+.species-daisy-leaf-r {
+  left: 52%;
+  bottom: 36%;
+  transform: rotateZ(32deg) scaleX(-1);
+}
+
+.species-sway-pivot {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform-origin: 50% 78%;
+}
+
+.species-flower {
+  left: 50%;
+  top: 8%;
+  width: 78%;
+  height: 62%;
+  transform: translateX(-50%);
+}
+
+.species-petal {
+  left: 32%;
+  top: 4%;
+  width: 36%;
+  height: 46%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 40% 30%,
+    var(--color-surface),
+    var(--color-warning-50) 58%,
+    var(--color-warning-800)
+  );
+  transform-origin: 50% 115%;
+}
+
+.species-petal:nth-child(1) {
+  transform: rotate(0deg);
+}
+
+.species-petal:nth-child(2) {
+  transform: rotate(45deg);
+}
+
+.species-petal:nth-child(3) {
+  transform: rotate(90deg);
+}
+
+.species-petal:nth-child(4) {
+  transform: rotate(135deg);
+}
+
+.species-petal:nth-child(5) {
+  transform: rotate(180deg);
+}
+
+.species-petal:nth-child(6) {
+  transform: rotate(225deg);
+}
+
+.species-petal:nth-child(7) {
+  transform: rotate(270deg);
+}
+
+.species-petal:nth-child(8) {
+  transform: rotate(315deg);
+}
+
+.species-daisy-center {
+  left: 30%;
+  top: 28%;
+  width: 40%;
+  height: 42%;
+  transform: translateZ(16px);
+}
+
+.species-sapling-soil {
+  left: 22%;
+  bottom: 8%;
+  width: 56%;
+  height: 18%;
+  transform: scaleY(0.55);
+}
+
+.species-sapling-stem {
+  height: 48%;
+}
+
+.species-sapling-leaf-l {
+  left: 16%;
+  bottom: 42%;
+  width: 34%;
+  height: 16%;
+  transform: rotateZ(-32deg);
+}
+
+.species-sapling-leaf-r {
+  left: 50%;
+  bottom: 52%;
+  width: 32%;
+  height: 15%;
+  transform: rotateZ(28deg) scaleX(-1);
+}
+
+.species-sapling-bud {
+  left: 40%;
+  bottom: 66%;
+  width: 20%;
+  height: 18%;
+  border-radius: 50% 50% 40% 40%;
+  background: linear-gradient(var(--color-brand-600), var(--color-success-700));
+  transform: translateZ(8px);
+}
+
+@media (min-width: 640px) {
+  .species-stage {
+    width: 7rem;
+    height: 8rem;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .species-rig {
+    animation: species-turn 6.5s ease-in-out infinite;
+  }
+
+  .species-cat-eye-l,
+  .species-cat-eye-r,
+  .species-sparrow-eye {
+    animation: species-blink 3.6s linear infinite;
+  }
+
+  .species-cat-tail {
+    animation: species-wag 1.8s ease-in-out infinite;
+  }
+
+  .species-turtle-head {
+    animation: species-nod 2.4s ease-in-out infinite;
+  }
+
+  .species-wing {
+    animation: species-flap 1.6s ease-in-out infinite;
+  }
+
+  .species-flower {
+    animation: species-flower-sway 2.6s ease-in-out infinite;
+  }
+
+  .species-sway-pivot {
+    animation: species-sway 2.6s ease-in-out infinite;
+  }
+
+  .species-sway-late {
+    animation-delay: 0.35s;
+  }
+}
+
+@keyframes species-turn {
+  0%,
+  100% {
+    transform: rotateX(12deg) rotateY(-34deg) translateY(0);
+  }
+
+  50% {
+    transform: rotateX(12deg) rotateY(34deg) translateY(-6px);
+  }
+}
+
+@keyframes species-blink {
+  0%,
+  42%,
+  50%,
+  100% {
+    transform: translateZ(24px) scaleY(1);
+  }
+
+  46% {
+    transform: translateZ(24px) scaleY(0.15);
+  }
+}
+
+@keyframes species-wag {
+  0%,
+  100% {
+    transform: rotateZ(12deg);
+  }
+
+  50% {
+    transform: rotateZ(-14deg);
+  }
+}
+
+@keyframes species-nod {
+  0%,
+  100% {
+    transform: translateZ(20px) translateY(0);
+  }
+
+  50% {
+    transform: translateZ(26px) translateY(-4px);
+  }
+}
+
+@keyframes species-flap {
+  0%,
+  100% {
+    transform: rotateZ(-24deg) translateZ(4px);
+  }
+
+  50% {
+    transform: rotateZ(14deg) translateZ(14px);
+  }
+}
+
+@keyframes species-flower-sway {
+  0%,
+  100% {
+    transform: translateX(-50%) rotateZ(-6deg);
+  }
+
+  50% {
+    transform: translateX(-50%) rotateZ(8deg);
+  }
+}
+
+@keyframes species-sway {
+  0%,
+  100% {
+    transform: rotateZ(-6deg);
+  }
+
+  50% {
+    transform: rotateZ(8deg);
+  }
+}
