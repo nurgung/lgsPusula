@@ -127,7 +127,7 @@ test("a linked parent sees weekly and monthly totals and downloads a Turkish PDF
   await expect(
     page.getByRole("heading", { name: "Bu ay", exact: true, level: 2 }),
   ).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Bugünkü öneri" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Bugünkü koçun" })).toBeVisible();
   await expect(
     page.getByText("Kayıtları yalnızca öğrenci değiştirebilir."),
   ).toBeVisible();

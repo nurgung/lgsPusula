@@ -16,7 +16,7 @@ describe("RecommendationCard", () => {
         })}
       />,
     );
-    expect(screen.getByRole("heading", { name: "Bugünkü öneri" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Bugünkü koçun" })).toBeTruthy();
     expect(screen.queryByRole("heading", { name: "Neden bu öneri?" })).toBeNull();
     expect(screen.getByText(/küçük bir soru hedefi/)).toBeTruthy();
     expect(screen.getByText(/günlük hedef satırı yok/)).toBeTruthy();
@@ -24,6 +24,11 @@ describe("RecommendationCard", () => {
     expect(screen.queryByText(/Europe\/Istanbul/)).toBeNull();
     expect(screen.queryByText(/coaching-v1/)).toBeNull();
     expect(screen.queryByRole("heading", { name: "Sade anlatım" })).toBeNull();
+    expect(
+      screen.getByText("Sade anlatım yok. Öneri, çalışma kayıtlarına göre hazır."),
+    ).toBeTruthy();
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.queryByText(/API|GROQ|AI_|öğrenci kimliği/i)).toBeNull();
     expect(screen.getByRole("link", { name: "Hedef belirle" }).getAttribute("href")).toBe(
       "/ogrenci/hedefler",
     );
@@ -128,6 +133,9 @@ describe("RecommendationCard", () => {
     expect(screen.getByText(/2 yanlış, 0 boş/)).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Neden bu öneri?" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Tamamlandı" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Kazanımlara bak" }).getAttribute("href")).toBe(
+      "/ogrenci/kazanimlar",
+    );
     expect(screen.queryByText(/Öneri tamamlandı|öneri tamam/i)).toBeNull();
   });
 
@@ -150,6 +158,9 @@ describe("RecommendationCard", () => {
     expect(
       screen.getByText("Bu cümle bir öneridir. Kayıtlarını ve puanını değiştirmez."),
     ).toBeTruthy();
+    expect(
+      screen.queryByText("Sade anlatım yok. Öneri, çalışma kayıtlarına göre hazır."),
+    ).toBeNull();
   });
 
   it("hides Tamamlandı when a parent is reading the same outcome", () => {

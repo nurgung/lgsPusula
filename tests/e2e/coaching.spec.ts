@@ -18,7 +18,7 @@ test.beforeEach(async ({ page }) => {
 
 function suggestion(page: Page) {
   return page.locator("section").filter({
-    has: page.getByRole("heading", { name: "Bugünkü öneri", level: 2 }),
+    has: page.getByRole("heading", { name: "Bugünkü koçun", level: 2 }),
   });
 }
 

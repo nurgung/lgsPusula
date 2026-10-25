@@ -113,11 +113,16 @@ async function StudentHome() {
         </div>
       ) : null}
       {/*
-        Four bands. Source order is the phone: path, today's goals, lesson tiles,
-        then the summary. From lg, goals and tiles sit side by side.
+        Phone order: coach, stage path, today's goals, lesson tiles, summary.
+        The coach stays full width above the path so the next step is readable
+        before the character band. From lg, goals and tiles sit side by side.
         The page canvas stays neutral; cards carry the surface.
       */}
       <div className="grid min-w-0 gap-4">
+        <RecommendationCard
+          report={explained.report}
+          explanation={explained.explanation}
+        />
         <StagePath
           stageId={growth.stageId}
           species={mascot.species}
@@ -140,26 +145,20 @@ async function StudentHome() {
           <h2 id="alt-ozet" className="text-lg font-bold text-ink-900">
             Özet
           </h2>
-          <div className="grid min-w-0 items-start gap-4 lg:grid-cols-2">
-            <WeekAndExamSummary
-              summary={weekSummary}
-              exam={
-                latest
-                  ? {
-                      id: latest.id,
-                      title: latest.title,
-                      takenOn: latest.takenOn,
-                      examType: latest.examType,
-                      totalNet: latest.totalNet,
-                    }
-                  : null
-              }
-            />
-            <RecommendationCard
-              report={explained.report}
-              explanation={explained.explanation}
-            />
-          </div>
+          <WeekAndExamSummary
+            summary={weekSummary}
+            exam={
+              latest
+                ? {
+                    id: latest.id,
+                    title: latest.title,
+                    takenOn: latest.takenOn,
+                    examType: latest.examType,
+                    totalNet: latest.totalNet,
+                  }
+                : null
+            }
+          />
           <EarnedBadges rewards={mascot.rewards} />
           <Card variant="quiet" title={STUDENT_DATA_NOTICE.title}>
             <ul className="grid list-disc gap-1 pl-5 text-ink-900">

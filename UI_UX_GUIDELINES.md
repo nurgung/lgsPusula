@@ -36,9 +36,10 @@ Hedef yerleşim `roadmap.md` Faz 14'tedir. Örnek görseller dizilimin örneğid
 - Görünür aşama yalnızca puana bakmaz. Seri, farklı gün, geçerli soru ve mevcut puan eşiği birlikte gerekir. Bir günde en fazla bir aşama ilerler. Boş gün seriyi yeniden başlatır; kazanılan aşamayı, puanı ve rozeti silmez.
 - Günlük hedefler: bugünkü kayıt, soru hedefi ve varsa kazanım işi. Açık görev, tamamlanandan daha belirgindir. Tamamlanan satır işaretlidir. Günlük ve haftalık soru hedefleri aynı bölümde, ayrı başlıklarla durur.
 - Ders karoları: katalogdaki gerçek dersler. Kutuda bu haftanın soru sayısı ve varsa o derse ait hedef vardır. Veri yoksa boş durum gösterilir. Başarı yüzdesi, performans puanı veya sıralama üretilmez.
-- Alt özet: haftalık soru ve dakika toplamı, son deneme neti, koçluk önerisi, gizlilik ve veli bağlantısı.
+- Koç kartı, kısa bildirimlerden sonra ve aşama yolundan önce durur. Küçük başlık "Bugünkü koçun"dur. Öneri cümlesi kartın en belirgin metnidir.
+- Alt özet: haftalık soru ve dakika toplamı, son deneme neti, gizlilik ve veli bağlantısı.
 
-Koçluk kartının ilk görünümünde kısa öneri, sıradaki işlem, kısa gerekçe ve bağlantı durur. Kazanım kodu, uzun açıklama, yanlış ve boş sayıları ile tarih aralığı "Neden bu öneri?" içindedir. Yapay zekâ cümlesi varsa "Sade anlatım" başlığıyla kural cümlesinden ayrı durur. Sayfa zemini nötr kalır; kartlar yüzey rengindedir. Ders kutuları tek renktir.
+Koçluk kartının ilk görünümünde kısa öneri, sıradaki işlem, kısa gerekçe ve bağlantı durur. Kazanım kodu, uzun açıklama, yanlış ve boş sayıları ile tarih aralığı "Neden bu öneri?" içindedir. Yapay zekâ cümlesi varsa "Sade anlatım" başlığıyla kural cümlesinden ayrı durur. Cümle yoksa sahte yanıt gösterilmez; kısa bir durum yazar. Sayfa zemini nötr kalır; kartlar yüzey rengindedir. Ders kutuları tek renktir.
 
 Hedef, rozet veya görünür aşama bu kayıtta ilk kez tamamlanırsa bir pencere açılır. Aşama penceresi, seri ve soru şartları da tamamlanmadan açılmaz. Pencerede aynı yol, işaretli hedefler, madalya, kazanılanın gerçek adı ve "Tamam" düğmesi vardır. Ada haritası, İngilizce seviye adı, kelime kartı, NFT, jeton, ücretli plan, ruh hâli ve uydurma yüzde yoktur. Bir gün ara vermek puanı ve kazanılan aşamayı geri götürmez. Çalışma serisi o gün yeniden başlar. Karakterin dinlenmesi puanı ve rozeti silmez.
 

@@ -8,8 +8,8 @@ alwaysApply: false
 
 Ayrıntı `roadmap.md` Faz 14. Örnek görseller dizilim içindir; ekran birebir kopyalanmaz.
 
-- Dört bant: aşama yolu, günlük hedefler, ders karoları, alt özet. `lg` altında bantlar alt alta iner.
-- İkinci görünüm turu aynı bantları tutar. Tam sayfa yeşil zemin yok. Ders kutuları tek renktir ve bu haftanın kayıtlı soru sayısını gösterir. Koçluk kanıtı "Neden bu öneri?" içindedir. `mascot-v1` puan tablosu ve koçluk kuralı değişmez. Görünür aşama `growth-v1` ile okunur.
+- Sıra: koç kartı, aşama yolu, günlük hedefler, ders karoları, alt özet. `lg` altında bantlar alt alta iner. Koç kartı tam genişliktedir ve yolun üstündedir.
+- Tam sayfa yeşil zemin yok. Ders kutuları tek renktir ve bu haftanın kayıtlı soru sayısını gösterir. Koçluk kanıtı "Neden bu öneri?" içindedir. `mascot-v1` puan tablosu ve koçluk kuralı değişmez. Görünür aşama `growth-v1` ile okunur.
 - Menü `getNavItems` ile kalır. Yeni öğe ve koyu yan menü ekleme.
 - Renk yalnızca `globals.css` token'ıdır. Yeni çift `src/lib/contrast.test.ts` içine girer. Satır içi `style` yok.
 - Tamamlama penceresi yalnızca bu kayıtta hedef, rozet veya görünür aşama ilk kez ilerleyince açılır. Aşama, puan eşiği tek başına aşılınca açılmaz. İçinde dört durak, işaretli hedefler, madalya, gerçek Türkçe ad ve "Tamam" vardır.
