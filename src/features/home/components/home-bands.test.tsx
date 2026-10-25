@@ -52,6 +52,12 @@ describe("StagePath", () => {
       ),
     ).toBeTruthy();
     expect(document.querySelector(".species-cat-head")).toBeTruthy();
+    expect(document.querySelector('[data-figure-size="hero"]')).toBeTruthy();
+    expect(document.querySelectorAll('[data-species-figure="cat"]')).toHaveLength(1);
+    expect(screen.getByText("Karakter puanı")).toBeTruthy();
+    expect(screen.getByText("Çalışma serisi")).toBeTruthy();
+    expect(screen.getByText("Toplam soru")).toBeTruthy();
+    expect(screen.getByRole("progressbar").className).toContain("h-5");
     expect(document.querySelector("svg")).toBeNull();
     expect(screen.getAllByText("Sırada")).toHaveLength(2);
     expect(screen.getByText("Toplam 35 karakter puanı. Aşama: Alışıyor.")).toBeTruthy();
@@ -167,6 +173,8 @@ describe("CelebrationDialog", () => {
     expect(dialog.textContent).toContain("Bugünkü soru hedefin tamam.");
     expect(dialog.textContent).toContain("Madalya");
     expect(dialog.textContent).toContain("Alışıyor");
+    expect(dialog.querySelector('[data-figure-size="compact"]')).toBeTruthy();
+    expect(dialog.querySelector('[data-figure-size="hero"]')).toBeNull();
     expect(dialog.textContent).toContain("✓");
     expect(dialog.textContent).toContain("Tamam");
     expect(screen.getByRole("button", { name: "Tamam" })).toBe(document.activeElement);

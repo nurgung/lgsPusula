@@ -696,6 +696,22 @@
   }
 }
 
+/* Home hero. Parts are sized in percentages, so the drawing grows with this box.
+   The small-figure scale (0.82 / 0.92) would pull a new character under the
+   target, so the hero keeps only a slight stage difference. */
+.species-stage[data-figure-size="hero"] {
+  width: 8.75rem;
+  height: 10rem;
+  perspective: 680px;
+}
+
+@media (min-width: 640px) {
+  .species-stage[data-figure-size="hero"] {
+    width: 11.25rem;
+    height: 13rem;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .species-rig {
     animation: species-turn 6.5s ease-in-out infinite;
@@ -824,6 +840,14 @@
 
 .species-stage[data-growth-stage="settling"] {
   scale: 0.92;
+}
+
+.species-stage[data-figure-size="hero"][data-growth-stage="new"] {
+  scale: 0.96;
+}
+
+.species-stage[data-figure-size="hero"][data-growth-stage="settling"] {
+  scale: 0.98;
 }
 
 .species-stage[data-growth-stage="settling"]::before,

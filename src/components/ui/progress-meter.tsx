@@ -3,6 +3,8 @@ type ProgressMeterProps = {
   value: number;
   max: number;
   unit: string;
+  /** `strong` is at least 16px. Other screens keep the shorter bar. */
+  size?: "regular" | "strong";
 };
 
 // Full class names so Tailwind can see them. The bar is rounded to 5 points;
@@ -36,7 +38,13 @@ function barWidth(percent: number): string {
   return BAR_WIDTH[step] ?? "w-0";
 }
 
-export function ProgressMeter({ label, value, max, unit }: ProgressMeterProps) {
+export function ProgressMeter({
+  label,
+  value,
+  max,
+  unit,
+  size = "regular",
+}: ProgressMeterProps) {
   const safeMax = max > 0 ? max : 1;
   const clamped = Math.min(Math.max(value, 0), safeMax);
   const percent = Math.round((clamped / safeMax) * 100);
@@ -55,7 +63,11 @@ export function ProgressMeter({ label, value, max, unit }: ProgressMeterProps) {
         aria-valuemax={max}
         aria-valuenow={clamped}
         aria-valuetext={valueText}
-        className="mt-2 h-3 w-full overflow-hidden rounded-full bg-brand-100"
+        className={
+          size === "strong"
+            ? "mt-2 h-5 w-full overflow-hidden rounded-full bg-brand-100"
+            : "mt-2 h-3 w-full overflow-hidden rounded-full bg-brand-100"
+        }
       >
         <div className={`h-full rounded-full bg-brand-600 ${barWidth(percent)}`} />
       </div>

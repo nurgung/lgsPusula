@@ -164,8 +164,8 @@ export function SpeciesFigure({
   stage = "new",
 }: {
   code: SpeciesCode;
-  /** `compact` fits the current stop on the stage path. */
-  size?: "regular" | "compact";
+  /** `compact` fits a stop. `hero` is the home stage. `regular` stays the smaller figure. */
+  size?: "regular" | "compact" | "hero";
   health?: "healthy" | "tired" | "sick" | "recovering";
   stage?: "new" | "settling" | "growing" | "companion";
 }) {
