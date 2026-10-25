@@ -65,35 +65,49 @@ export function SubjectTiles({
                 <li key={subject.id} className="min-w-0">
                   <Link
                     href={`/ogrenci/calisma/yeni?ders=${encodeURIComponent(subject.id)}`}
-                    className="grid min-h-11 min-w-0 gap-2 rounded-card border border-border bg-surface p-3 break-words text-ink-900"
+                    className="flex h-full min-h-11 min-w-0 flex-col gap-3 rounded-card border border-border bg-surface p-4 break-words text-ink-900 hover:bg-brand-50"
                   >
-                    <span className="text-base font-bold">{subject.name}</span>
-                    {showCount ? (
-                      <span className="text-sm font-semibold tabular-nums">
-                        Bu hafta {subject.weekQuestions} soru
-                      </span>
+                    <span
+                      title={subject.name}
+                      className="line-clamp-2 text-base font-bold leading-snug break-words"
+                    >
+                      {subject.name}
+                    </span>
+                    {showCount || goals.length > 0 ? (
+                      <div className="mt-auto grid min-w-0 gap-3">
+                        {showCount ? (
+                          <p className="flex flex-wrap items-baseline gap-x-2">
+                            <span className="text-sm font-semibold text-ink-700">Bu hafta</span>{" "}
+                            <span className="text-3xl font-extrabold tabular-nums leading-none">
+                              {subject.weekQuestions}
+                            </span>{" "}
+                            <span className="text-sm font-bold text-ink-700">soru</span>
+                          </p>
+                        ) : null}
+                        {goals.map((goal) => (
+                          <div key={goal.id} className="grid min-w-0 gap-1">
+                            <ProgressMeter
+                              label={goal.periodLabel}
+                              value={goal.doneQuestions}
+                              max={goal.targetQuestions}
+                              unit="soru"
+                              track="quiet"
+                            />
+                            <p
+                              className={
+                                goal.met
+                                  ? "w-fit rounded-full bg-success-50 px-2 py-1 text-sm font-semibold text-success-700"
+                                  : "text-sm text-ink-700"
+                              }
+                            >
+                              {goal.met
+                                ? "Hedefe ulaştın."
+                                : `Kalan ${Math.max(0, goal.targetQuestions - goal.doneQuestions)} soru.`}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
                     ) : null}
-                    {goals.map((goal) => (
-                      <span key={goal.id} className="grid min-w-0 gap-1">
-                        <ProgressMeter
-                          label={goal.periodLabel}
-                          value={goal.doneQuestions}
-                          max={goal.targetQuestions}
-                          unit="soru"
-                        />
-                        <span
-                          className={
-                            goal.met
-                              ? "w-fit rounded-full bg-success-50 px-2 py-1 text-sm font-semibold text-success-700"
-                              : "text-sm text-ink-700"
-                          }
-                        >
-                          {goal.met
-                            ? "Hedefe ulaştın."
-                            : `Kalan ${Math.max(0, goal.targetQuestions - goal.doneQuestions)} soru.`}
-                        </span>
-                      </span>
-                    ))}
                   </Link>
                 </li>
               );

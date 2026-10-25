@@ -161,7 +161,30 @@ describe("SubjectTiles", () => {
     expect(link.textContent).toContain("8 / 20 soru");
     expect(link.textContent).toContain("Kalan 12 soru.");
     expect(link.textContent).not.toMatch(/Hedefe ulaştın/);
+    expect(screen.getByRole("progressbar", { name: "Haftalık hedef" }).getAttribute("aria-valuenow")).toBe(
+      "8",
+    );
     expect(screen.queryByText(/%|sıralama/i)).toBeNull();
+  });
+
+  it("shows the weekly count without a bar when the subject has no goal", () => {
+    render(
+      <SubjectTiles
+        subjects={[
+          {
+            id: "ders-1",
+            name: "T.C. İnkılap Tarihi ve Atatürkçülük",
+            weekQuestions: 4,
+            goals: [],
+          },
+        ]}
+      />,
+    );
+    const link = screen.getByRole("link", { name: /İnkılap Tarihi/ });
+    expect(link.getAttribute("href")).toBe("/ogrenci/calisma/yeni?ders=ders-1");
+    expect(link.textContent).toContain("T.C. İnkılap Tarihi ve Atatürkçülük");
+    expect(link.textContent).toContain("Bu hafta 4 soru");
+    expect(screen.queryByRole("progressbar")).toBeNull();
   });
 });
 

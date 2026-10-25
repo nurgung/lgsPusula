@@ -3,8 +3,16 @@ type ProgressMeterProps = {
   value: number;
   max: number;
   unit: string;
-  /** `strong` is at least 16px. Other screens keep the shorter bar. */
-  size?: "regular" | "strong";
+  /**
+   * `regular` is the short bar. `strong` is at least 16px.
+   * `hero` keeps the same count and bar, with a larger figure for the daily goal.
+   */
+  size?: "regular" | "strong" | "hero";
+  /**
+   * `brand` is the soft teal track. `quiet` is a neutral track so an empty
+   * goal does not look filled. The fill still uses the real percent.
+   */
+  track?: "brand" | "quiet";
 };
 
 // Full class names so Tailwind can see them. The bar is rounded to 5 points;
@@ -38,12 +46,24 @@ function barWidth(percent: number): string {
   return BAR_WIDTH[step] ?? "w-0";
 }
 
+const TRACK = {
+  regular: "mt-2 h-3 w-full overflow-hidden rounded-full",
+  strong: "mt-2 h-5 w-full overflow-hidden rounded-full",
+  hero: "mt-3 h-5 w-full overflow-hidden rounded-full",
+} as const;
+
+const TRACK_COLOR = {
+  brand: "bg-brand-100",
+  quiet: "bg-border",
+} as const;
+
 export function ProgressMeter({
   label,
   value,
   max,
   unit,
   size = "regular",
+  track = "brand",
 }: ProgressMeterProps) {
   const safeMax = max > 0 ? max : 1;
   const clamped = Math.min(Math.max(value, 0), safeMax);
@@ -52,10 +72,20 @@ export function ProgressMeter({
 
   return (
     <div>
-      <div className="flex flex-wrap items-baseline justify-between gap-x-2 text-sm">
-        <span className="font-semibold text-ink-900">{label}</span>
-        <span className="text-ink-700">{valueText}</span>
-      </div>
+      {size === "hero" ? (
+        <div className="grid gap-1">
+          <span className="text-sm font-semibold text-ink-700">{label}</span>
+          <p className="flex flex-wrap items-baseline gap-x-2 text-ink-900">
+            <span className="text-4xl font-extrabold tabular-nums leading-none">{value}</span>
+            <span className="text-lg font-bold text-ink-700">{` / ${max} ${unit}`}</span>
+          </p>
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-baseline justify-between gap-x-2 text-sm">
+          <span className="font-semibold text-ink-900">{label}</span>
+          <span className="text-ink-700">{valueText}</span>
+        </div>
+      )}
       <div
         role="progressbar"
         aria-label={label}
@@ -63,11 +93,7 @@ export function ProgressMeter({
         aria-valuemax={max}
         aria-valuenow={clamped}
         aria-valuetext={valueText}
-        className={
-          size === "strong"
-            ? "mt-2 h-5 w-full overflow-hidden rounded-full bg-brand-100"
-            : "mt-2 h-3 w-full overflow-hidden rounded-full bg-brand-100"
-        }
+        className={`${TRACK[size]} ${TRACK_COLOR[track]}`}
       >
         <div className={`h-full rounded-full bg-brand-600 ${barWidth(percent)}`} />
       </div>

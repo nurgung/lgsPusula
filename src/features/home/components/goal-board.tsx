@@ -8,6 +8,7 @@ import {
   type StudyGoalView,
   type StudyLogView,
 } from "@/features/study/summary";
+import { cn } from "@/lib/cn";
 
 export function GoalBoard({
   goals,
@@ -43,6 +44,7 @@ export function GoalBoard({
           title="Günlük hedef"
           rows={daily}
           empty="Bugün için hedefin yok."
+          figure="hero"
         />
         <GoalGroup
           id="haftalik-hedef"
@@ -74,37 +76,41 @@ function GoalGroup({
   title,
   rows,
   empty,
+  figure = "regular",
 }: {
   id: string;
   title: string;
   rows: readonly GoalCompletion[];
   empty: string;
+  /** Daily progress uses a large figure. Weekly stays on the shorter meter. */
+  figure?: "regular" | "hero";
 }) {
   return (
     <section className="grid min-w-0 gap-3" aria-labelledby={id}>
       <h3 id={id} className="text-base font-bold text-ink-900">
-        <span className="rounded-full bg-brand-100 px-2 py-1">{title}</span>
+        {title}
       </h3>
       {rows.length === 0 ? (
         <p className="text-ink-700">{empty}</p>
       ) : (
-        <ul className="grid min-w-0 gap-4">
+        <ul className="grid min-w-0 gap-3">
           {rows.map((row) => {
             const scope = row.subjectName ?? "Tüm dersler";
             return (
               <li
                 key={row.goalId}
-                className={
-                  row.met
-                    ? "grid min-w-0 gap-2 rounded-xl border border-success-700/40 bg-success-50 p-3"
-                    : "grid min-w-0 gap-2"
-                }
+                className={cn(
+                  "grid min-w-0 gap-2 rounded-card p-3",
+                  row.met ? "bg-success-50" : "bg-canvas",
+                )}
               >
                 <ProgressMeter
                   label={scope}
                   value={row.doneQuestions}
                   max={row.targetQuestions}
                   unit="soru"
+                  size={figure === "hero" ? "hero" : "regular"}
+                  track="quiet"
                 />
                 <p
                   className={

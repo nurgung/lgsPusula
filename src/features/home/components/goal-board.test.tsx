@@ -51,7 +51,11 @@ describe("GoalBoard", () => {
     expect(screen.getAllByRole("heading", { name: "Hedeflerin" })).toHaveLength(1);
     expect(screen.getByRole("heading", { name: "Günlük hedef" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Haftalık hedef" })).toBeTruthy();
-    expect(screen.getByText("10 / 10 soru")).toBeTruthy();
+    expect(
+      screen.getByText(
+        (_content, node) => node?.textContent?.replace(/\s+/g, " ").trim() === "10 / 10 soru",
+      ).querySelector(".text-4xl")?.textContent,
+    ).toBe("10");
     expect(screen.getByText("Hedefe ulaştın.")).toBeTruthy();
     expect(screen.getByText("10 / 20 soru")).toBeTruthy();
     expect(screen.getByText("Kalan 10 soru.")).toBeTruthy();
