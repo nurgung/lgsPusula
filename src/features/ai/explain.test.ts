@@ -94,6 +94,32 @@ describe("explainRecommendation", () => {
     });
     expect(quota.source).toBe("rules");
     expect(quota.report.recommendation).toEqual(report.recommendation);
+
+    const failed = await explainRecommendation({
+      report,
+      enabled: true,
+      zdrConfirmed: true,
+      remaining: 2,
+      complete: async () => ({ ok: false, reason: "error" }),
+    });
+    expect(failed.source).toBe("rules");
+    expect(failed.explanation).toBeNull();
+    expect(failed.report).toBe(report);
+  });
+
+  it("keeps the rule card when the call throws", async () => {
+    const result = await explainRecommendation({
+      report,
+      enabled: true,
+      zdrConfirmed: true,
+      remaining: 2,
+      complete: async () => {
+        throw new Error("network");
+      },
+    });
+    expect(result.source).toBe("rules");
+    expect(result.explanation).toBeNull();
+    expect(result.report).toBe(report);
   });
 
   it("shows a sentence without letting the model replace the rule", async () => {

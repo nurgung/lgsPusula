@@ -23,6 +23,7 @@ describe("RecommendationCard", () => {
     expect(screen.queryByText(/Kural:/)).toBeNull();
     expect(screen.queryByText(/Europe\/Istanbul/)).toBeNull();
     expect(screen.queryByText(/coaching-v1/)).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Sade anlatım" })).toBeNull();
     expect(screen.getByRole("link", { name: "Hedef belirle" }).getAttribute("href")).toBe(
       "/ogrenci/hedefler",
     );

@@ -1,11 +1,16 @@
 import { readFileSync } from "node:fs";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { addCalendarDays } from "@/features/study/calendar";
 import { evaluateGrowth, growthNoticeContent, type StudyContribution } from "../growth";
+import { MASCOT_MESSAGES, stageEarnedNotice, supportiveCopyIssues } from "../messages";
 import { SPECIES } from "../species";
-import { stageEarnedNotice, supportiveCopyIssues } from "../messages";
 import { CharacterStatus } from "./character-status";
+import { GrowthNotices } from "./growth-notices";
+
+vi.mock("../actions", () => ({
+  dismissReminderAction: vi.fn(),
+}));
 
 function span(end: string, count: number, questions: number): StudyContribution[] {
   return Array.from({ length: count }, (_, index) => ({
@@ -67,6 +72,72 @@ describe("CharacterStatus", () => {
           `[data-species-figure="${species.code}"][data-health="sick"][data-growth-stage="new"]`,
         ),
       ).toBeTruthy();
+      unmount();
+    }
+  });
+
+  it("shows the pose, sentence, and notice for each health state", () => {
+    const today = "2026-10-24";
+    const cases: {
+      days: string[];
+      health: "healthy" | "tired" | "sick" | "recovering";
+    }[] = [
+      { health: "healthy", days: [today] },
+      { health: "tired", days: [addCalendarDays(today, -2)] },
+      { health: "sick", days: [addCalendarDays(today, -4)] },
+      { health: "recovering", days: [addCalendarDays(today, -4), today] },
+    ];
+    const labels = {
+      healthy: MASCOT_MESSAGES.healthHealthy,
+      tired: MASCOT_MESSAGES.healthTired,
+      sick: MASCOT_MESSAGES.healthSick,
+      recovering: MASCOT_MESSAGES.healthRecovering,
+    } as const;
+    const details = {
+      healthy: MASCOT_MESSAGES.healthHealthyDetail,
+      tired: MASCOT_MESSAGES.healthTiredDetail,
+      sick: MASCOT_MESSAGES.healthSickDetail,
+      recovering: MASCOT_MESSAGES.healthRecoveringDetail,
+    } as const;
+
+    for (const item of cases) {
+      const growth = evaluateGrowth({
+        today,
+        logs: item.days.map((studiedOn) => ({ studiedOn, questionCount: 2 })),
+        rewards: [],
+      });
+      expect(growth.health).toBe(item.health);
+      const { unmount } = render(
+        <>
+          <GrowthNotices
+            notices={growth.notices.map((notice) => ({
+              id: `${notice.kind}-${notice.noticeDate}`,
+              ...growthNoticeContent(notice.kind, growth.stageName),
+            }))}
+          />
+          <CharacterStatus species="cat" growth={growth} />
+        </>,
+      );
+      expect(screen.getByText(new RegExp(`Sağlık: ${labels[item.health]}`))).toBeTruthy();
+      expect(document.body.textContent).toContain(details[item.health]);
+      expect(
+        document.querySelector(
+          `[data-species-figure="cat"][data-health="${item.health}"][data-figure-size="regular"]`,
+        ),
+      ).toBeTruthy();
+      for (const notice of growth.notices) {
+        const copy = growthNoticeContent(notice.kind, growth.stageName);
+        expect(screen.getByRole("heading", { name: copy.title })).toBeTruthy();
+        expect(screen.getByText(copy.body)).toBeTruthy();
+        expect(supportiveCopyIssues(copy.body)).toEqual([]);
+      }
+      if (growth.notices.length === 0) {
+        expect(screen.queryByText(MASCOT_MESSAGES.noticeInApp)).toBeNull();
+      } else {
+        expect(screen.getAllByText(MASCOT_MESSAGES.noticeInApp)).toHaveLength(
+          growth.notices.length,
+        );
+      }
       unmount();
     }
   });
