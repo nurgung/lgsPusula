@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
-import { expect, test, type Page } from "@playwright/test";
+import { type Page } from "@playwright/test";
+import { expect, test } from "./support/fixtures.ts";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { usernameToAuthEmail } from "../../src/features/auth/username.ts";
 import {
@@ -11,7 +12,13 @@ import {
   useFreshClientIp,
   type TestAccount,
 } from "./support/auth.ts";
-import { E2E_SUBJECT_PREFIX, seedCatalog } from "./support/catalog.ts";
+import {
+  E2E_SOURCE_NAME,
+  E2E_SOURCE_VERSION,
+  E2E_SUBJECT_PREFIX,
+  seedCatalog,
+  trackE2eSubjectCode,
+} from "./support/catalog.ts";
 import { totpCode } from "./support/totp.ts";
 
 test.skip(
@@ -138,11 +145,13 @@ test("an admin can change the catalog only after TOTP, and never delete or move 
   await expectCannotChange(client, seeded);
 
   await verifyTotp(client);
+  const extraCode = `${E2E_SUBJECT_PREFIX}${randomBytes(4).toString("hex")}`;
+  trackE2eSubjectCode(extraCode);
   const { error: insertError } = await client.from("subjects").insert({
-    code: `${E2E_SUBJECT_PREFIX}${randomBytes(4).toString("hex")}`,
+    code: extraCode,
     name: "Yönetici dersi",
-    source_name: "Kurgusal test kaynağı",
-    source_version: "e2e",
+    source_name: E2E_SOURCE_NAME,
+    source_version: E2E_SOURCE_VERSION,
   });
   expect(insertError).toBeNull();
 
@@ -185,6 +194,7 @@ test("the admin manages the catalog on screen and the student only sees current 
 }) => {
   test.setTimeout(120_000);
   const tag = randomBytes(4).toString("hex");
+  trackE2eSubjectCode(`${E2E_SUBJECT_PREFIX}${tag}`);
   const subjectName = `E2E Ders ${tag}`;
   const topicName = `E2E Konu ${tag}`;
   const oldCode = `E2E.${tag}.ESKI`;
@@ -211,8 +221,8 @@ test("the admin manages the catalog on screen and the student only sees current 
 
   await addSubject.getByLabel("Ders kodu").fill(`${E2E_SUBJECT_PREFIX}${tag}`);
   await addSubject.getByLabel("Ders adı").fill(subjectName);
-  await addSubject.getByLabel("Kaynak adı").fill("Kurgusal test kaynağı");
-  await addSubject.getByLabel("Kaynak sürümü").fill("e2e");
+  await addSubject.getByLabel("Kaynak adı").fill(E2E_SOURCE_NAME);
+  await addSubject.getByLabel("Kaynak sürümü").fill(E2E_SOURCE_VERSION);
   await addSubject.getByRole("button", { name: "Dersi ekle" }).click();
   await expect(addSubject.getByText("Ders eklendi.")).toBeVisible();
 

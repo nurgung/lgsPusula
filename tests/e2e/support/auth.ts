@@ -9,8 +9,9 @@ import {
   type AccountRole,
   type AdminEnv,
 } from "../../../scripts/lib/account-admin.ts";
+import { E2E_ACCOUNT_PREFIX as E2E_USERNAME_PREFIX } from "./catalog-signature.ts";
 
-export const E2E_USERNAME_PREFIX = "e2e_";
+export { E2E_USERNAME_PREFIX };
 
 export function isAuthConfigured(): boolean {
   return Boolean(

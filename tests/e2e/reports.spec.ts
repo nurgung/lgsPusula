@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { expect, test, type Page } from "@playwright/test";
+import { type Page } from "@playwright/test";
+import { expect, test } from "./support/fixtures.ts";
 import { createClient } from "@supabase/supabase-js";
 import { usernameToAuthEmail } from "../../src/features/auth/username.ts";
 import { MIN_PDF_BYTES } from "../../src/features/reports/constants.ts";
