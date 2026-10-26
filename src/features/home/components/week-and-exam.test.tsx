@@ -22,21 +22,43 @@ const summary: PeriodSummary = {
 };
 
 describe("WeekAndExamSummary", () => {
-  it("shows subject totals and an empty exam note", () => {
+  it("shows labeled week totals and an empty exam note", () => {
     render(<WeekAndExamSummary summary={summary} exam={null} />);
     expect(screen.getByRole("heading", { name: "Bu hafta" })).toBeTruthy();
-    expect(screen.getByText(/6 doğru, 3 yanlış, 1 boş/)).toBeTruthy();
-    expect(screen.getByText("Derslere göre soru sayısı ders kutularında.")).toBeTruthy();
-    expect(screen.queryByText("10 soru · 25 dakika")).toBeNull();
+    expect(screen.getByText("19 Ekim 2026 – 23 Ekim 2026")).toBeTruthy();
+    expect(screen.getByText("Toplam soru")).toBeTruthy();
+    expect(screen.getByText("10")).toBeTruthy();
+    expect(screen.getByText("Doğru cevap")).toBeTruthy();
+    expect(screen.getByText("6")).toBeTruthy();
+    expect(screen.getByText("Süre")).toBeTruthy();
+    expect(screen.getByText("25")).toBeTruthy();
+    expect(screen.getByText("dakika")).toBeTruthy();
+    expect(screen.queryByText("Yanlış")).toBeNull();
+    expect(screen.queryByText("Boş")).toBeNull();
+    expect(screen.queryByText("Derslere göre soru sayısı ders kutularında.")).toBeNull();
+    expect(screen.getByRole("link", { name: "Çalışma kayıtları" }).getAttribute("href")).toBe(
+      "/ogrenci/calisma",
+    );
     expect(screen.getByRole("heading", { name: "Son deneme" })).toBeTruthy();
     expect(screen.getByText("Henüz deneme kaydın yok.")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Deneme ekle" }).getAttribute("href")).toBe(
+      "/ogrenci/denemeler/yeni",
+    );
     expect(screen.queryByText(/lgs-v1/)).toBeNull();
   });
 
-  it("shows the latest exam net and a link to that exam", () => {
+  it("shows an empty week without invented numbers and the latest exam net", () => {
     render(
       <WeekAndExamSummary
-        summary={{ ...summary, questionCount: 0, bySubject: [] }}
+        summary={{
+          ...summary,
+          questionCount: 0,
+          correctCount: 0,
+          wrongCount: 0,
+          blankCount: 0,
+          durationMinutes: 0,
+          bySubject: [],
+        }}
         exam={{
           id: "exam-1",
           title: "Ekim denemesi",
@@ -46,9 +68,18 @@ describe("WeekAndExamSummary", () => {
         }}
       />,
     );
+    expect(screen.getByText("Bu hafta henüz çalışma kaydı yok.")).toBeTruthy();
+    expect(screen.queryByText("Toplam soru")).toBeNull();
+    expect(screen.queryByText("Doğru cevap")).toBeNull();
+    expect(screen.queryByText("Süre")).toBeNull();
     expect(screen.getByText("Ekim denemesi")).toBeTruthy();
-    expect(screen.getByText(/Toplam net 14,00/)).toBeTruthy();
+    expect(screen.getByText("20 Ekim 2026")).toBeTruthy();
     expect(screen.getByText(/Tam LGS denemesi/)).toBeTruthy();
+    expect(screen.getByText("Net")).toBeTruthy();
+    expect(screen.getByText("14,00")).toBeTruthy();
+    expect(screen.getByText("soru neti")).toBeTruthy();
+    expect(screen.queryByText("Yanlış")).toBeNull();
+    expect(screen.queryByText("Boş")).toBeNull();
     expect(screen.getByRole("link", { name: "Denemeye bak" }).getAttribute("href")).toBe(
       "/ogrenci/denemeler/exam-1",
     );

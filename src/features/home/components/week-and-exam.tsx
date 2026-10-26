@@ -22,60 +22,69 @@ export function WeekAndExamSummary({
   exam: HomeExamSummary | null;
 }) {
   return (
+    <div className="grid min-w-0 items-stretch gap-4 lg:grid-cols-2">
+      <WeekSummary summary={summary} />
+      <LatestExam exam={exam} />
+    </div>
+  );
+}
+
+function WeekSummary({ summary }: { summary: PeriodSummary }) {
+  return (
     <Card
       title="Bu hafta"
-      description={`${formatTurkishDateRange(summary)} · soru ve dakika`}
+      headingLevel={3}
+      description={formatTurkishDateRange(summary)}
     >
-      <div className="grid min-w-0 gap-5">
+      <div className="grid min-w-0 gap-4">
         {summary.questionCount === 0 ? (
           <StateMessage
             variant="empty"
             title="Bu hafta henüz çalışma kaydı yok."
-            description="Kayıt yazınca toplam burada, derslere göre sayılar ders kutularında görünür. Bir gün ara vermen bir sorun değil."
+            description="Kayıt yazınca toplam burada görünür. Bir gün ara vermen bir sorun değil."
           />
         ) : (
-          <div className="grid min-w-0 gap-2">
-            <p className="font-semibold text-ink-900 tabular-nums">
-              Toplam {summary.questionCount} soru · {summary.correctCount} doğru,{" "}
-              {summary.wrongCount} yanlış, {summary.blankCount} boş ·{" "}
-              {summary.durationMinutes} dakika
-            </p>
-            <p className="text-sm text-ink-700">
-              Derslere göre soru sayısı ders kutularında.
-            </p>
-          </div>
-        )}
-
-        <section
-          className="grid min-w-0 gap-3 border-t border-border pt-4"
-          aria-labelledby="son-deneme"
-        >
-          <h3 id="son-deneme" className="text-base font-bold text-ink-900">
-            Son deneme
-          </h3>
-          {exam ? (
-            <div className="grid min-w-0 gap-1">
-              <p className="font-semibold break-words text-ink-900">{exam.title}</p>
-              <p className="text-ink-700">
-                {formatTurkishDate(exam.takenOn)} · {EXAM_TYPE_LABELS[exam.examType]}
-              </p>
-              <p className="text-ink-900 tabular-nums">
-                Toplam net {formatNet(exam.totalNet)}
-              </p>
+          <dl className="grid min-w-0 gap-4">
+            <Measure label="Toplam soru" value={summary.questionCount} prominent />
+            <div className="grid min-w-0 grid-cols-2 gap-3">
+              <Measure label="Doğru cevap" value={summary.correctCount} />
+              <Measure label="Süre" value={summary.durationMinutes} unit="dakika" />
             </div>
-          ) : (
-            <StateMessage
-              variant="empty"
-              title="Henüz deneme kaydın yok."
-              description="Deneme sonucunu yazınca özeti burada görürsün."
-            />
-          )}
-        </section>
-
-        <div className="flex flex-wrap gap-2">
+          </dl>
+        )}
+        <div>
           <ButtonLink href="/ogrenci/calisma" variant="secondary">
             Çalışma kayıtları
           </ButtonLink>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function LatestExam({ exam }: { exam: HomeExamSummary | null }) {
+  return (
+    <Card title="Son deneme" headingLevel={3}>
+      <div className="grid min-w-0 gap-4">
+        {exam ? (
+          <div className="grid min-w-0 gap-3">
+            <p className="font-semibold break-words text-ink-900">{exam.title}</p>
+            <p className="text-sm break-words text-ink-600">
+              <span>{formatTurkishDate(exam.takenOn)}</span>
+              <span> · {EXAM_TYPE_LABELS[exam.examType]}</span>
+            </p>
+            <dl className="min-w-0">
+              <Measure label="Net" value={formatNet(exam.totalNet)} unit="soru neti" prominent />
+            </dl>
+          </div>
+        ) : (
+          <StateMessage
+            variant="empty"
+            title="Henüz deneme kaydın yok."
+            description="Deneme sonucunu yazınca özeti burada görürsün."
+          />
+        )}
+        <div>
           {exam ? (
             <ButtonLink href={`/ogrenci/denemeler/${exam.id}`} variant="secondary">
               Denemeye bak
@@ -88,5 +97,43 @@ export function WeekAndExamSummary({
         </div>
       </div>
     </Card>
+  );
+}
+
+function Measure({
+  label,
+  value,
+  unit,
+  prominent = false,
+}: {
+  label: string;
+  value: number | string;
+  unit?: string;
+  prominent?: boolean;
+}) {
+  return (
+    <div
+      className={
+        prominent
+          ? "min-w-0"
+          : "min-w-0 rounded-xl border border-border bg-surface p-3"
+      }
+    >
+      <dt className="text-sm font-semibold break-words text-ink-700">{label}</dt>
+      <dd className="mt-1 flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
+        <span
+          className={
+            prominent
+              ? "text-5xl font-extrabold tabular-nums leading-none break-words text-ink-900"
+              : "text-3xl font-extrabold tabular-nums leading-none break-words text-ink-900"
+          }
+        >
+          {value}
+        </span>
+        {unit ? (
+          <span className="text-sm font-bold break-words text-ink-700">{unit}</span>
+        ) : null}
+      </dd>
+    </div>
   );
 }
