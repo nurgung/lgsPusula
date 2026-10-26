@@ -28,23 +28,38 @@ export function RecommendationCard({
   const showLink = audience === "student" && item.href != null && item.actionLabel != null;
   const showDetails = details.length > 0 || parentWindow != null;
 
+  const action =
+    showPractice || showLink ? (
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
+        {showPractice && item.practice ? (
+          <CompletePracticeButton outcomeId={item.practice.outcomeId} />
+        ) : null}
+        {showLink && item.href && item.actionLabel ? (
+          <ButtonLink href={item.href} variant={showPractice ? "secondary" : "primary"}>
+            {item.actionLabel}
+          </ButtonLink>
+        ) : null}
+      </div>
+    ) : null;
+
   return (
     <section
-      className="min-w-0 rounded-card border-2 border-brand-700 bg-surface p-4 shadow-card sm:p-6"
+      className="min-w-0 rounded-card border-2 border-brand-700 bg-surface p-3 shadow-card sm:p-4"
       aria-labelledby="bugunku-koc"
     >
       <h2 id="bugunku-koc" className="text-sm font-bold text-brand-700">
         {COACHING_MESSAGES.cardTitle}
       </h2>
-      <div className="mt-3 grid min-w-0 gap-4">
-        <div className="flex min-w-0 items-start gap-3 rounded-xl border border-brand-100 bg-brand-50 p-4">
+      <div className="mt-2 grid min-w-0 gap-2">
+        <div className="flex min-w-0 items-start gap-2 rounded-xl border border-brand-100 bg-brand-50 px-3 py-2">
           <CoachMark />
-          <p className="min-w-0 text-xl font-extrabold leading-snug break-words text-ink-900 sm:text-2xl">
+          <p className="min-w-0 text-lg font-extrabold leading-snug break-words text-ink-900">
             {lead}
           </p>
         </div>
+        {action}
         {reason ? (
-          <p className="min-w-0 text-sm leading-relaxed break-words text-ink-700">
+          <p className="min-w-0 text-sm leading-snug break-words text-ink-700">
             <span className="font-semibold text-ink-900">Gerekçe. </span>
             {reason}
           </p>
@@ -54,12 +69,12 @@ export function RecommendationCard({
         ) : null}
         {showDetails ? (
           <details className="min-w-0 rounded-xl border border-border bg-canvas px-3">
-            <summary className="min-h-11 cursor-pointer rounded-xl py-3">
+            <summary className="min-h-11 cursor-pointer rounded-xl py-2">
               <h3 className="inline text-base font-bold text-ink-900">
                 {COACHING_MESSAGES.whyHeading}
               </h3>
             </summary>
-            <div className="grid min-w-0 gap-2 pb-3">
+            <div className="grid min-w-0 gap-2 pb-2">
               {parentWindow ? (
                 <p className="min-w-0 text-sm break-words text-ink-700">{parentWindow}</p>
               ) : null}
@@ -75,38 +90,23 @@ export function RecommendationCard({
             </div>
           </details>
         ) : null}
-        {showPractice || showLink ? (
-          <div className="grid min-w-0 gap-2">
-            <p className="text-sm font-bold text-ink-900">Sıradaki işlem</p>
-            <div className="flex min-w-0 flex-wrap items-center gap-2">
-              {showPractice && item.practice ? (
-                <CompletePracticeButton outcomeId={item.practice.outcomeId} />
-              ) : null}
-              {showLink && item.href && item.actionLabel ? (
-                <ButtonLink href={item.href} variant={showPractice ? "secondary" : "primary"}>
-                  {item.actionLabel}
-                </ButtonLink>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
         {explanation ? (
           <section
-            className="min-w-0 rounded-xl border border-border bg-canvas p-3 sm:p-4"
+            className="min-w-0 rounded-xl border border-border bg-canvas px-3 py-2"
             aria-labelledby="oneri-sade"
           >
             <h3 id="oneri-sade" className="text-sm font-bold text-ink-900">
               Sade anlatım
             </h3>
-            <p className="mt-2 min-w-0 text-base leading-relaxed break-words text-ink-900">
+            <p className="mt-1 min-w-0 text-sm leading-snug break-words text-ink-900">
               {explanation}
             </p>
-            <p className="mt-2 text-sm leading-relaxed text-ink-700">
+            <p className="mt-1 text-sm leading-snug text-ink-700">
               {COACHING_MESSAGES.narrationDisclaimer}
             </p>
           </section>
         ) : (
-          <p className="min-w-0 text-sm leading-relaxed break-words text-ink-700">
+          <p className="min-w-0 text-sm leading-snug break-words text-ink-700">
             {COACHING_MESSAGES.narrationAbsent}
           </p>
         )}
@@ -119,7 +119,7 @@ function CoachMark() {
   return (
     <span
       aria-hidden="true"
-      className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-surface text-brand-700"
+      className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface text-brand-700"
     >
       <svg
         width="24"

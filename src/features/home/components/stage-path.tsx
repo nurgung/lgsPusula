@@ -38,11 +38,6 @@ export function StagePath({
       <h2 id={headingId} className="text-lg font-bold break-words text-ink-900">
         Aşama yolun
       </h2>
-      {detailed && growth ? (
-        <div className="mt-3">
-          <CharacterStatus species={species} growth={growth} showLinks layout="home" />
-        </div>
-      ) : null}
       {detailed ? (
         <StageJourney currentIndex={currentIndex} />
       ) : (
@@ -104,6 +99,11 @@ export function StagePath({
           })}
         </ol>
       )}
+      {detailed && growth ? (
+        <div className="mt-3">
+          <CharacterStatus species={species} growth={growth} showLinks layout="home" />
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -159,7 +159,7 @@ function StageJourney({ currentIndex }: { currentIndex: number }) {
               </span>
               <div
                 className={cn(
-                  "min-w-0 rounded-card border p-3",
+                  "min-w-0 rounded-card border px-3 py-2",
                   place === "current" &&
                     "border-2 border-brand-700 bg-brand-50 shadow-card",
                   place === "done" && "border-brand-100 bg-surface",
@@ -167,16 +167,24 @@ function StageJourney({ currentIndex }: { currentIndex: number }) {
                   "lg:mt-4 lg:text-center",
                 )}
               >
-                <p className="text-base font-bold leading-snug break-words text-ink-900">
+                <p
+                  className={cn(
+                    "leading-snug break-words text-ink-900",
+                    place === "current" ? "text-lg font-extrabold" : "text-base font-bold",
+                  )}
+                >
                   {level.name}
                 </p>
                 <p
                   className={cn(
                     "mt-1 text-sm",
-                    place === "next" ? "text-ink-600" : "font-semibold text-ink-900",
+                    place === "current" &&
+                      "inline-block rounded-full bg-brand-100 px-2 py-0.5 font-bold text-ink-900",
+                    place === "done" && "font-semibold text-ink-900",
+                    place === "next" && "text-ink-600",
                   )}
                 >
-                  {place === "done" ? "Geçildi" : place === "current" ? "Buradasın." : "Sırada"}
+                  {place === "done" ? "Geçildi" : place === "current" ? "Buradasın" : "Sırada"}
                 </p>
               </div>
             </li>

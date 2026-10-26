@@ -158,12 +158,6 @@ export function CharacterStatus({
       >
         {growth.nextStep}
       </p>
-      {layout === "home" ? (
-        <div className="grid min-w-0 gap-1">
-          <p className="min-w-0 break-words text-sm text-ink-700">{pointsLine}</p>
-          <p className="min-w-0 break-words text-sm text-ink-700">{streakLine}</p>
-        </div>
-      ) : null}
       <p className="text-sm break-words text-ink-700">{MASCOT_MESSAGES.streakNote}</p>
       <p className="text-sm break-words text-ink-700">{MASCOT_MESSAGES.noRegression}</p>
 

@@ -110,12 +110,6 @@ function taskActionLabel(id: string): string {
   return id === "review_outcome" ? "Kazanımlara bak" : "Kayıt ekle";
 }
 
-const TASK_LEAD: Record<string, string> = {
-  log_today: "Çalışma kaydı",
-  meet_goal: "Soru hedefi",
-  review_outcome: "Kazanım eşleştirme",
-};
-
 function HomeTaskRow({
   task,
   linked,
@@ -126,7 +120,6 @@ function HomeTaskRow({
   emphasis: "primary" | "secondary" | "done";
 }) {
   const done = emphasis === "done";
-  const lead = TASK_LEAD[task.id];
   return (
     <li
       data-task-emphasis={emphasis}
@@ -140,19 +133,14 @@ function HomeTaskRow({
         <TaskGlyph id={task.id} done={done} prominent={emphasis === "primary"} />
         <div className="grid min-w-0 flex-1 gap-2">
           <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p
-                className={cn(
-                  "font-bold break-words",
-                  done ? "text-ink-700" : "text-ink-900",
-                )}
-              >
-                {lead ?? task.title}
-              </p>
-              {lead ? (
-                <p className="mt-0.5 text-sm break-words text-ink-700">{task.title}</p>
-              ) : null}
-            </div>
+            <p
+              className={cn(
+                "min-w-0 font-bold break-words",
+                done ? "text-ink-700" : "text-ink-900",
+              )}
+            >
+              {task.title}
+            </p>
             <span
               className={
                 done

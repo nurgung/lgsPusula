@@ -108,7 +108,7 @@ async function StudentHome() {
       />
       {growthNotices.length > 0 ? <GrowthNotices notices={growthNotices} /> : null}
       {mascot.reminderId ? (
-        <div className="mb-6">
+        <div className="mb-3">
           <ReminderCard noticeId={mascot.reminderId} />
         </div>
       ) : null}

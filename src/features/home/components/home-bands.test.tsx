@@ -60,9 +60,17 @@ describe("StagePath", () => {
     expect(screen.getByRole("progressbar").className).toContain("h-5");
     expect(document.querySelector("svg")).toBeNull();
     expect(screen.getAllByText("Sırada")).toHaveLength(2);
-    expect(screen.getByText("Toplam 35 karakter puanı. Aşama: Alışıyor.")).toBeTruthy();
+    const stageName = screen.getByText("Alışıyor");
+    const pointsLabel = screen.getByText("Karakter puanı");
+    expect(
+      stageName.compareDocumentPosition(pointsLabel) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(screen.getByText("35")).toBeTruthy();
+    expect(screen.getByText("7 gün")).toBeTruthy();
+    expect(screen.queryByText("Toplam 35 karakter puanı. Aşama: Alışıyor.")).toBeNull();
+    expect(screen.queryByText(/En uzun seri: 7 gün/)).toBeNull();
     expect(screen.getByText("14 günlük seriyi tamamlaman gerekiyor")).toBeTruthy();
-    expect(screen.getByText(/Çalışma serisi: 7 gün/)).toBeTruthy();
+    expect(screen.getByText("Buradasın")).toBeTruthy();
     expect(screen.queryByText(/Level|Explorer/)).toBeNull();
     expect(screen.getByRole("link", { name: "Karaktere bak" }).getAttribute("href")).toBe(
       "/ogrenci/karakter",

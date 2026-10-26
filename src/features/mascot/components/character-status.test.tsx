@@ -132,11 +132,12 @@ describe("CharacterStatus", () => {
         expect(supportiveCopyIssues(copy.body)).toEqual([]);
       }
       if (growth.notices.length === 0) {
-        expect(screen.queryByText(MASCOT_MESSAGES.noticeInApp)).toBeNull();
+        expect(screen.queryByText(/Telefon bildirimi/)).toBeNull();
       } else {
-        expect(screen.getAllByText(MASCOT_MESSAGES.noticeInApp)).toHaveLength(
-          growth.notices.length,
-        );
+        const channel = screen.getAllByText("Yalnızca uygulama içi. Telefon bildirimi yok.");
+        expect(channel).toHaveLength(growth.notices.length);
+        expect(channel[0]?.textContent).toMatch(/uygulama içi/);
+        expect(channel[0]?.textContent).toMatch(/Telefon bildirimi/);
       }
       unmount();
     }

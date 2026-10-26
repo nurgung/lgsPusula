@@ -10,25 +10,33 @@ import { CharacterStatus } from "./character-status";
 
 export function ReminderCard({ noticeId }: { noticeId: string }) {
   return (
-    <Card title={MASCOT_MESSAGES.reminderTitle}>
-      <div className="grid min-w-0 gap-4">
-        <p className="min-w-0 break-words text-ink-900">{MASCOT_MESSAGES.reminderBody}</p>
-        <div className="flex flex-wrap gap-2">
-          <ButtonLink href="/ogrenci/calisma/yeni" variant="secondary">
-            {MASCOT_MESSAGES.reminderAction}
-          </ButtonLink>
-          <form action={dismissReminderAction}>
-            <input type="hidden" name="noticeId" value={noticeId} />
-            <button
-              type="submit"
-              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-border bg-surface px-4 py-2 text-base font-semibold text-ink-900"
-            >
-              {MASCOT_MESSAGES.reminderDismiss}
-            </button>
-          </form>
-        </div>
+    <section
+      className="grid min-w-0 items-center gap-2 rounded-xl border border-border bg-canvas px-3 py-2 sm:grid-cols-[minmax(0,1fr)_auto]"
+      aria-labelledby="hatirlatma-baslik"
+    >
+      <div className="min-w-0">
+        <h2 id="hatirlatma-baslik" className="text-sm font-bold break-words text-ink-900">
+          {MASCOT_MESSAGES.reminderTitle}
+        </h2>
+        <p className="min-w-0 text-sm leading-snug break-words text-ink-900">
+          {MASCOT_MESSAGES.reminderBody}
+        </p>
       </div>
-    </Card>
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
+        <ButtonLink href="/ogrenci/calisma/yeni" variant="ghost">
+          {MASCOT_MESSAGES.reminderAction}
+        </ButtonLink>
+        <form action={dismissReminderAction}>
+          <input type="hidden" name="noticeId" value={noticeId} />
+          <button
+            type="submit"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-ink-900"
+          >
+            {MASCOT_MESSAGES.reminderDismiss}
+          </button>
+        </form>
+      </div>
+    </section>
   );
 }
 

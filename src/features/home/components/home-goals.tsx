@@ -18,7 +18,7 @@ export function HomeGoals({
   return (
     <Card
       title="Bugünün hedefleri"
-      description="Açık görev üstte. Gün bugünü, hafta pazartesiden pazara sayılır. Birim: soru."
+      description="Gün bugünü, hafta pazartesiden pazara. Birim soru."
     >
       <section className="grid min-w-0 gap-3" aria-labelledby="bugun-gorev">
         <h3 id="bugun-gorev" className="text-base font-bold text-ink-900">
