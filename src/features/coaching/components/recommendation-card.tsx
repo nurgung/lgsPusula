@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
 import { ButtonLink } from "@/components/ui/button";
 import { formatTurkishDateRange } from "@/features/study/calendar";
+import { cn } from "@/lib/cn";
 import { COACHING_MESSAGES } from "../messages";
 import { coachingLead, studentVisibleEvidence, studentVisibleReason } from "../present";
 import type { CoachingReport } from "../rules";
@@ -10,11 +12,14 @@ export function RecommendationCard({
   audience = "student",
   readOnlyNote,
   explanation = null,
+  afterAction = null,
 }: {
   report: CoachingReport;
   audience?: "student" | "parent";
   readOnlyNote?: string;
   explanation?: string | null;
+  /** Sits after the existing action and before the reason. Home uses it for the narrow-screen stage line. */
+  afterAction?: ReactNode;
 }) {
   const item = report.recommendation;
   const reason = studentVisibleReason(item.reason);
@@ -44,20 +49,21 @@ export function RecommendationCard({
 
   return (
     <section
-      className="min-w-0 rounded-card border-2 border-brand-700 bg-surface p-3 shadow-card sm:p-4"
+      className="min-w-0 rounded-card border-2 border-brand-700 bg-surface px-3 pt-2 pb-3 shadow-card sm:p-4"
       aria-labelledby="bugunku-koc"
     >
       <h2 id="bugunku-koc" className="text-sm font-bold text-brand-700">
         {COACHING_MESSAGES.cardTitle}
       </h2>
       <div className="mt-2 grid min-w-0 gap-2">
-        <div className="flex min-w-0 items-start gap-2 rounded-xl border border-brand-100 bg-brand-50 px-3 py-2">
-          <CoachMark />
-          <p className="min-w-0 text-lg font-extrabold leading-snug break-words text-ink-900">
-            {lead}
+        <div className="min-w-0 rounded-xl border border-brand-100 bg-brand-50 px-3 py-1.5 sm:py-2">
+          <p className="min-w-0 text-lg font-extrabold leading-snug break-words text-ink-900 sm:flex sm:items-start sm:gap-2">
+            <CoachMark className="max-sm:hidden" />
+            <span className="min-w-0">{lead}</span>
           </p>
         </div>
         {action}
+        {afterAction}
         {reason ? (
           <p className="min-w-0 text-sm leading-snug break-words text-ink-700">
             <span className="font-semibold text-ink-900">Gerekçe. </span>
@@ -115,11 +121,14 @@ export function RecommendationCard({
   );
 }
 
-function CoachMark() {
+function CoachMark({ className }: { className?: string }) {
   return (
     <span
       aria-hidden="true"
-      className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface text-brand-700"
+      className={cn(
+        "inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface text-brand-700",
+        className,
+      )}
     >
       <svg
         width="24"

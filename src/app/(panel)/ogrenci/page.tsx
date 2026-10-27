@@ -16,7 +16,7 @@ import { RevokeLinkButton } from "@/features/family/components/revoke-link-butto
 import { loadOwnFamilyLinks } from "@/features/family/load-links";
 import { EarnedBadges } from "@/features/home/components/earned-badges";
 import { HomeGoals } from "@/features/home/components/home-goals";
-import { StagePath } from "@/features/home/components/stage-path";
+import { StageGlance, StagePath } from "@/features/home/components/stage-path";
 import { SubjectTiles } from "@/features/home/components/subject-tiles";
 import { WeekAndExamSummary } from "@/features/home/components/week-and-exam";
 import { GrowthNotices } from "@/features/mascot/components/growth-notices";
@@ -103,6 +103,7 @@ async function StudentHome() {
   return (
     <>
       <PageHeader
+        compact
         title={`Merhaba, ${user.displayName}`}
         description={`Bugün ${formatTurkishDate(today)}. Küçük bir adım da ilerleme sayılır.`}
       />
@@ -113,15 +114,18 @@ async function StudentHome() {
         </div>
       ) : null}
       {/*
-        Phone order: coach, stage path, today's goals, lesson tiles, summary.
-        The coach stays full width above the path so the next step is readable
-        before the character band. From lg, goals and tiles sit side by side.
-        The page canvas stays neutral; cards carry the surface.
+        Narrow screens: short greeting, notice, the full coach sentence, its
+        existing action, then a one-line stage glance. The four-stop path stays
+        below that line and is not repeated from `sm` up, where the glance hides.
+        From lg, goals and tiles sit side by side. The canvas stays neutral.
       */}
       <div className="grid min-w-0 gap-4">
         <RecommendationCard
           report={explained.report}
           explanation={explained.explanation}
+          afterAction={
+            <StageGlance className="sm:hidden" stageName={growth.stageName} />
+          }
         />
         <StagePath
           stageId={growth.stageId}

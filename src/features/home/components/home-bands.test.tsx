@@ -3,7 +3,8 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import type { CelebrationView } from "../celebration";
 import { CelebrationDialog } from "./celebration-dialog";
 import { DailyGoals } from "./daily-goals";
-import { StagePath } from "./stage-path";
+import { StageGlance, StagePath } from "./stage-path";
+
 import { SubjectTiles } from "./subject-tiles";
 import { addCalendarDays } from "@/features/study/calendar";
 import { evaluateGrowth, type StudyContribution } from "@/features/mascot/growth";
@@ -93,6 +94,17 @@ describe("StagePath", () => {
       screen.getByText("Bu en yüksek aşama. Kazandığın aşama sende kalır."),
     ).toBeTruthy();
     expect(screen.queryByText(/Kalan/)).toBeNull();
+  });
+});
+
+describe("StageGlance", () => {
+  it("shows the real stage name and the current stop, without clipping the words", () => {
+    render(<StageGlance stageName="Birlikte büyüyor" />);
+    const glance = document.querySelector("[data-stage-glance]");
+    expect(glance?.textContent).toContain("Birlikte büyüyor");
+    expect(glance?.textContent).toContain("Buradasın");
+    expect(glance?.textContent).not.toMatch(/…|\.\.\./);
+    expect(screen.queryByRole("link")).toBeNull();
   });
 });
 

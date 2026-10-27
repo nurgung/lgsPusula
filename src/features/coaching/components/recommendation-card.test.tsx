@@ -34,6 +34,37 @@ describe("RecommendationCard", () => {
     );
   });
 
+  it("places extra home content after the action and before the reason", () => {
+    render(
+      <RecommendationCard
+        afterAction={<p>Aşama özeti</p>}
+        report={buildCoachingReport({
+          today: "2026-10-20",
+          logs: [],
+          goals: [],
+          exams: [],
+          mistakes: [],
+        })}
+      />,
+    );
+    const lead = screen.getByText(/küçük bir soru hedefi/);
+    const action = screen.getByRole("link", { name: "Hedef belirle" });
+    const glance = screen.getByText("Aşama özeti");
+    const reason = screen.getByText(/günlük hedef satırı yok/);
+    expect(
+      lead.compareDocumentPosition(action) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      action.compareDocumentPosition(glance) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      glance.compareDocumentPosition(reason) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(lead.textContent).toBe(
+      "Bugün için küçük bir soru hedefi belirleyebilirsin. Hedef seçmezsen de çalışma kaydı yazabilirsin.",
+    );
+  });
+
   it("hides the student action when a parent is reading", () => {
     render(
       <RecommendationCard

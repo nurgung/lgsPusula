@@ -8,6 +8,34 @@ import { cn } from "@/lib/cn";
 /** Share of the desktop track filled up to the current stop. Static names so Tailwind keeps them. */
 const PATH_FILL = ["w-0", "w-1/4", "w-1/2", "w-3/4"] as const;
 
+/**
+ * Current stop only, for the narrow home screen. The four-stop path stays
+ * further down the page and is unchanged from the `sm` breakpoint up.
+ */
+export function StageGlance({
+  stageName,
+  className,
+}: {
+  stageName: string;
+  className?: string;
+}) {
+  return (
+    <p
+      className={cn(
+        "flex min-h-11 min-w-0 flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-border bg-canvas px-3 py-2",
+        className,
+      )}
+      data-stage-glance=""
+    >
+      <span className="text-sm font-semibold text-ink-700">Aşama</span>
+      <span className="min-w-0 text-base font-extrabold break-words text-ink-900">{stageName}</span>
+      <span className="rounded-full bg-brand-100 px-2 py-0.5 text-sm font-bold text-ink-900">
+        Buradasın
+      </span>
+    </p>
+  );
+}
+
 export function StagePath({
   stageId,
   species,
