@@ -34,7 +34,7 @@ describe("studentVisibleEvidence", () => {
 });
 
 describe("coachingLead", () => {
-  it("keeps the action and leaves the outcome wording in the evidence", () => {
+  it("keeps the outcome code and description in the lead", () => {
     const report = buildCoachingReport({
       today: "2026-10-20",
       logs: [],
@@ -53,9 +53,10 @@ describe("coachingLead", () => {
       ],
     });
     const lead = coachingLead(report.recommendation.message, report.recommendation.evidence);
-    expect(lead).toMatch(/^Fen Bilimleri dersinde bu kazanım için 1 soru çöz\./);
-    expect(lead).not.toMatch(/F\.8\.1\.1\.1/);
-    expect(lead).not.toMatch(/Mevsimlerin/);
+    expect(lead).toMatch(
+      /^Fen Bilimleri dersinde F\.8\.1\.1\.1 kazanımı şunu söyler: Mevsimlerin oluşumuna yönelik tahminlerde bulunur\./,
+    );
+    expect(lead).toMatch(/Bu kazanım için 1 soru çöz\./);
     expect(studentVisibleEvidence(report.recommendation.evidence).join("\n")).toMatch(
       /F\.8\.1\.1\.1/,
     );

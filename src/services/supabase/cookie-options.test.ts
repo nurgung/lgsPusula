@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { withAuthCookieOptions } from "./cookie-options";
+import { parseCookieHeader, withAuthCookieOptions } from "./cookie-options";
 
 describe("withAuthCookieOptions", () => {
   it("forces Secure, HttpOnly and SameSite=Lax on every auth cookie", () => {
@@ -19,5 +19,20 @@ describe("withAuthCookieOptions", () => {
       httpOnly: true,
     });
     expect(withAuthCookieOptions(undefined)).toMatchObject({ secure: true });
+  });
+});
+
+describe("parseCookieHeader", () => {
+  it("returns an empty list when the header is missing", () => {
+    expect(parseCookieHeader(null)).toEqual([]);
+    expect(parseCookieHeader("")).toEqual([]);
+  });
+
+  it("keeps values that contain equals signs", () => {
+    expect(parseCookieHeader("a=1; b=c=d; e=f")).toEqual([
+      { name: "a", value: "1" },
+      { name: "b", value: "c=d" },
+      { name: "e", value: "f" },
+    ]);
   });
 });

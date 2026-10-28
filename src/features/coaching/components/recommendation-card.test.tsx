@@ -158,10 +158,9 @@ describe("RecommendationCard", () => {
         })}
       />,
     );
-    const lead = screen.getByText(/bu kazanım için 2 soru çöz/);
-    expect(lead.textContent).not.toMatch(/Mevsimlerin/);
-    expect(lead.textContent).not.toMatch(/F\.8\.1\.1\.1/);
-    expect(screen.getByText(/Mevsimlerin oluşumuna/)).toBeTruthy();
+    const lead = screen.getByText(/F\.8\.1\.1\.1 kazanımı şunu söyler/);
+    expect(lead.textContent).toMatch(/Mevsimlerin oluşumuna yönelik tahminlerde bulunur/);
+    expect(lead.textContent).toMatch(/Bu kazanım için 2 soru çöz/);
     expect(screen.getByText(/2 yanlış, 0 boş/)).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Neden bu öneri?" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Tamamlandı" })).toBeTruthy();

@@ -16,3 +16,20 @@ export const AUTH_COOKIE_OPTIONS = {
 export function withAuthCookieOptions(options: CookieOptions | undefined): CookieOptions {
   return { ...options, ...AUTH_COOKIE_OPTIONS };
 }
+
+/** Cookie pairs from the incoming Cookie header (name/value only). */
+export function parseCookieHeader(header: string | null): { name: string; value: string }[] {
+  if (!header) return [];
+  const pairs: { name: string; value: string }[] = [];
+  for (const part of header.split(";")) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const eq = trimmed.indexOf("=");
+    if (eq === -1) {
+      pairs.push({ name: trimmed, value: "" });
+      continue;
+    }
+    pairs.push({ name: trimmed.slice(0, eq), value: trimmed.slice(eq + 1) });
+  }
+  return pairs;
+}

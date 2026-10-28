@@ -61,18 +61,41 @@ export default function HomePreviewPage() {
     logs: [],
     goals: [],
     exams: [],
-    mistakes: [],
+    mistakes: [
+      {
+        outcomeId: "11111111-1111-4111-8111-111111111111",
+        outcomeCode: "M.8.1.1",
+        outcomeDescription: "Tam sayılarla işlemler yapar.",
+        subjectId: "ornek-matematik",
+        subjectName: "Matematik",
+        kind: "wrong",
+        takenOn: addCalendarDays(today, -5),
+      },
+      {
+        outcomeId: "11111111-1111-4111-8111-111111111111",
+        outcomeCode: "M.8.1.1",
+        outcomeDescription: "Tam sayılarla işlemler yapar.",
+        subjectId: "ornek-matematik",
+        subjectName: "Matematik",
+        kind: "wrong",
+        takenOn: addCalendarDays(today, -5),
+      },
+      {
+        outcomeId: "11111111-1111-4111-8111-111111111111",
+        outcomeCode: "M.8.1.1",
+        outcomeDescription: "Tam sayılarla işlemler yapar.",
+        subjectId: "ornek-matematik",
+        subjectName: "Matematik",
+        kind: "blank",
+        takenOn: addCalendarDays(today, -12),
+      },
+    ],
   });
   const sampleReport = {
     ...report,
     recommendation: {
       ...report.recommendation,
-      message: "Matematik dersinde bu kazanım için 3 soru çöz.",
-      reason: "Bu öneri, son 90 günde bir kazanıma bağlandığın yanlış ve boş sorulara dayanıyor.",
-      evidence: ["Örnek veri: 4 yanlış, 2 boş soru."],
-      practice: { outcomeId: "ornek-kazanim", questionCount: 3 },
       href: "/onizleme/ana-sayfa",
-      actionLabel: "Kazanımlara bak",
     },
   };
   const week = {
