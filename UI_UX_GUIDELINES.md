@@ -16,15 +16,59 @@ LGS Pusula; 8. sınıf öğrencileri için güven veren, modern, anlaşılır ve
 
 ## Görsel kimlik
 
-- Genel his: enerjik, sakin, güvenilir ve çağdaş.
-- Renk yaklaşımı: koyu lacivert veya mürekkep tonlarıyla dengelenen mavi/teal ana renk; başarı için ölçülü yeşil; dikkat için kehribar; hata için erişilebilir kırmızı.
-- Arka plan: geniş boşluklar ve düşük görsel gürültü.
+- Genel his: temiz, modern ve profesyonel bir eğitim uygulaması; canlı ama aşırı çocukça değil.
+- Renk yaklaşımı: açık mavi/beyaz yüzeyler; kontrollü turkuaz (marka) vurgu; başarı için ölçülü yeşil; dikkat için kehribar; hata için erişilebilir kırmızı; özet bloklarında kontrollü gök mavisi (accent).
+- Arka plan: nötr açık canvas; geniş boşluklar ve düşük görsel gürültü.
 - Kartlar: az sayıda anlamlı kart; her kart tek bir ana göreve veya ölçüme hizmet etmeli.
+- Karakter: ana görsel odak; kritik bilgi yalnızca görselde bulunmamalı.
 - Köşeler ve gölgeler: tutarlı, ölçülü ve performansı etkilemeyecek düzeyde.
-- Tipografi: Türkçe karakterleri iyi destekleyen, okunaklı bir sans-serif yazı tipi.
-- İllüstrasyonlar: özgün ve tutarlı karakter ailesi; kritik bilgi yalnızca görselde bulunmamalı.
+- Tipografi: Nunito (latin + latin-ext); büyük, kolay okunan başlıklar; yardımcı metin gövdeden ayrılır.
+- İllüstrasyonlar: özgün ve tutarlı karakter ailesi.
 
-Renk token'ları merkezi tema dosyasında tanımlanmalı; bileşenlere rastgele hex renkler dağılmamalıdır.
+**Tek tasarım sistemi:** Tüm renk, tipografi, boşluk, yarıçap ve gölge değerleri `src/app/globals.css` içindeki `@theme` token'larından gelir. Bileşenlere rastgele hex dağılmaz. Yeni metin/zemin çifti `src/lib/contrast.test.ts` içine eklenir. Sonraki görsel fazlar bu token'lardan sapmaz; ikinci bir tema veya bileşen kütüphanesi açılmaz.
+
+## Tasarım sistemi (token'lar)
+
+Kaynak: `src/app/globals.css`. Ortak UI: `src/components/ui/*`.
+
+### Renkler
+
+| Rol | Token örnekleri | Kullanım |
+| --- | --- | --- |
+| Sayfa zemini | `canvas`, `canvas-soft` | Sayfa arka planı; yumuşak teal yıkama |
+| Yüzey | `surface`, `surface-muted` | Kart; sessiz/ikincil panel |
+| Kenarlık | `border`, `border-strong` | Kart ve ikincil düğme kenarı |
+| Metin | `ink-900`, `ink-700`, `ink-600`, `ink-500` | Ana, ikincil, yardımcı, soluk yardımcı |
+| Marka | `brand-50` … `brand-800` | Birincil işlem, vurgu, dolgu |
+| İkincil vurgu | `accent-50`, `accent-100`, `accent-700` | Haftalık özet / deneme gibi farklılaştırılmış yüzey |
+| Durum | `success-*`, `warning-*`, `danger-*`, `info-*` | Başarı, uyarı, hata, bilgi |
+| Odak | `focus` | `:focus-visible` halkası |
+
+### Tipografi
+
+| Rol | Token / sınıf | Not |
+| --- | --- | --- |
+| Sayfa başlığı | `text-page-title` | `PageHeader` |
+| Bölüm başlığı | `text-section` | Bant / bölüm |
+| Kart başlığı | `text-card-title` | `Card` |
+| Gövde | `text-body` | Varsayılan gövde |
+| Yardımcı | `text-helper` | Açıklama, etiket |
+| Sayısal | `text-metric`, `text-metric-lg` | İlerleme ve özet rakamları |
+
+### Boşluk, yarıçap, gölge
+
+- Boşluk: `spacing-card-x/y`, `spacing-section`, `spacing-band`, `spacing-touch` (min. dokunma ~44px).
+- Yarıçap: `radius-control` (düğme/alan), `radius-card`, `radius-panel`, `radius-pill`.
+- Gölge: `shadow-soft`, `shadow-card`, `shadow-raised` — hafif ve tutarlı.
+
+### Kart ve düğme
+
+- `Card` varyantları: `default` (standart), `feature` (vurgulu), `quiet` (ikincil panel), `accent` (farklılaştırılmış özet yüzeyi).
+- `Button` / `ButtonLink`: `primary` (turkuaz dolgu, kolay ayırt edilir), `secondary` (kenarlıklı yüzey), `ghost` (metin bağlantısı). Hover / disabled durumları token'lıdır; odak `:focus-visible` ile görünür.
+- İlerleme: `ProgressMeter` (`regular` / `strong` / `hero`; iz `brand` veya `quiet`).
+- Durum yüzeyi: `StateMessage` (`loading` / `empty` / `error` / `success` / `info`) — anlam her zaman metinle gelir.
+
+Bu fazda öğrenci ana sayfasının bölüm sırası ve kart yerleşimi değiştirilmez; sonraki fazlar aynı token ve bileşenleri kullanarak kompozisyonu yeniler.
 
 ## Bilgi mimarisi
 
@@ -36,7 +80,9 @@ Hedef yerleşim `roadmap.md` Faz 14'tedir. Örnek görseller dizilimin örneğid
 - Görünür aşama yalnızca puana bakmaz. Seri, farklı gün, geçerli soru ve mevcut puan eşiği birlikte gerekir. Bir günde en fazla bir aşama ilerler. Boş gün seriyi yeniden başlatır; kazanılan aşamayı, puanı ve rozeti silmez.
 - Günlük hedefler: bugünkü kayıt, soru hedefi ve varsa kazanım işi. Açık görev, tamamlanandan daha belirgindir. Tamamlanan satır işaretlidir. Günlük ve haftalık soru hedefleri aynı bölümde, ayrı başlıklarla durur.
 - Ders karoları: katalogdaki gerçek dersler. Kutuda bu haftanın soru sayısı ve varsa o derse ait hedef vardır. Veri yoksa boş durum gösterilir. Başarı yüzdesi, performans puanı veya sıralama üretilmez.
-- Koç kartı, kısa bildirimlerden sonra ve aşama yolundan önce durur. Küçük başlık "Bugünkü koçun"dur. Öneri cümlesi kartın en belirgin metnidir.
+- Karakter bandı (`CharacterHero`) karşılamadan hemen sonra durur: figür, aşama, istatistikler, dört duraklı yol ve sonraki aşama.
+- Seri / sağlık / hatırlatma duyuruları karakter bandı ile koç kartı arasında, koçtan daha hafif şeritler olarak durur; aynı görsel ağırlıkta kart olmazlar.
+- Koç kartı (`RecommendationCard`) duyurulardan sonra gelir. Sıra: kısa başlık → öneri cümlesi (vurgulu yüzey) → kısa neden → birincil/ikincil işlem → isteğe bağlı "Neden bu öneri?" ve sade anlatım. Öneri metni kartın en belirgin satırıdır.
 - Alt özet: haftalık soru ve dakika toplamı, son deneme neti, gizlilik ve veli bağlantısı.
 
 Koçluk kartının ilk görünümünde kısa öneri, sıradaki işlem, kısa gerekçe ve bağlantı durur. Kazanım kodu, uzun açıklama, yanlış ve boş sayıları ile tarih aralığı "Neden bu öneri?" içindedir. Yapay zekâ cümlesi varsa "Sade anlatım" başlığıyla kural cümlesinden ayrı durur. Cümle yoksa sahte yanıt gösterilmez; kısa bir durum yazar. Sayfa zemini nötr kalır; kartlar yüzey rengindedir. Ders kutuları tek renktir.

@@ -47,9 +47,9 @@ function barWidth(percent: number): string {
 }
 
 const TRACK = {
-  regular: "mt-2 h-3 w-full overflow-hidden rounded-full",
-  strong: "mt-2 h-5 w-full overflow-hidden rounded-full",
-  hero: "mt-3 h-5 w-full overflow-hidden rounded-full",
+  regular: "mt-2 h-3 w-full overflow-hidden rounded-pill",
+  strong: "mt-2 h-5 w-full overflow-hidden rounded-pill",
+  hero: "mt-3 h-5 w-full overflow-hidden rounded-pill",
 } as const;
 
 const TRACK_COLOR = {
@@ -74,14 +74,14 @@ export function ProgressMeter({
     <div>
       {size === "hero" ? (
         <div className="grid gap-1">
-          <span className="text-sm font-semibold text-ink-700">{label}</span>
+          <span className="text-helper font-semibold text-ink-700">{label}</span>
           <p className="flex flex-wrap items-baseline gap-x-2 text-ink-900">
-            <span className="text-4xl font-extrabold tabular-nums leading-none">{value}</span>
-            <span className="text-lg font-bold text-ink-700">{` / ${max} ${unit}`}</span>
+            <span className="text-metric-lg font-extrabold tabular-nums">{value}</span>
+            <span className="text-section font-bold text-ink-700">{` / ${max} ${unit}`}</span>
           </p>
         </div>
       ) : (
-        <div className="flex flex-wrap items-baseline justify-between gap-x-2 text-sm">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-2 text-helper">
           <span className="font-semibold text-ink-900">{label}</span>
           <span className="text-ink-700">{valueText}</span>
         </div>
@@ -95,7 +95,7 @@ export function ProgressMeter({
         aria-valuetext={valueText}
         className={`${TRACK[size]} ${TRACK_COLOR[track]}`}
       >
-        <div className={`h-full rounded-full bg-brand-600 ${barWidth(percent)}`} />
+        <div className={`h-full rounded-pill bg-brand-600 ${barWidth(percent)}`} />
       </div>
     </div>
   );

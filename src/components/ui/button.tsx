@@ -5,11 +5,11 @@ import { cn } from "@/lib/cn";
 type ButtonVariant = "primary" | "secondary" | "ghost";
 
 const base =
-  "inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl px-4 py-2 text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex min-h-touch min-w-touch items-center justify-center gap-2 rounded-control px-4 py-2 text-body font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60";
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "bg-brand-600 text-white hover:bg-brand-700",
-  secondary: "border border-border bg-surface text-ink-900 hover:bg-brand-50",
+  primary: "bg-brand-600 text-white shadow-soft hover:bg-brand-700",
+  secondary: "border border-border-strong bg-surface text-ink-900 hover:bg-brand-50",
   ghost: "text-brand-700 hover:bg-brand-50",
 };
 

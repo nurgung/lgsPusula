@@ -88,7 +88,7 @@ function ToastItem({
         type="button"
         onClick={() => onDismiss(toast.id)}
         aria-label={`Bildirimi kapat: ${toast.title}`}
-        className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl text-ink-700 hover:bg-surface"
+        className="inline-flex size-touch shrink-0 items-center justify-center rounded-control text-ink-700 hover:bg-surface-muted"
       >
         <svg
           width="20"

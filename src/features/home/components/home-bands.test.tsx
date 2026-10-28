@@ -4,10 +4,8 @@ import type { CelebrationView } from "../celebration";
 import { CelebrationDialog } from "./celebration-dialog";
 import { DailyGoals } from "./daily-goals";
 import { StageGlance, StagePath } from "./stage-path";
-
 import { SubjectTiles } from "./subject-tiles";
-import { addCalendarDays } from "@/features/study/calendar";
-import { evaluateGrowth, type StudyContribution } from "@/features/mascot/growth";
+
 
 beforeAll(() => {
   HTMLDialogElement.prototype.showModal = function showModal(this: HTMLDialogElement) {
@@ -30,70 +28,22 @@ const view: CelebrationView = {
 };
 
 describe("StagePath", () => {
-  it("marks the current stop with the character and names every stop", () => {
-    const logs: StudyContribution[] = Array.from({ length: 7 }, (_, index) => ({
-      studiedOn: addCalendarDays("2026-10-24", index - 6),
-      questionCount: 1,
-    }));
-    const growth = evaluateGrowth({
-      today: "2026-10-24",
-      logs,
-      rewards: logs.map((log) => ({ points: 5, sourceDate: log.studiedOn })),
-    });
-    render(<StagePath stageId={growth.stageId} species="cat" growth={growth} detailed />);
+  it("keeps the compact celebration path with every stop name", () => {
+    render(<StagePath stageId="settling" species="cat" />);
     expect(screen.getByRole("heading", { name: "Aşama yolun" })).toBeTruthy();
     for (const name of ["Yeni arkadaş", "Alışıyor", "Birlikte büyüyor", "Yol arkadaşı"]) {
       expect(screen.getByText(name)).toBeTruthy();
     }
     expect(screen.getByText("Geçildi")).toBeTruthy();
-    expect(screen.getByText("Hayvan: Kedi. Buradasın.")).toBeTruthy();
+    expect(screen.getByText("Kedi. Buradasın.")).toBeTruthy();
     expect(
       document.querySelector(
-        '[data-species-figure="cat"][data-health="healthy"][data-growth-stage="settling"]',
+        '[data-species-figure="cat"][data-figure-size="compact"][data-growth-stage="settling"]',
       ),
     ).toBeTruthy();
-    expect(document.querySelector(".species-cat-head")).toBeTruthy();
-    expect(document.querySelector('[data-figure-size="hero"]')).toBeTruthy();
-    expect(document.querySelectorAll('[data-species-figure="cat"]')).toHaveLength(1);
-    expect(screen.getByText("Karakter puanı")).toBeTruthy();
-    expect(screen.getByText("Çalışma serisi")).toBeTruthy();
-    expect(screen.getByText("Toplam soru")).toBeTruthy();
-    expect(screen.getByRole("progressbar").className).toContain("h-5");
-    expect(document.querySelector("svg")).toBeNull();
     expect(screen.getAllByText("Sırada")).toHaveLength(2);
-    const stageName = screen.getByText("Alışıyor");
-    const pointsLabel = screen.getByText("Karakter puanı");
-    expect(
-      stageName.compareDocumentPosition(pointsLabel) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-    expect(screen.getByText("35")).toBeTruthy();
-    expect(screen.getByText("7 gün")).toBeTruthy();
-    expect(screen.queryByText("Toplam 35 karakter puanı. Aşama: Alışıyor.")).toBeNull();
-    expect(screen.queryByText(/En uzun seri: 7 gün/)).toBeNull();
-    expect(screen.getByText("14 günlük seriyi tamamlaman gerekiyor")).toBeTruthy();
-    expect(screen.getByText("Buradasın")).toBeTruthy();
+    expect(screen.queryByText("Karakter puanı")).toBeNull();
     expect(screen.queryByText(/Level|Explorer/)).toBeNull();
-    expect(screen.getByRole("link", { name: "Karaktere bak" }).getAttribute("href")).toBe(
-      "/ogrenci/karakter",
-    );
-  });
-
-  it("names the top stage without asking for another step", () => {
-    const logs: StudyContribution[] = Array.from({ length: 30 }, (_, index) => ({
-      studiedOn: addCalendarDays("2026-10-24", index - 29),
-      questionCount: 25,
-    }));
-    const growth = evaluateGrowth({
-      today: "2026-10-24",
-      logs,
-      rewards: logs.map((log) => ({ points: 5, sourceDate: log.studiedOn })),
-    });
-    render(<StagePath stageId={growth.stageId} species="cat" growth={growth} detailed />);
-    expect(growth.stageId).toBe("companion");
-    expect(
-      screen.getByText("Bu en yüksek aşama. Kazandığın aşama sende kalır."),
-    ).toBeTruthy();
-    expect(screen.queryByText(/Kalan/)).toBeNull();
   });
 });
 

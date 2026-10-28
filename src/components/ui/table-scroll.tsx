@@ -10,7 +10,7 @@ export function TableScroll({ label, children }: { label: string; children: Reac
       role="region"
       aria-label={label}
       tabIndex={0}
-      className="max-w-full overflow-x-auto rounded-xl border border-border"
+      className="max-w-full overflow-x-auto rounded-card border border-border"
     >
       {children}
     </div>
@@ -19,5 +19,5 @@ export function TableScroll({ label, children }: { label: string; children: Reac
 
 export const tableClassName = "w-full border-collapse text-left text-sm";
 export const thClassName =
-  "border-b border-border bg-canvas px-2 py-2 font-semibold text-ink-700 sm:px-3";
+  "border-b border-border bg-surface-muted px-2 py-2 font-semibold text-ink-700 sm:px-3";
 export const tdClassName = "border-b border-border px-2 py-2 text-ink-900 sm:px-3";

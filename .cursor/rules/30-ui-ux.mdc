@@ -20,3 +20,5 @@ alwaysApply: true
 - Mobilde tabloların önemli sütunlarını kaybetme; uygun kart görünümü veya kontrollü kaydırma sun.
 - Gerçek veri yerine örnek veri kullanıyorsan bunu geliştirme ortamında açıkça belirt.
 - Öğrenci ana sayfasını ve hedef tamamlama penceresini Faz 14 ile `40-student-dashboard.mdc` dışında değiştirme.
+- Görsel dil yalnızca `src/app/globals.css` token'ları ve `src/components/ui` ortak bileşenleridir. Yeni hex, ikinci tema veya paralel bileşen seti ekleme. Yeni metin/zemin çifti `src/lib/contrast.test.ts` içine girer.
+- Sonraki öğrenci ana sayfası görsel fazları bu tasarım sisteminden sapmadan ilerler; yalnızca kozmetik renk yaması yapma.

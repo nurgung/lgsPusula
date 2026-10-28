@@ -12,14 +12,14 @@ export function PageHeader({
   compact?: boolean;
 }) {
   return (
-    <header className={compact ? "mb-3 sm:mb-6" : "mb-6"}>
-      <h1 className="text-2xl font-extrabold break-words text-ink-900 sm:text-3xl">
+    <header className={compact ? "mb-3 sm:mb-6" : "mb-section"}>
+      <h1 className="text-page-title font-extrabold break-words text-ink-900 sm:text-3xl">
         {title}
       </h1>
       {description ? (
         <p
           className={cn(
-            "max-w-prose break-words text-base text-ink-700",
+            "max-w-prose break-words text-body text-ink-700",
             compact ? "mt-1 sm:mt-2" : "mt-2",
           )}
         >

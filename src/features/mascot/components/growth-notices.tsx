@@ -4,6 +4,12 @@ import { MASCOT_MESSAGES } from "../messages";
 /** Shorter than `noticeInApp`, with the same two facts: in-app only, no phone push. */
 const NOTICE_CHANNEL = "Yalnızca uygulama içi. Telefon bildirimi yok.";
 
+const dismissClassName =
+  "inline-flex min-h-touch min-w-touch items-center justify-center rounded-control border border-border bg-surface px-3 py-2 text-helper font-semibold text-ink-900 hover:bg-surface-muted";
+
+/**
+ * Compact strips — lighter than the coach card so they do not compete for attention.
+ */
 export function GrowthNotices({
   notices,
 }: {
@@ -11,22 +17,21 @@ export function GrowthNotices({
 }) {
   if (notices.length === 0) return null;
   return (
-    <div className="mb-2 grid min-w-0 gap-2 sm:mb-3">
+    <div className="grid min-w-0 gap-2" data-growth-notices="">
       {notices.map((notice) => (
         <section
           key={notice.id}
-          className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 rounded-xl border border-border bg-canvas px-3 py-2 max-sm:py-1"
+          className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-1 rounded-control border border-border border-l-4 border-l-brand-200 bg-surface-muted px-3 py-2"
           aria-labelledby={`duyuru-${notice.id}`}
         >
-          {/* Narrow screens keep the title beside Gizle and let the sentences use the full row. */}
           <div className="min-w-0 max-sm:contents">
             <h2
               id={`duyuru-${notice.id}`}
-              className="text-sm font-bold break-words text-ink-900 max-sm:self-center"
+              className="text-helper font-bold break-words text-ink-900 max-sm:self-center"
             >
               {notice.title}
             </h2>
-            <p className="min-w-0 text-sm leading-snug break-words text-ink-900 max-sm:col-span-2">
+            <p className="min-w-0 text-helper leading-snug break-words text-ink-700 max-sm:col-span-2">
               {notice.body}
             </p>
             <p className="text-xs leading-snug break-words text-ink-600 max-sm:col-span-2">
@@ -35,10 +40,7 @@ export function GrowthNotices({
           </div>
           <form action={dismissReminderAction} className="max-sm:col-start-2 max-sm:row-start-1">
             <input type="hidden" name="noticeId" value={notice.id} />
-            <button
-              type="submit"
-              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-ink-900"
-            >
+            <button type="submit" className={dismissClassName}>
               {MASCOT_MESSAGES.noticeDismiss}
             </button>
           </form>

@@ -11,26 +11,27 @@ import { CharacterStatus } from "./character-status";
 export function ReminderCard({ noticeId }: { noticeId: string }) {
   return (
     <section
-      className="grid min-w-0 items-center gap-2 rounded-xl border border-border bg-canvas px-3 py-2 sm:grid-cols-[minmax(0,1fr)_auto]"
+      className="grid min-w-0 items-start gap-2 rounded-control border border-border border-l-4 border-l-warning-500 bg-warning-50 px-3 py-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
       aria-labelledby="hatirlatma-baslik"
+      data-reminder-card=""
     >
       <div className="min-w-0">
-        <h2 id="hatirlatma-baslik" className="text-sm font-bold break-words text-ink-900">
+        <h2 id="hatirlatma-baslik" className="text-helper font-bold break-words text-ink-900">
           {MASCOT_MESSAGES.reminderTitle}
         </h2>
-        <p className="min-w-0 text-sm leading-snug break-words text-ink-900">
+        <p className="min-w-0 text-helper leading-snug break-words text-ink-700">
           {MASCOT_MESSAGES.reminderBody}
         </p>
       </div>
       <div className="flex min-w-0 flex-wrap items-center gap-2">
-        <ButtonLink href="/ogrenci/calisma/yeni" variant="ghost">
+        <ButtonLink href="/ogrenci/calisma/yeni" variant="secondary">
           {MASCOT_MESSAGES.reminderAction}
         </ButtonLink>
         <form action={dismissReminderAction}>
           <input type="hidden" name="noticeId" value={noticeId} />
           <button
             type="submit"
-            className="inline-flex min-h-11 items-center justify-center rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-ink-900"
+            className="inline-flex min-h-touch min-w-touch items-center justify-center rounded-control border border-border bg-surface px-3 py-2 text-helper font-semibold text-ink-900 hover:bg-surface-muted"
           >
             {MASCOT_MESSAGES.reminderDismiss}
           </button>

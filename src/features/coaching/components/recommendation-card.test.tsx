@@ -34,7 +34,7 @@ describe("RecommendationCard", () => {
     );
   });
 
-  it("places extra home content after the action and before the reason", () => {
+  it("keeps lead, reason, action, then optional home content in that order", () => {
     render(
       <RecommendationCard
         afterAction={<p>Aşama özeti</p>}
@@ -48,21 +48,22 @@ describe("RecommendationCard", () => {
       />,
     );
     const lead = screen.getByText(/küçük bir soru hedefi/);
+    const reason = screen.getByText(/günlük hedef satırı yok/);
     const action = screen.getByRole("link", { name: "Hedef belirle" });
     const glance = screen.getByText("Aşama özeti");
-    const reason = screen.getByText(/günlük hedef satırı yok/);
     expect(
-      lead.compareDocumentPosition(action) & Node.DOCUMENT_POSITION_FOLLOWING,
+      lead.compareDocumentPosition(reason) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      reason.compareDocumentPosition(action) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
     expect(
       action.compareDocumentPosition(glance) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
-    expect(
-      glance.compareDocumentPosition(reason) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
     expect(lead.textContent).toBe(
       "Bugün için küçük bir soru hedefi belirleyebilirsin. Hedef seçmezsen de çalışma kaydı yazabilirsin.",
     );
+    expect(screen.getByText(/^Neden:/)).toBeTruthy();
   });
 
   it("hides the student action when a parent is reading", () => {

@@ -18,7 +18,7 @@ export function RecommendationCard({
   audience?: "student" | "parent";
   readOnlyNote?: string;
   explanation?: string | null;
-  /** Sits after the existing action and before the reason. Home uses it for the narrow-screen stage line. */
+  /** Sits after the action row. Home no longer needs a stage glance here. */
   afterAction?: ReactNode;
 }) {
   const item = report.recommendation;
@@ -49,43 +49,51 @@ export function RecommendationCard({
 
   return (
     <section
-      className="min-w-0 rounded-card border-2 border-brand-700 bg-surface px-3 pt-2 pb-3 shadow-card sm:p-4"
+      className="min-w-0 rounded-panel border border-border bg-surface p-4 shadow-card sm:p-5"
       aria-labelledby="bugunku-koc"
+      data-coach-card=""
     >
-      <h2 id="bugunku-koc" className="text-sm font-bold text-brand-700">
-        {COACHING_MESSAGES.cardTitle}
-      </h2>
-      <div className="mt-2 grid min-w-0 gap-2">
-        <div className="min-w-0 rounded-xl border border-brand-100 bg-brand-50 px-3 py-1.5 sm:py-2">
-          <p className="min-w-0 text-lg font-extrabold leading-snug break-words text-ink-900 sm:flex sm:items-start sm:gap-2">
-            <CoachMark className="max-sm:hidden" />
-            <span className="min-w-0">{lead}</span>
+      <div className="flex min-w-0 items-center gap-2">
+        <CoachMark />
+        <h2 id="bugunku-koc" className="text-helper font-bold tracking-wide text-brand-700 uppercase">
+          {COACHING_MESSAGES.cardTitle}
+        </h2>
+      </div>
+
+      <div className="mt-3 grid min-w-0 gap-3">
+        <div className="min-w-0 rounded-card bg-brand-50 px-4 py-3 sm:px-5 sm:py-4">
+          <p className="min-w-0 text-card-title font-extrabold leading-snug break-words text-ink-900 sm:text-section">
+            {lead}
           </p>
         </div>
-        {action}
-        {afterAction}
+
         {reason ? (
-          <p className="min-w-0 text-sm leading-snug break-words text-ink-700">
-            <span className="font-semibold text-ink-900">Gerekçe. </span>
+          <p className="min-w-0 text-helper leading-snug break-words text-ink-700">
+            <span className="font-semibold text-ink-900">Neden: </span>
             {reason}
           </p>
         ) : null}
+
         {audience === "parent" && readOnlyNote ? (
-          <p className="min-w-0 text-sm break-words text-ink-700">{readOnlyNote}</p>
+          <p className="min-w-0 text-helper break-words text-ink-700">{readOnlyNote}</p>
         ) : null}
+
+        {action}
+        {afterAction}
+
         {showDetails ? (
-          <details className="min-w-0 rounded-xl border border-border bg-canvas px-3">
-            <summary className="min-h-11 cursor-pointer rounded-xl py-2">
-              <h3 className="inline text-base font-bold text-ink-900">
+          <details className="min-w-0 rounded-card border border-border bg-surface-muted px-3 open:pb-2">
+            <summary className="min-h-touch cursor-pointer rounded-control py-2">
+              <h3 className="inline text-body font-bold text-ink-900">
                 {COACHING_MESSAGES.whyHeading}
               </h3>
             </summary>
-            <div className="grid min-w-0 gap-2 pb-2">
+            <div className="grid min-w-0 gap-2 pb-1">
               {parentWindow ? (
-                <p className="min-w-0 text-sm break-words text-ink-700">{parentWindow}</p>
+                <p className="min-w-0 text-helper break-words text-ink-700">{parentWindow}</p>
               ) : null}
               {details.length > 0 ? (
-                <ul className="grid min-w-0 list-disc gap-1 pl-5 text-sm text-ink-700">
+                <ul className="grid min-w-0 list-disc gap-1 pl-5 text-helper text-ink-700">
                   {details.map((line) => (
                     <li key={line} className="min-w-0 break-words">
                       {line}
@@ -96,23 +104,24 @@ export function RecommendationCard({
             </div>
           </details>
         ) : null}
+
         {explanation ? (
           <section
-            className="min-w-0 rounded-xl border border-border bg-canvas px-3 py-2"
+            className="min-w-0 rounded-card border border-border bg-surface-muted px-3 py-2"
             aria-labelledby="oneri-sade"
           >
-            <h3 id="oneri-sade" className="text-sm font-bold text-ink-900">
+            <h3 id="oneri-sade" className="text-helper font-bold text-ink-900">
               Sade anlatım
             </h3>
-            <p className="mt-1 min-w-0 text-sm leading-snug break-words text-ink-900">
+            <p className="mt-1 min-w-0 text-helper leading-snug break-words text-ink-900">
               {explanation}
             </p>
-            <p className="mt-1 text-sm leading-snug text-ink-700">
+            <p className="mt-1 text-helper leading-snug text-ink-600">
               {COACHING_MESSAGES.narrationDisclaimer}
             </p>
           </section>
         ) : (
-          <p className="min-w-0 text-sm leading-snug break-words text-ink-700">
+          <p className="min-w-0 text-helper leading-snug break-words text-ink-600">
             {COACHING_MESSAGES.narrationAbsent}
           </p>
         )}
@@ -126,13 +135,13 @@ function CoachMark({ className }: { className?: string }) {
     <span
       aria-hidden="true"
       className={cn(
-        "inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface text-brand-700",
+        "inline-flex size-9 shrink-0 items-center justify-center rounded-control bg-brand-100 text-brand-700",
         className,
       )}
     >
       <svg
-        width="24"
-        height="24"
+        width="20"
+        height="20"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"

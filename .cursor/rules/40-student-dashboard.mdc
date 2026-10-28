@@ -8,10 +8,10 @@ alwaysApply: false
 
 Ayrıntı `roadmap.md` Faz 14. Örnek görseller dizilim içindir; ekran birebir kopyalanmaz.
 
-- Sıra: koç kartı, aşama yolu, günlük hedefler, ders karoları, alt özet. `lg` altında bantlar alt alta iner. Koç kartı tam genişliktedir ve yolun üstündedir.
+- Sıra: karşılama, karakter bandı (`CharacterHero`), kompakt duyurular/hatırlatma, koç kartı (`RecommendationCard`), günlük hedefler, ders karoları, alt özet. `lg` altında bantlar alt alta iner. Karakter bandı görsel odaktır; duyurular koçtan hafiftir; koçta öneri cümlesi birincil işlemin üstündedir.
 - Tam sayfa yeşil zemin yok. Ders kutuları tek renktir ve bu haftanın kayıtlı soru sayısını gösterir. Koçluk kanıtı "Neden bu öneri?" içindedir. `mascot-v1` puan tablosu ve koçluk kuralı değişmez. Görünür aşama `growth-v1` ile okunur.
 - Menü `getNavItems` ile kalır. Yeni öğe ve koyu yan menü ekleme.
-- Renk yalnızca `globals.css` token'ıdır. Yeni çift `src/lib/contrast.test.ts` içine girer. Satır içi `style` yok.
+- Renk, tipografi, boşluk, yarıçap ve gölge yalnızca `globals.css` token'ıdır (`UI_UX_GUIDELINES.md` tasarım sistemi). Yeni çift `src/lib/contrast.test.ts` içine girer. Satır içi `style` yok. Kart/düğme/ilerleme için `src/components/ui` ortak bileşenlerini tercih et; paralel stil dili kurma.
 - Tamamlama penceresi yalnızca bu kayıtta hedef, rozet veya görünür aşama ilk kez ilerleyince açılır. Aşama, puan eşiği tek başına aşılınca açılmaz. İçinde dört durak, işaretli hedefler, madalya, gerçek Türkçe ad ve "Tamam" vardır.
 - Kazanım önerisindeki Tamamlandı bu pencereyi açmaz. Kısa alkış penceresi `alkis` işaretiyle açılır; puan yazılmaz. Konfeti yine yalnızca hareket tercihi açıksa görünür.
 - Pencere odak içinde kalır, Esc kapatır, kapanınca tek kullanımlık adres işareti silinir. Aynı gün yenilemek tekrar açmaz.

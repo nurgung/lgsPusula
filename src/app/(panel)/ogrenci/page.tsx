@@ -14,9 +14,9 @@ import { CreateInviteForm } from "@/features/family/components/create-invite-for
 import { RespondLinkForms } from "@/features/family/components/respond-link-forms";
 import { RevokeLinkButton } from "@/features/family/components/revoke-link-button";
 import { loadOwnFamilyLinks } from "@/features/family/load-links";
+import { CharacterHero } from "@/features/home/components/character-hero";
 import { EarnedBadges } from "@/features/home/components/earned-badges";
 import { HomeGoals } from "@/features/home/components/home-goals";
-import { StageGlance, StagePath } from "@/features/home/components/stage-path";
 import { SubjectTiles } from "@/features/home/components/subject-tiles";
 import { WeekAndExamSummary } from "@/features/home/components/week-and-exam";
 import { GrowthNotices } from "@/features/mascot/components/growth-notices";
@@ -105,33 +105,23 @@ async function StudentHome() {
       <PageHeader
         compact
         title={`Merhaba, ${user.displayName}`}
-        description={`Bugün ${formatTurkishDate(today)}. Küçük bir adım da ilerleme sayılır.`}
+        description={`Bugün ${formatTurkishDate(today)}.`}
       />
-      {growthNotices.length > 0 ? <GrowthNotices notices={growthNotices} /> : null}
-      {mascot.reminderId ? (
-        <div className="mb-3">
-          <ReminderCard noticeId={mascot.reminderId} />
-        </div>
-      ) : null}
       {/*
-        Narrow screens: short greeting, notice, the full coach sentence, its
-        existing action, then a one-line stage glance. The four-stop path stays
-        below that line and is not repeated from `sm` up, where the glance hides.
+        Phase 2–3: character band first; compact notices; coach card with clear action hierarchy.
         From lg, goals and tiles sit side by side. The canvas stays neutral.
       */}
-      <div className="grid min-w-0 gap-4">
+      <div className="grid min-w-0 gap-section">
+        <CharacterHero species={mascot.species} growth={growth} />
+        {growthNotices.length > 0 || mascot.reminderId ? (
+          <div className="grid min-w-0 gap-2">
+            {growthNotices.length > 0 ? <GrowthNotices notices={growthNotices} /> : null}
+            {mascot.reminderId ? <ReminderCard noticeId={mascot.reminderId} /> : null}
+          </div>
+        ) : null}
         <RecommendationCard
           report={explained.report}
           explanation={explained.explanation}
-          afterAction={
-            <StageGlance className="sm:hidden" stageName={growth.stageName} />
-          }
-        />
-        <StagePath
-          stageId={growth.stageId}
-          species={mascot.species}
-          growth={growth}
-          detailed
         />
         <div className="grid min-w-0 items-start gap-4 lg:grid-cols-2">
           <HomeGoals

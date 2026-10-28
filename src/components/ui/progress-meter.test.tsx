@@ -31,7 +31,7 @@ describe("ProgressMeter", () => {
     const figure = screen.getByText(
       (_content, node) => node?.textContent?.replace(/\s+/g, " ").trim() === "4 / 10 soru",
     );
-    expect(figure.querySelector(".text-4xl")?.textContent).toBe("4");
+    expect(figure.querySelector(".text-metric-lg")?.textContent).toBe("4");
     expect(figure.textContent).not.toContain("Hedefe ulaştın");
   });
 

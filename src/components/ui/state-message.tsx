@@ -4,8 +4,8 @@ import { cn } from "@/lib/cn";
 export type StateVariant = "loading" | "empty" | "error" | "success" | "info";
 
 const styles: Record<StateVariant, { box: string; label: string }> = {
-  loading: { box: "border-border bg-surface text-ink-700", label: "Yükleniyor" },
-  empty: { box: "border-border bg-canvas text-ink-700", label: "Henüz veri yok" },
+  loading: { box: "border-border bg-surface text-ink-700 shadow-soft", label: "Yükleniyor" },
+  empty: { box: "border-border bg-surface-muted text-ink-700", label: "Henüz veri yok" },
   error: { box: "border-danger-700/40 bg-danger-50 text-danger-700", label: "Hata" },
   success: {
     box: "border-success-700/40 bg-success-50 text-success-700",

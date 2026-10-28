@@ -4,11 +4,17 @@ import { contrastRatio } from "./contrast";
 // Keep these pairs aligned with the text/background tokens in src/app/globals.css.
 const PAIRS: { name: string; foreground: string; background: string; minimum: number }[] =
   [
-    { name: "ink on canvas", foreground: "#0f1b2d", background: "#f6f8fb", minimum: 4.5 },
+    { name: "ink on canvas", foreground: "#0f1b2d", background: "#f3f7fc", minimum: 4.5 },
     {
       name: "ink on surface",
       foreground: "#0f1b2d",
       background: "#ffffff",
+      minimum: 4.5,
+    },
+    {
+      name: "ink on surface muted",
+      foreground: "#0f1b2d",
+      background: "#eef3f9",
       minimum: 4.5,
     },
     {
@@ -17,7 +23,19 @@ const PAIRS: { name: string; foreground: string; background: string; minimum: nu
       background: "#ffffff",
       minimum: 4.5,
     },
+    {
+      name: "secondary text on surface muted",
+      foreground: "#2b3a52",
+      background: "#eef3f9",
+      minimum: 4.5,
+    },
     { name: "help text", foreground: "#4a5870", background: "#ffffff", minimum: 4.5 },
+    {
+      name: "muted help text on surface",
+      foreground: "#64748b",
+      background: "#ffffff",
+      minimum: 4.5,
+    },
     { name: "brand link", foreground: "#115e59", background: "#ffffff", minimum: 4.5 },
     {
       name: "primary button",
@@ -51,6 +69,24 @@ const PAIRS: { name: string; foreground: string; background: string; minimum: nu
       name: "secondary text on soft canvas",
       foreground: "#2b3a52",
       background: "#e7f3f0",
+      minimum: 4.5,
+    },
+    {
+      name: "ink on accent wash",
+      foreground: "#0f1b2d",
+      background: "#eff6ff",
+      minimum: 4.5,
+    },
+    {
+      name: "accent text on accent wash",
+      foreground: "#1d4ed8",
+      background: "#eff6ff",
+      minimum: 4.5,
+    },
+    {
+      name: "secondary text on accent wash",
+      foreground: "#2b3a52",
+      background: "#eff6ff",
       minimum: 4.5,
     },
     { name: "ink on tile 1", foreground: "#0f1b2d", background: "#e5f4f1", minimum: 4.5 },
