@@ -13,6 +13,7 @@ export function EarnedBadges({ rewards }: { rewards: readonly RewardEvent[] }) {
   return (
     <Card
       title="Rozetlerin"
+      icon={<TrophyIcon />}
       headingLevel={3}
       description={
         earned.length > 0 ? "Açıklamalar karakter sayfasında." : undefined
@@ -61,11 +62,30 @@ export function EarnedBadges({ rewards }: { rewards: readonly RewardEvent[] }) {
 
 function BadgeMark() {
   return (
-    <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-warning-50 text-warning-800">
+    <span className="inline-flex size-11 items-center justify-center rounded-full border-2 border-warning-500 bg-warning-50 text-warning-800 shadow-soft">
       <svg viewBox="0 0 48 48" className="h-7 w-7" aria-hidden="true">
         <circle cx="24" cy="18" r="10" fill="currentColor" />
         <path d="M16 26 L13 42 L24 35 L35 42 L32 26" fill="currentColor" />
       </svg>
     </span>
+  );
+}
+
+function TrophyIcon() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M8 4h8v5a4 4 0 0 1-8 0V4Z" />
+      <path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M9 20h6" />
+    </svg>
   );
 }

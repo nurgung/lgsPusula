@@ -19,8 +19,17 @@ const titles: Record<CardVariant, string> = {
   accent: "text-card-title font-bold",
 };
 
+const ICON_TONES = {
+  brand: "bg-brand-100 text-brand-800",
+  accent: "bg-accent-100 text-accent-700",
+  warm: "bg-warning-50 text-warning-800",
+} as const;
+
 type CardProps = {
   title?: string;
+  /** Decorative symbol in a round chip before the title. Needs `title`. The title carries the meaning. */
+  icon?: ReactNode;
+  iconTone?: keyof typeof ICON_TONES;
   description?: ReactNode;
   headingLevel?: 2 | 3;
   variant?: CardVariant;
@@ -30,6 +39,8 @@ type CardProps = {
 
 export function Card({
   title,
+  icon,
+  iconTone = "brand",
   description,
   headingLevel = 2,
   variant = "default",
@@ -39,12 +50,38 @@ export function Card({
   const Heading = headingLevel === 2 ? "h2" : "h3";
   return (
     <section className={cn("min-w-0 rounded-card border", shells[variant], className)}>
-      {title ? (
-        <Heading className={cn("break-words text-ink-900", titles[variant])}>
-          {title}
-        </Heading>
-      ) : null}
-      {description ? <p className="mt-1 text-helper text-ink-600">{description}</p> : null}
+      {title && icon ? (
+        <div className="flex min-w-0 items-start gap-3">
+          <span
+            aria-hidden="true"
+            className={cn(
+              "inline-flex size-9 shrink-0 items-center justify-center rounded-control",
+              ICON_TONES[iconTone],
+            )}
+          >
+            {icon}
+          </span>
+          <div className="min-w-0">
+            <Heading className={cn("break-words text-ink-900", titles[variant])}>
+              {title}
+            </Heading>
+            {description ? (
+              <p className="mt-1 text-helper text-ink-600">{description}</p>
+            ) : null}
+          </div>
+        </div>
+      ) : (
+        <>
+          {title ? (
+            <Heading className={cn("break-words text-ink-900", titles[variant])}>
+              {title}
+            </Heading>
+          ) : null}
+          {description ? (
+            <p className="mt-1 text-helper text-ink-600">{description}</p>
+          ) : null}
+        </>
+      )}
       {children ? (
         <div className={title || description ? "mt-4" : undefined}>{children}</div>
       ) : null}

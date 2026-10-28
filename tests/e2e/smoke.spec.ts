@@ -1,6 +1,14 @@
 import { expect, test } from "@playwright/test";
 
-const pages = ["/", "/giris", "/onizleme", "/onizleme/bilesenler", "/onizleme/durumlar"];
+const pages = [
+  "/",
+  "/giris",
+  "/onizleme",
+  "/onizleme/bilesenler",
+  "/onizleme/durumlar",
+  "/onizleme/karakterler",
+  "/onizleme/ana-sayfa",
+];
 
 for (const path of pages) {
   test(`${path} renders one h1 without horizontal overflow`, async ({ page }) => {

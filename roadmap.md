@@ -490,6 +490,7 @@ Penceredeki düzen ikinci görsele benzer, içeriği LGS'dir:
 - [x] 14.4 Pencere yalnızca eşiğin bu kayıtta aşıldığında açılır. Aynı gün sayfayı yenilemek pencereyi tekrar açmaz. Hedef yoksa veya henüz tamamlanmadıysa açılmaz — birim test ve `tests/e2e/home-celebration.spec.ts`
 - [x] 14.5 Hareket azaltma açıkken konfeti ve yol animasyonu durur. Renk tek başına "tamam" demez; işaret ve "Tamam" metni durur — uçtan uca `display: none` ve `animation-name: none`
 - [x] 14.6 Birim testler ve uçtan uca: eşik aşımı pencereyi açar, aşılmayan kayıt açmaz, 320 px taşma yok, Esc kapatır — 24 Ekim 2026, 320 px ve masaüstü geçti
+- [x] 14.7 Tasarım paketi uyarlaması (28 Ekim 2026, proje sahibi isteği): karakterler net SVG çizimlere çevrildi; karakter bandı gökyüzü sahnesi, selamlama, istatistik kutuları ve sağlık kartıyla yenilendi; duyuru, koç kartı, özet ve rozet kartlarına simge eklendi. Puan, `growth-v1`, sağlık hesabı, menü ve sıra değişmedi. Birim testler ve `smoke`, `home-celebration`, `mascot`, `auth`, `coaching`, `study`, `release`, `components`, `outcomes` uçtan uca testleri 320 px ve masaüstünde geçti. Telefonda gerçek cihaz denemesi yapılmadı.
 
 **Bitti sayılması için**
 - [x] 14.0 karar yazılı

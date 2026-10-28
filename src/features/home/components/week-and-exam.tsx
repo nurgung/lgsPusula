@@ -33,6 +33,8 @@ function WeekSummary({ summary }: { summary: PeriodSummary }) {
   return (
     <Card
       title="Bu hafta"
+      icon={<ChartIcon />}
+      iconTone="accent"
       headingLevel={3}
       description={formatTurkishDateRange(summary)}
     >
@@ -64,7 +66,7 @@ function WeekSummary({ summary }: { summary: PeriodSummary }) {
 
 function LatestExam({ exam }: { exam: HomeExamSummary | null }) {
   return (
-    <Card title="Son deneme" headingLevel={3}>
+    <Card title="Son deneme" icon={<SheetIcon />} headingLevel={3}>
       <div className="grid min-w-0 gap-4">
         {exam ? (
           <div className="grid min-w-0 gap-3">
@@ -135,5 +137,34 @@ function Measure({
         ) : null}
       </dd>
     </div>
+  );
+}
+
+const ICON_PROPS = {
+  width: 20,
+  height: 20,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.75,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  "aria-hidden": true,
+} as const;
+
+function ChartIcon() {
+  return (
+    <svg {...ICON_PROPS}>
+      <path d="M5 20V11M12 20V5M19 20v-7" />
+    </svg>
+  );
+}
+
+function SheetIcon() {
+  return (
+    <svg {...ICON_PROPS}>
+      <path d="M7 3h8l4 4v14H7V3Z" />
+      <path d="M15 3v4h4M10 12h6M10 16h6" />
+    </svg>
   );
 }

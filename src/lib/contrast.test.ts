@@ -119,6 +119,73 @@ const PAIRS: { name: string; foreground: string; background: string; minimum: nu
       background: "#effcfa",
       minimum: 4.5,
     },
+    // Home character scene: text sits on the accent-100 → accent-50 → brand-100 wash.
+    {
+      name: "ink on scene sky",
+      foreground: "#0f1b2d",
+      background: "#dbeafe",
+      minimum: 4.5,
+    },
+    {
+      name: "secondary text on scene sky",
+      foreground: "#2b3a52",
+      background: "#dbeafe",
+      minimum: 4.5,
+    },
+    {
+      name: "secondary text on scene mint",
+      foreground: "#2b3a52",
+      background: "#cdf5ef",
+      minimum: 4.5,
+    },
+    {
+      name: "scene eyebrow on sky",
+      foreground: "#134e4a",
+      background: "#dbeafe",
+      minimum: 4.5,
+    },
+    {
+      name: "scene eyebrow on accent wash",
+      foreground: "#134e4a",
+      background: "#eff6ff",
+      minimum: 4.5,
+    },
+    {
+      name: "scene eyebrow on mint",
+      foreground: "#134e4a",
+      background: "#cdf5ef",
+      minimum: 4.5,
+    },
+    {
+      name: "icon chip on brand wash",
+      foreground: "#134e4a",
+      background: "#cdf5ef",
+      minimum: 4.5,
+    },
+    {
+      name: "icon chip on accent chip",
+      foreground: "#1d4ed8",
+      background: "#dbeafe",
+      minimum: 4.5,
+    },
+    {
+      name: "icon chip on warm chip",
+      foreground: "#92400e",
+      background: "#fff8eb",
+      minimum: 4.5,
+    },
+    {
+      name: "danger text on danger wash",
+      foreground: "#b91c1c",
+      background: "#fef2f2",
+      minimum: 4.5,
+    },
+    {
+      name: "ink on coach card wash",
+      foreground: "#0f1b2d",
+      background: "#effcfa",
+      minimum: 4.5,
+    },
   ];
 
 describe("design token contrast", () => {

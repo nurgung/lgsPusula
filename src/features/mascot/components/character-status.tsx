@@ -5,6 +5,7 @@ import { cn } from "@/lib/cn";
 import { MASCOT_MESSAGES } from "../messages";
 import type { GrowthView } from "../growth";
 import { speciesByCode, type SpeciesCode } from "../species";
+import { HeroScene } from "./hero-scene";
 import { SpeciesFigure } from "./species-figure";
 
 const HEALTH_TEXT = {
@@ -32,6 +33,7 @@ export function CharacterStatus({
   showLinks = false,
   layout = "detail",
   path,
+  intro,
 }: {
   species: SpeciesCode | null;
   growth: GrowthView;
@@ -40,6 +42,8 @@ export function CharacterStatus({
   layout?: "home" | "detail";
   /** Inserted after the home stats (stage journey). */
   path?: ReactNode;
+  /** Greeting block at the top of the home band. */
+  intro?: ReactNode;
 }) {
   const chosen = species ? speciesByCode(species) : undefined;
   const health = HEALTH_TEXT[growth.health];
@@ -50,25 +54,28 @@ export function CharacterStatus({
 
   if (layout === "home") {
     return (
-      <div className="grid min-w-0 gap-section">
-        <div className="grid min-w-0 items-center gap-4 lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] lg:gap-8">
-          <div className="mx-auto flex w-full max-w-[15rem] items-center justify-center rounded-panel bg-canvas-soft px-4 py-5 sm:px-5 sm:py-6 lg:mx-0">
-            {chosen ? (
-              <SpeciesFigure
-                code={chosen.code}
-                size="hero"
-                health={growth.health}
-                stage={growth.stageId}
-              />
-            ) : (
-              <span className="flex min-h-40 w-full items-center justify-center rounded-panel bg-brand-50 px-3 text-center text-helper font-semibold text-ink-900">
-                Henüz seçilmedi
-              </span>
-            )}
-          </div>
+      <div className="grid min-w-0" data-character-band="">
+        <div className="relative isolate min-w-0 overflow-hidden bg-linear-to-br from-accent-100 via-accent-50 to-brand-100 p-4 sm:p-6">
+          <HeroScene />
+          <div className="relative z-10 grid min-w-0 gap-4 lg:grid-cols-[auto_minmax(0,1fr)_16.5rem] lg:gap-x-6 lg:[grid-template-areas:'figure_intro_side'_'figure_stage_side'_'figure_stats_side']">
+            {intro ? <div className="min-w-0 lg:[grid-area:intro]">{intro}</div> : null}
 
-          <div className="grid min-w-0 gap-3">
-            <div className="grid min-w-0 gap-2">
+            <div className="flex min-w-0 justify-center self-end lg:[grid-area:figure] lg:justify-start">
+              {chosen ? (
+                <SpeciesFigure
+                  code={chosen.code}
+                  size="hero"
+                  health={growth.health}
+                  stage={growth.stageId}
+                />
+              ) : (
+                <span className="flex min-h-40 w-full max-w-[15rem] items-center justify-center rounded-panel bg-surface/90 px-3 text-center text-helper font-semibold text-ink-900">
+                  Henüz seçilmedi
+                </span>
+              )}
+            </div>
+
+            <div className="grid min-w-0 content-start gap-2 lg:[grid-area:stage]">
               <p className="text-helper font-semibold text-ink-700">Şu anki aşama</p>
               <p className="text-section font-extrabold break-words text-ink-900 sm:text-2xl">
                 {growth.stageName}
@@ -85,89 +92,110 @@ export function CharacterStatus({
                   </p>
                 </div>
               )}
-              <p
-                className={cn(
-                  "w-fit max-w-full rounded-pill px-3 py-1 text-helper font-bold break-words",
-                  growth.health === "healthy" && "bg-success-50 text-success-700",
-                  growth.health === "tired" && "bg-warning-50 text-warning-800",
-                  growth.health === "sick" && "bg-danger-50 text-danger-700",
-                  growth.health === "recovering" && "bg-accent-50 text-accent-700",
-                )}
-              >
-                Sağlık: {health.label}
-              </p>
-              <p className="text-helper break-words text-ink-700">{health.detail}</p>
             </div>
+
+            <dl className="grid grid-cols-3 gap-2 sm:gap-3 lg:[grid-area:stats]">
+              <Stat
+                value={String(growth.points)}
+                label="Karakter puanı"
+                icon={<PointsIcon />}
+                tone="brand"
+              />
+              <Stat
+                value={`${growth.currentStreak} gün`}
+                label="Çalışma serisi"
+                icon={<StreakIcon />}
+                tone="warm"
+              />
+              <Stat
+                value={String(growth.questions)}
+                label="Toplam soru"
+                icon={<QuestionsIcon />}
+                tone="cool"
+              />
+            </dl>
+
+            <aside
+              className="grid min-w-0 content-start gap-3 rounded-card border border-surface bg-surface/90 p-card-y px-card-x shadow-card lg:[grid-area:side]"
+              aria-label="Sağlık durumu ve sonraki aşama"
+            >
+              <div className="flex min-w-0 items-start gap-3">
+                <span
+                  aria-hidden="true"
+                  className="inline-flex size-9 shrink-0 items-center justify-center rounded-pill bg-danger-50 text-danger-700"
+                >
+                  <HeartIcon />
+                </span>
+                <div className="grid min-w-0 gap-1">
+                  <p
+                    className={cn(
+                      "w-fit max-w-full rounded-pill px-3 py-1 text-helper font-bold break-words",
+                      growth.health === "healthy" && "bg-success-50 text-success-700",
+                      growth.health === "tired" && "bg-warning-50 text-warning-800",
+                      growth.health === "sick" && "bg-danger-50 text-danger-700",
+                      growth.health === "recovering" && "bg-accent-50 text-accent-700",
+                    )}
+                  >
+                    Sağlık: {health.label}
+                  </p>
+                  <p className="text-helper break-words text-ink-700">{health.detail}</p>
+                </div>
+              </div>
+
+              {growth.nextStageName ? (
+                <div className="grid min-w-0 gap-2 border-t border-border pt-3">
+                  <p className="font-semibold text-ink-900">
+                    Sonraki aşama: {growth.nextStageName}
+                  </p>
+                  {meter ? (
+                    <ProgressMeter
+                      label={meter.gap}
+                      value={meter.current}
+                      max={meter.target}
+                      unit={meter.unit}
+                      size="strong"
+                    />
+                  ) : null}
+                  {unmet.length > 1 ? (
+                    <ul className="grid list-disc gap-1 pl-5 text-ink-900">
+                      {unmet.slice(1).map((item) => (
+                        <li key={item.id} className="break-words text-helper">
+                          {item.gap}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              ) : null}
+            </aside>
           </div>
         </div>
 
-        <dl className="grid grid-cols-3 gap-2 sm:gap-3">
-          <Stat
-            value={String(growth.points)}
-            label="Karakter puanı"
-            icon={<PointsIcon />}
-          />
-          <Stat
-            value={`${growth.currentStreak} gün`}
-            label="Çalışma serisi"
-            icon={<StreakIcon />}
-          />
-          <Stat
-            value={String(growth.questions)}
-            label="Toplam soru"
-            icon={<QuestionsIcon />}
-          />
-        </dl>
+        <div className="grid min-w-0 gap-section p-4 sm:p-6">
+          {path}
 
-        {path}
+          <p
+            className={cn(
+              "min-w-0 break-words text-ink-900",
+              !growth.nextStageName && "font-semibold",
+            )}
+          >
+            {growth.nextStep}
+          </p>
+          <p className="text-helper break-words text-ink-700">{MASCOT_MESSAGES.streakNote}</p>
+          <p className="text-helper break-words text-ink-700">{MASCOT_MESSAGES.noRegression}</p>
 
-        {growth.nextStageName ? (
-          <div className="grid min-w-0 gap-2 rounded-card border border-border bg-surface-muted p-card-y px-card-x">
-            <p className="font-semibold text-ink-900">
-              Sonraki aşama: {growth.nextStageName}
-            </p>
-            {meter ? (
-              <ProgressMeter
-                label={meter.gap}
-                value={meter.current}
-                max={meter.target}
-                unit={meter.unit}
-                size="strong"
-              />
-            ) : null}
-            {unmet.length > 1 ? (
-              <ul className="grid list-disc gap-1 pl-5 text-ink-900">
-                {unmet.slice(1).map((item) => (
-                  <li key={item.id} className="break-words text-helper">
-                    {item.gap}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-        ) : null}
-
-        <p
-          className={cn(
-            "min-w-0 break-words text-ink-900",
-            !growth.nextStageName && "font-semibold",
-          )}
-        >
-          {growth.nextStep}
-        </p>
-        <p className="text-helper break-words text-ink-700">{MASCOT_MESSAGES.streakNote}</p>
-        <p className="text-helper break-words text-ink-700">{MASCOT_MESSAGES.noRegression}</p>
-
-        {showLinks ? (
-          <div className="flex flex-wrap gap-2">
-            <ButtonLink href="/ogrenci/karakter">
-              {chosen ? "Karaktere bak" : "Karakter seç"}
-            </ButtonLink>
-            <ButtonLink href="/ogrenci/bildirimler" variant="ghost">
-              Hatırlatma ayarları
-            </ButtonLink>
-          </div>
-        ) : null}
+          {showLinks ? (
+            <div className="flex flex-wrap gap-2">
+              <ButtonLink href="/ogrenci/karakter">
+                {chosen ? "Karaktere bak" : "Karakter seç"}
+              </ButtonLink>
+              <ButtonLink href="/ogrenci/bildirimler" variant="ghost">
+                Hatırlatma ayarları
+              </ButtonLink>
+            </div>
+          ) : null}
+        </div>
       </div>
     );
   }
@@ -259,27 +287,56 @@ export function CharacterStatus({
   );
 }
 
+const STAT_TONE = {
+  brand: "bg-brand-100 text-brand-800",
+  warm: "bg-warning-50 text-warning-800",
+  cool: "bg-accent-100 text-accent-700",
+} as const;
+
 function Stat({
   value,
   label,
   icon,
+  tone = "brand",
 }: {
   value: string;
   label: string;
   icon: ReactNode;
+  tone?: keyof typeof STAT_TONE;
 }) {
   return (
-    <div className="flex min-w-0 flex-col gap-2 rounded-card border border-border bg-surface p-3 shadow-soft sm:p-4">
-      <div className="flex min-w-0 items-start gap-2 text-brand-700">
-        <span className="mt-0.5 shrink-0">{icon}</span>
+    <div className="flex min-w-0 flex-col gap-2 rounded-card border border-surface bg-surface/90 p-3 shadow-card sm:p-4">
+      <div className="flex min-w-0 items-start gap-2">
+        <span
+          aria-hidden="true"
+          className={cn(
+            "mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-control",
+            STAT_TONE[tone],
+          )}
+        >
+          {icon}
+        </span>
         <dt className="text-helper font-semibold leading-snug break-words text-ink-700">
           {label}
         </dt>
       </div>
-      <dd className="text-metric font-extrabold break-words tabular-nums text-ink-900 sm:text-metric-lg">
+      <dd className="text-section font-extrabold break-words tabular-nums text-ink-900 sm:text-page-title">
         {value}
       </dd>
     </div>
+  );
+}
+
+function HeartIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 

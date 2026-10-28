@@ -1,4 +1,5 @@
 import { dismissReminderAction } from "../actions";
+import { NoticeIcon } from "./notice-icon";
 import { MASCOT_MESSAGES } from "../messages";
 
 /** Shorter than `noticeInApp`, with the same two facts: in-app only, no phone push. */
@@ -21,24 +22,25 @@ export function GrowthNotices({
       {notices.map((notice) => (
         <section
           key={notice.id}
-          className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-1 rounded-control border border-border border-l-4 border-l-brand-200 bg-surface-muted px-3 py-2"
+          className="flex min-w-0 flex-wrap items-start gap-x-3 gap-y-2 rounded-card border border-border border-l-4 border-l-brand-600 bg-surface px-3 py-3 shadow-soft"
           aria-labelledby={`duyuru-${notice.id}`}
         >
-          <div className="min-w-0 max-sm:contents">
+          <NoticeIcon tone="brand" />
+          <div className="min-w-0 flex-1 basis-48">
             <h2
               id={`duyuru-${notice.id}`}
-              className="text-helper font-bold break-words text-ink-900 max-sm:self-center"
+              className="text-helper font-bold break-words text-ink-900"
             >
               {notice.title}
             </h2>
-            <p className="min-w-0 text-helper leading-snug break-words text-ink-700 max-sm:col-span-2">
+            <p className="min-w-0 text-helper leading-snug break-words text-ink-700">
               {notice.body}
             </p>
-            <p className="text-xs leading-snug break-words text-ink-600 max-sm:col-span-2">
+            <p className="text-xs leading-snug break-words text-ink-600">
               {NOTICE_CHANNEL}
             </p>
           </div>
-          <form action={dismissReminderAction} className="max-sm:col-start-2 max-sm:row-start-1">
+          <form action={dismissReminderAction} className="max-sm:basis-full max-sm:pl-12">
             <input type="hidden" name="noticeId" value={notice.id} />
             <button type="submit" className={dismissClassName}>
               {MASCOT_MESSAGES.noticeDismiss}

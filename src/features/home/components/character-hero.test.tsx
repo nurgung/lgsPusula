@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { addCalendarDays } from "@/features/study/calendar";
 import { evaluateGrowth, type StudyContribution } from "@/features/mascot/growth";
@@ -58,6 +58,36 @@ describe("CharacterHero", () => {
     expect(
       pointsLabel.compareDocumentPosition(pathHeading) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
+  });
+
+  it("holds the page title, the health card and next-stage progress in the scene", () => {
+    const growth = evaluateGrowth({
+      today: "2026-10-24",
+      logs: [{ studiedOn: "2026-10-24", questionCount: 5 }],
+      rewards: [{ points: 5, sourceDate: "2026-10-24" }],
+    });
+    render(
+      <CharacterHero
+        species="turtle"
+        growth={growth}
+        greeting={{ name: "Deneme", dateLabel: "24 Ekim 2026" }}
+      />,
+    );
+    expect(screen.getByRole("heading", { level: 1, name: "Merhaba, Deneme" })).toBeTruthy();
+    expect(screen.getByText(/Bugün 24 Ekim 2026\./)).toBeTruthy();
+    const side = screen.getByLabelText("Sağlık durumu ve sonraki aşama");
+    expect(side.textContent).toContain("Sağlık: İyi görünüyor");
+    expect(side.textContent).toContain("Sonraki aşama: Alışıyor");
+    expect(within(side).getByRole("progressbar")).toBeTruthy();
+    // The decorative scene is hidden from assistive technology.
+    const scene = document.querySelector("[data-character-hero] svg[aria-hidden='true']");
+    expect(scene).toBeTruthy();
+  });
+
+  it("has no page title of its own unless the page passes a greeting", () => {
+    const growth = evaluateGrowth({ today: "2026-10-24", logs: [], rewards: [] });
+    render(<CharacterHero species="cat" growth={growth} />);
+    expect(screen.queryByRole("heading", { level: 1 })).toBeNull();
   });
 
   it("asks for a character when none is chosen and still shows points", () => {

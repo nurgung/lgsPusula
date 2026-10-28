@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Card } from "@/components/ui/card";
-import { PageHeader } from "@/components/ui/page-header";
 import { StateMessage } from "@/components/ui/state-message";
 import { requireStudent } from "@/features/access/guards";
 import { loadCoachingExplanation } from "@/features/ai/load-explanation";
@@ -102,17 +101,16 @@ async function StudentHome() {
 
   return (
     <>
-      <PageHeader
-        compact
-        title={`Merhaba, ${user.displayName}`}
-        description={`Bugün ${formatTurkishDate(today)}.`}
-      />
       {/*
         Phase 2–3: character band first; compact notices; coach card with clear action hierarchy.
         From lg, goals and tiles sit side by side. The canvas stays neutral.
       */}
       <div className="grid min-w-0 gap-section">
-        <CharacterHero species={mascot.species} growth={growth} />
+        <CharacterHero
+          species={mascot.species}
+          growth={growth}
+          greeting={{ name: user.displayName, dateLabel: formatTurkishDate(today) }}
+        />
         {growthNotices.length > 0 || mascot.reminderId ? (
           <div className="grid min-w-0 gap-2">
             {growthNotices.length > 0 ? <GrowthNotices notices={growthNotices} /> : null}

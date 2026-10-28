@@ -7,14 +7,16 @@ import { MASCOT_MESSAGES } from "../messages";
 import { badgesFor, tasksFor, type RewardEvent, type TaskFacts } from "../rules";
 import { speciesByCode, type SpeciesCode } from "../species";
 import { CharacterStatus } from "./character-status";
+import { NoticeIcon } from "./notice-icon";
 
 export function ReminderCard({ noticeId }: { noticeId: string }) {
   return (
     <section
-      className="grid min-w-0 items-start gap-2 rounded-control border border-border border-l-4 border-l-warning-500 bg-warning-50 px-3 py-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+      className="grid min-w-0 items-start gap-x-3 gap-y-2 rounded-card border border-border border-l-4 border-l-warning-500 bg-surface px-3 py-3 shadow-soft grid-cols-[auto_minmax(0,1fr)] sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center"
       aria-labelledby="hatirlatma-baslik"
       data-reminder-card=""
     >
+      <NoticeIcon tone="warm" />
       <div className="min-w-0">
         <h2 id="hatirlatma-baslik" className="text-helper font-bold break-words text-ink-900">
           {MASCOT_MESSAGES.reminderTitle}
@@ -23,7 +25,7 @@ export function ReminderCard({ noticeId }: { noticeId: string }) {
           {MASCOT_MESSAGES.reminderBody}
         </p>
       </div>
-      <div className="flex min-w-0 flex-wrap items-center gap-2">
+      <div className="flex min-w-0 flex-wrap items-center gap-2 max-sm:col-span-2">
         <ButtonLink href="/ogrenci/calisma/yeni" variant="secondary">
           {MASCOT_MESSAGES.reminderAction}
         </ButtonLink>

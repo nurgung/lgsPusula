@@ -1,681 +1,134 @@
+/* Flat vector characters. Every color is a design token from globals.css
+   (or a mix of tokens), so the figures follow the one design system. */
+
 .species-stage {
+  --species-outline: var(--color-ink-900);
+  --species-tan: color-mix(in srgb, var(--color-warning-800) 42%, var(--color-warning-500));
+  --species-blush: color-mix(in srgb, var(--color-danger-700) 28%, var(--color-surface));
+  --species-ink-soft: var(--color-ink-700);
+
   position: relative;
   display: block;
   width: 6rem;
   height: 7rem;
   flex-shrink: 0;
-  perspective: 340px;
   pointer-events: none;
 }
 
-.species-rig {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-  transform: rotateX(12deg) rotateY(28deg);
-}
-
-.species-ball,
-.species-cat-tail,
-.species-flower,
-.species-wing,
-.species-leaf {
-  position: absolute;
-  transform-style: preserve-3d;
-}
-
-.species-ball i {
-  position: absolute;
-  inset: 0;
+.species-svg {
   display: block;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 32% 28%,
-    var(--color-surface),
-    var(--species-fill) 48%,
-    color-mix(in srgb, var(--species-fill) 58%, var(--color-ink-900))
-  );
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
-.species-ball i:nth-child(2) {
-  transform: rotateY(60deg);
+/* --- Shared strokes and fills --- */
+
+.species-line {
+  stroke: var(--species-outline);
+  stroke-width: 2.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
-.species-ball i:nth-child(3) {
-  transform: rotateY(120deg);
-}
-
-.species-fill-brand {
-  --species-fill: var(--color-brand-600);
-}
-
-.species-fill-brand-dark {
-  --species-fill: var(--color-brand-800);
-}
-
-.species-fill-brand-soft {
-  --species-fill: var(--color-brand-100);
-}
-
-.species-fill-green {
-  --species-fill: var(--color-success-700);
-}
-
-.species-fill-amber {
-  --species-fill: var(--color-warning-500);
-}
-
-.species-fill-amber-dark {
-  --species-fill: var(--color-warning-800);
-}
-
-.species-fill-cream {
-  --species-fill: var(--color-warning-50);
-}
-
-.species-fill-ink {
-  --species-fill: var(--color-ink-700);
-}
-
-.species-shadow {
-  position: absolute;
-  left: 16%;
-  bottom: 5%;
-  width: 68%;
-  height: 14%;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--color-ink-900) 16%, transparent);
-  transform: rotateX(68deg);
-}
-
-.species-eye {
-  position: absolute;
-  width: 11%;
-  height: 13%;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 35% 32%,
-    var(--color-surface) 0 16%,
-    var(--color-ink-900) 18% 100%
-  );
-  transform: translateZ(24px);
-}
-
-.species-ear {
-  position: absolute;
-  width: 16%;
-  height: 20%;
-  background: linear-gradient(var(--color-brand-800), var(--color-brand-600));
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
-  transform: translateZ(10px);
-}
-
-.species-ear-inner {
-  background: var(--color-warning-50);
-  width: 8%;
-  height: 10%;
-  transform: translateZ(14px);
-}
-
-.species-nose {
-  position: absolute;
-  width: 8%;
-  height: 6%;
-  border-radius: 50%;
-  background: var(--color-warning-500);
-  transform: translateZ(30px);
+.species-stripe,
+.species-whisker,
+.species-shell-pattern,
+.species-leg-line,
+.species-foot-line {
+  fill: none;
+  stroke: var(--species-outline);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .species-whisker {
-  position: absolute;
-  width: 18%;
-  height: 2px;
-  background: var(--color-ink-700);
-  transform: translateZ(26px);
+  stroke-width: 1.8;
 }
 
-.species-spot,
-.species-beak,
-.species-wing,
-.species-tail-feather,
-.species-leg,
-.species-stem,
-.species-leaf,
-.species-petal,
-.species-daisy-center,
-.species-platypus-bill,
-.species-platypus-tail {
-  position: absolute;
-  display: block;
+.species-stripe-light {
+  stroke: var(--color-surface);
 }
 
-.species-cat-body {
-  left: 24%;
-  bottom: 12%;
-  width: 54%;
-  height: 42%;
+.species-shell-pattern {
+  stroke: color-mix(in srgb, var(--color-ink-900) 70%, var(--color-success-700));
+  stroke-width: 2.2;
 }
 
-.species-cat-chest {
-  left: 36%;
-  bottom: 20%;
-  width: 32%;
-  height: 24%;
-  transform: translateZ(12px);
+.species-leg-line,
+.species-foot-line {
+  stroke: var(--color-warning-500);
+  stroke-width: 3.2;
 }
 
-.species-cat-head {
-  left: 30%;
-  bottom: 42%;
-  width: 46%;
-  height: 40%;
-  transform: translateZ(8px);
+.species-fill-orange { fill: var(--color-warning-500); }
+.species-fill-brown { fill: var(--color-warning-800); }
+.species-fill-tan { fill: var(--species-tan); }
+.species-fill-cream { fill: var(--color-tile-2); }
+.species-fill-green { fill: var(--color-success-700); }
+.species-fill-lime { fill: var(--color-tile-4); }
+.species-fill-teal { fill: var(--color-brand-600); }
+.species-fill-teal-soft { fill: var(--color-brand-200); }
+.species-fill-sky { fill: var(--color-accent-100); }
+.species-fill-slate { fill: var(--color-ink-600); }
+.species-fill-ink-soft { fill: var(--species-ink-soft); }
+.species-fill-amber { fill: var(--color-warning-500); }
+.species-fill-white { fill: var(--color-surface); }
+.species-fill-ink { fill: var(--color-ink-900); }
+.species-fill-blush { fill: var(--species-blush); stroke: none; }
+.species-stroke-orange { stroke: var(--color-warning-500); }
+
+.species-shadow {
+  fill: color-mix(in srgb, var(--color-ink-900) 16%, transparent);
 }
 
-.species-cat-ear-l {
-  left: 30%;
-  bottom: 74%;
-  transform: translateZ(12px) rotateZ(-18deg);
+/* Tail and stems are drawn twice: a wide dark line, then a narrower colored line on top. */
+.species-tail-outline,
+.species-stem-outline {
+  fill: none;
+  stroke: var(--species-outline);
+  stroke-width: 12.5;
+  stroke-linecap: round;
 }
 
-.species-cat-ear-r {
-  left: 54%;
-  bottom: 74%;
-  transform: translateZ(14px) rotateZ(16deg);
+.species-stem-outline {
+  stroke-width: 9;
 }
 
-.species-cat-ear-l-inner {
-  left: 34%;
-  bottom: 76%;
+.species-tail-fill,
+.species-stem-fill {
+  fill: none;
+  stroke-width: 7.5;
+  stroke-linecap: round;
 }
 
-.species-cat-ear-r-inner {
-  left: 58%;
-  bottom: 76%;
-}
-
-.species-cat-eye-l {
-  left: 38%;
-  bottom: 58%;
-}
-
-.species-cat-eye-r {
-  left: 56%;
-  bottom: 59%;
-}
-
-.species-cat-nose {
-  left: 48%;
-  bottom: 50%;
-}
-
-.species-cat-whisker-l {
-  left: 22%;
-  bottom: 50%;
-  transform: translateZ(26px) rotateZ(12deg);
-}
-
-.species-cat-whisker-r {
-  left: 60%;
-  bottom: 51%;
-  transform: translateZ(26px) rotateZ(-10deg);
-}
-
-.species-cat-paw-l,
-.species-cat-paw-r {
-  bottom: 8%;
-  width: 18%;
-  height: 12%;
-  transform: translateZ(16px);
-}
-
-.species-cat-paw-l {
-  left: 30%;
-}
-
-.species-cat-paw-r {
-  left: 54%;
-}
-
-.species-cat-tail {
-  left: 18%;
-  bottom: 18%;
-  width: 22%;
-  height: 30%;
-  transform-origin: 80% 80%;
-  transform: rotateZ(18deg);
-}
-
-.species-cat-tail-a {
-  left: 0;
-  bottom: 10%;
-  width: 80%;
-  height: 55%;
-}
-
-.species-turtle-plastron {
-  left: 18%;
-  bottom: 14%;
-  width: 64%;
-  height: 28%;
-}
-
-.species-turtle-shell {
-  left: 10%;
-  bottom: 22%;
-  width: 76%;
-  height: 52%;
-  transform: scaleY(0.72);
-}
-
-.species-spot {
-  width: 12%;
-  height: 8%;
-  border-radius: 50%;
-  background: var(--color-warning-800);
-  transform: translateZ(18px);
-}
-
-.species-turtle-spot-a {
-  left: 28%;
-  bottom: 48%;
-}
-
-.species-turtle-spot-b {
-  left: 48%;
-  bottom: 54%;
-}
-
-.species-turtle-head {
-  left: 62%;
-  bottom: 24%;
-  width: 28%;
-  height: 26%;
-  transform: translateZ(20px);
-}
-
-.species-turtle-eye {
-  left: 74%;
-  bottom: 36%;
-  width: 8%;
-  height: 9%;
-  transform: translateZ(36px);
-}
-
-.species-turtle-leg-a,
-.species-turtle-leg-b,
-.species-turtle-leg-c,
-.species-turtle-leg-d {
-  bottom: 12%;
-  width: 16%;
-  height: 12%;
-}
-
-.species-turtle-leg-a {
-  left: 16%;
-  transform: translateZ(10px);
-}
-
-.species-turtle-leg-b {
-  left: 66%;
-  transform: translateZ(12px);
-}
-
-.species-turtle-leg-c {
-  left: 22%;
-  transform: translateZ(-8px);
-}
-
-.species-turtle-leg-d {
-  left: 58%;
-  transform: translateZ(-6px);
-}
-
-.species-sparrow-body {
-  left: 28%;
-  bottom: 22%;
-  width: 42%;
-  height: 38%;
-}
-
-.species-sparrow-belly {
-  left: 36%;
-  bottom: 24%;
-  width: 28%;
-  height: 24%;
-  transform: translateZ(12px);
-}
-
-.species-sparrow-head {
-  left: 46%;
-  bottom: 46%;
-  width: 30%;
-  height: 28%;
-  transform: translateZ(10px);
-}
-
-.species-sparrow-eye {
-  left: 58%;
-  bottom: 58%;
-  width: 9%;
-  height: 10%;
-  transform: translateZ(28px);
-}
-
-.species-beak {
-  left: 70%;
-  bottom: 52%;
-  width: 16%;
-  height: 10%;
-  background: var(--color-warning-500);
-  clip-path: polygon(0 20%, 100% 50%, 0 80%);
-  transform: translateZ(22px);
-}
-
-.species-wing {
-  left: 24%;
-  bottom: 32%;
-  width: 34%;
-  height: 22%;
-  border-radius: 50% 40% 50% 40%;
-  background: linear-gradient(var(--color-ink-700), var(--color-warning-800));
-  transform-origin: 80% 50%;
-  transform: rotateZ(-18deg) translateZ(6px);
-}
-
-.species-sparrow-tail {
-  left: 16%;
-  bottom: 40%;
-  width: 22%;
-  height: 12%;
-  border-radius: 40%;
-  background: var(--color-ink-700);
-  transform: rotateZ(24deg) translateZ(-4px);
-}
-
-.species-leg {
-  bottom: 10%;
-  width: 3px;
-  height: 16%;
-  border-radius: 2px;
-  background: var(--color-warning-800);
-}
-
-.species-sparrow-leg-l {
-  left: 42%;
-}
-
-.species-sparrow-leg-r {
-  left: 54%;
-}
-
-.species-stem {
-  left: 48%;
-  bottom: 12%;
-  width: 6%;
-  height: 42%;
-  border-radius: 999px;
-  background: linear-gradient(var(--color-success-700), var(--color-brand-800));
-}
-
-.species-leaf {
-  width: 28%;
-  height: 14%;
-  border-radius: 0 70% 0 70%;
-  background: linear-gradient(135deg, var(--color-tile-4), var(--color-success-700));
-}
-
-.species-daisy-leaf-l {
-  left: 18%;
-  bottom: 28%;
-  transform: rotateZ(-36deg);
-}
-
-.species-daisy-leaf-r {
-  left: 52%;
-  bottom: 36%;
-  transform: rotateZ(32deg) scaleX(-1);
-}
-
-.species-sway-pivot {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-  transform-origin: 50% 78%;
-}
-
-.species-flower {
-  left: 50%;
-  top: 8%;
-  width: 78%;
-  height: 62%;
-  transform: translateX(-50%);
+.species-stem-fill {
+  stroke: var(--color-success-700);
+  stroke-width: 4.5;
 }
 
 .species-petal {
-  left: 32%;
-  top: 4%;
-  width: 36%;
-  height: 46%;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 40% 30%,
-    var(--color-surface),
-    var(--color-warning-50) 58%,
-    var(--color-warning-800)
-  );
-  transform-origin: 50% 115%;
+  stroke-width: 2.2;
 }
 
-.species-petal:nth-child(1) {
-  transform: rotate(0deg);
+.species-stitch {
+  fill: none;
+  stroke: var(--color-brand-700);
+  stroke-width: 2.2;
+  stroke-dasharray: 1 6;
+  stroke-linecap: round;
 }
 
-.species-petal:nth-child(2) {
-  transform: rotate(45deg);
+.species-ring {
+  fill: none;
+  stroke: var(--color-warning-500);
+  stroke-width: 3;
+  stroke-dasharray: 2 7;
+  stroke-linecap: round;
 }
 
-.species-petal:nth-child(3) {
-  transform: rotate(90deg);
-}
-
-.species-petal:nth-child(4) {
-  transform: rotate(135deg);
-}
-
-.species-petal:nth-child(5) {
-  transform: rotate(180deg);
-}
-
-.species-petal:nth-child(6) {
-  transform: rotate(225deg);
-}
-
-.species-petal:nth-child(7) {
-  transform: rotate(270deg);
-}
-
-.species-petal:nth-child(8) {
-  transform: rotate(315deg);
-}
-
-.species-daisy-center {
-  left: 30%;
-  top: 28%;
-  width: 40%;
-  height: 42%;
-  transform: translateZ(16px);
-}
-
-.species-sapling-soil {
-  left: 22%;
-  bottom: 8%;
-  width: 56%;
-  height: 18%;
-  transform: scaleY(0.55);
-}
-
-.species-sapling-stem {
-  height: 48%;
-}
-
-.species-sapling-leaf-l {
-  left: 16%;
-  bottom: 42%;
-  width: 34%;
-  height: 16%;
-  transform: rotateZ(-32deg);
-}
-
-.species-sapling-leaf-r {
-  left: 50%;
-  bottom: 52%;
-  width: 32%;
-  height: 15%;
-  transform: rotateZ(28deg) scaleX(-1);
-}
-
-.species-sapling-bud {
-  left: 40%;
-  bottom: 66%;
-  width: 20%;
-  height: 18%;
-  border-radius: 50% 50% 40% 40%;
-  background: linear-gradient(var(--color-brand-600), var(--color-success-700));
-  transform: translateZ(8px);
-}
-
-.species-platypus-body {
-  left: 18%;
-  bottom: 18%;
-  width: 52%;
-  height: 32%;
-}
-
-.species-platypus-head {
-  left: 46%;
-  bottom: 28%;
-  width: 28%;
-  height: 24%;
-  transform: translateZ(10px);
-}
-
-.species-platypus-bill {
-  left: 66%;
-  bottom: 32%;
-  width: 26%;
-  height: 12%;
-  border-radius: 30% 70% 70% 30%;
-  background: var(--color-warning-500);
-  transform: translateZ(22px);
-}
-
-.species-platypus-eye {
-  left: 56%;
-  bottom: 40%;
-  width: 8%;
-  height: 9%;
-}
-
-.species-platypus-tail {
-  left: 4%;
-  bottom: 30%;
-  width: 24%;
-  height: 14%;
-  border-radius: 46% 20% 20% 46%;
-  background: var(--color-warning-800);
-  transform: rotateZ(6deg) translateZ(-6px);
-}
-
-.species-platypus-foot-l,
-.species-platypus-foot-r {
-  bottom: 10%;
-  width: 16%;
-  height: 8%;
-  transform: translateZ(8px);
-}
-
-.species-platypus-foot-l {
-  left: 28%;
-}
-
-.species-platypus-foot-r {
-  left: 48%;
-}
-
-.species-capybara-body {
-  left: 14%;
-  bottom: 12%;
-  width: 64%;
-  height: 40%;
-}
-
-.species-capybara-head {
-  left: 38%;
-  bottom: 40%;
-  width: 40%;
-  height: 34%;
-  transform: translateZ(8px);
-}
-
-.species-capybara-snout {
-  left: 62%;
-  bottom: 42%;
-  width: 22%;
-  height: 16%;
-  transform: translateZ(18px);
-}
-
-.species-ear.species-capybara-ear-l,
-.species-ear.species-capybara-ear-r {
-  width: 12%;
-  height: 10%;
-  border-radius: 50% 50% 40% 40%;
-  clip-path: none;
-  background: linear-gradient(var(--color-warning-800), var(--color-warning-500));
-}
-
-.species-capybara-ear-l {
-  left: 44%;
-  bottom: 68%;
-  transform: translateZ(12px);
-}
-
-.species-capybara-ear-r {
-  left: 62%;
-  bottom: 68%;
-  transform: translateZ(14px);
-}
-
-.species-capybara-eye {
-  left: 56%;
-  bottom: 54%;
-  width: 8%;
-  height: 9%;
-}
-
-.species-capybara-nose {
-  left: 72%;
-  bottom: 46%;
-  width: 6%;
-  height: 5%;
-}
-
-.species-capybara-paw-l,
-.species-capybara-paw-r {
-  bottom: 8%;
-  width: 16%;
-  height: 10%;
-  transform: translateZ(12px);
-}
-
-.species-capybara-paw-l {
-  left: 26%;
-}
-
-.species-capybara-paw-r {
-  left: 50%;
-}
+/* --- Sizes --- */
 
 @media (min-width: 640px) {
   .species-stage {
@@ -696,274 +149,255 @@
   }
 }
 
-/* Home hero. Parts are sized in percentages, so the drawing grows with this box.
-   The small-figure scale (0.82 / 0.92) would pull a new character under the
-   target, so the hero keeps only a slight stage difference. */
+/* Home hero. The drawing scales with this box. */
 .species-stage[data-figure-size="hero"] {
-  width: 8.75rem;
-  height: 10rem;
-  perspective: 680px;
+  width: 10rem;
+  height: 11.5rem;
 }
 
 @media (min-width: 640px) {
   .species-stage[data-figure-size="hero"] {
-    width: 11.25rem;
-    height: 13rem;
+    width: 12.5rem;
+    height: 14.5rem;
   }
+}
+
+@media (min-width: 1024px) {
+  .species-stage[data-figure-size="hero"] {
+    width: 14.5rem;
+    height: 16.75rem;
+  }
+}
+
+/* --- Motion (only when the student allows it) --- */
+
+.species-eyes,
+.species-cat-tail,
+.species-sparrow-wing,
+.species-turtle-head,
+.species-flower,
+.species-sway-pivot,
+.species-leaf-sway {
+  transform-box: fill-box;
+}
+
+.species-eyes {
+  transform-origin: center;
+}
+
+.species-cat-tail {
+  transform-origin: 10% 90%;
+}
+
+.species-sparrow-wing {
+  transform-origin: 90% 40%;
+}
+
+.species-turtle-head {
+  transform-origin: 20% 80%;
+}
+
+.species-flower {
+  transform-origin: 50% 100%;
+}
+
+.species-sway-pivot {
+  transform-origin: 0 100%;
+}
+
+.species-sway-late {
+  transform-origin: 100% 100%;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .species-rig {
-    animation: species-turn 6.5s ease-in-out infinite;
+    animation: species-bob 3.2s ease-in-out infinite;
   }
 
-  .species-cat-eye-l,
-  .species-cat-eye-r,
-  .species-sparrow-eye {
-    animation: species-blink 3.6s linear infinite;
+  .species-eyes {
+    animation: species-blink 4s linear infinite;
   }
 
   .species-cat-tail {
-    animation: species-wag 1.8s ease-in-out infinite;
+    animation: species-wag 2s ease-in-out infinite;
   }
 
   .species-turtle-head {
-    animation: species-nod 2.4s ease-in-out infinite;
+    animation: species-nod 2.6s ease-in-out infinite;
   }
 
-  .species-wing {
-    animation: species-flap 1.6s ease-in-out infinite;
+  .species-sparrow-wing {
+    animation: species-flap 1.8s ease-in-out infinite;
   }
 
   .species-flower {
-    animation: species-flower-sway 2.6s ease-in-out infinite;
+    animation: species-flower-sway 3s ease-in-out infinite;
   }
 
   .species-sway-pivot {
-    animation: species-sway 2.6s ease-in-out infinite;
+    animation: species-sway 3s ease-in-out infinite;
   }
 
   .species-sway-late {
-    animation-delay: 0.35s;
+    animation-delay: 0.4s;
   }
 }
 
-@keyframes species-turn {
+@keyframes species-bob {
   0%,
   100% {
-    transform: rotateX(12deg) rotateY(-34deg) translateY(0);
+    transform: translateY(0);
   }
 
   50% {
-    transform: rotateX(12deg) rotateY(34deg) translateY(-6px);
+    transform: translateY(-3px);
   }
 }
 
 @keyframes species-blink {
   0%,
-  42%,
+  44%,
   50%,
   100% {
-    transform: translateZ(24px) scaleY(1);
+    transform: scaleY(1);
   }
 
-  46% {
-    transform: translateZ(24px) scaleY(0.15);
+  47% {
+    transform: scaleY(0.12);
   }
 }
 
 @keyframes species-wag {
   0%,
   100% {
-    transform: rotateZ(12deg);
+    transform: rotate(6deg);
   }
 
   50% {
-    transform: rotateZ(-14deg);
+    transform: rotate(-10deg);
   }
 }
 
 @keyframes species-nod {
   0%,
   100% {
-    transform: translateZ(20px) translateY(0);
+    transform: translateY(0) rotate(0deg);
   }
 
   50% {
-    transform: translateZ(26px) translateY(-4px);
+    transform: translateY(-2px) rotate(-4deg);
   }
 }
 
 @keyframes species-flap {
   0%,
   100% {
-    transform: rotateZ(-24deg) translateZ(4px);
+    transform: rotate(0deg);
   }
 
   50% {
-    transform: rotateZ(14deg) translateZ(14px);
+    transform: rotate(-12deg);
   }
 }
 
 @keyframes species-flower-sway {
   0%,
   100% {
-    transform: translateX(-50%) rotateZ(-6deg);
+    transform: rotate(-3deg);
   }
 
   50% {
-    transform: translateX(-50%) rotateZ(8deg);
+    transform: rotate(4deg);
   }
 }
 
 @keyframes species-sway {
   0%,
   100% {
-    transform: rotateZ(-6deg);
+    transform: rotate(-2deg);
   }
 
   50% {
-    transform: rotateZ(8deg);
+    transform: rotate(3deg);
   }
 }
 
-/* growth-v1. Stage and health change the pose. The words next to the figure
-   still name the state. These are local shapes, not image files. */
-
-.species-stage[data-health="healthy"] .species-rig {
-  filter: saturate(1);
-}
+/* growth-v1. Stage and health change the pose and the small marks. The words
+   next to the figure still name the state. These are local shapes, not image files. */
 
 .species-stage[data-growth-stage="new"] {
-  scale: 0.82;
+  scale: 0.9;
 }
 
 .species-stage[data-growth-stage="settling"] {
-  scale: 0.92;
+  scale: 0.95;
 }
 
 .species-stage[data-figure-size="hero"][data-growth-stage="new"] {
-  scale: 0.96;
+  scale: 0.97;
 }
 
 .species-stage[data-figure-size="hero"][data-growth-stage="settling"] {
-  scale: 0.98;
+  scale: 0.99;
 }
 
-.species-stage[data-growth-stage="settling"]::before,
-.species-stage[data-growth-stage="growing"]::before,
-.species-stage[data-growth-stage="companion"]::before {
-  content: "";
-  position: absolute;
-  z-index: 1;
+.species-stage[data-health="healthy"] .species-svg {
+  filter: none;
 }
 
-.species-stage[data-growth-stage="settling"]::before {
-  top: 8%;
-  left: 8%;
-  width: 16%;
-  height: 16%;
-  border-radius: 50%;
-  background: var(--color-brand-600);
-}
-
-.species-stage[data-growth-stage="growing"]::before {
-  bottom: 16%;
-  left: 0;
-  width: 22%;
-  height: 28%;
-  border-radius: 0 80% 0 80%;
-  background: var(--color-success-700);
-}
-
-.species-stage[data-growth-stage="companion"]::before {
-  inset: 4%;
-  border: 3px solid var(--color-warning-500);
-  border-radius: 999px;
+.species-stage[data-health="tired"] .species-svg {
+  filter: saturate(0.55);
 }
 
 .species-stage[data-health="tired"] .species-rig {
-  translate: 0 12%;
-  filter: saturate(0.5);
+  transform: translateY(5px);
 }
 
-.species-stage[data-health="tired"] .species-eye {
-  scale: 1 0.4;
+.species-stage[data-health="tired"] .species-eyes {
+  transform: scaleY(0.4);
 }
 
-.species-stage[data-health="tired"] .species-leaf,
-.species-stage[data-health="tired"] .species-flower,
-.species-stage[data-health="tired"] .species-petal {
-  rotate: 22deg;
+.species-stage[data-health="sick"] .species-svg {
+  filter: saturate(0.2);
 }
 
 .species-stage[data-health="sick"] .species-rig {
-  translate: 0 16%;
-  rotate: 8deg;
-  filter: saturate(0.15);
+  transform: translateY(7px);
 }
 
-.species-stage[data-health="sick"] .species-eye {
-  scale: 1 0.1;
+.species-stage[data-health="sick"] .species-eyes {
+  transform: scaleY(0.12);
 }
 
-.species-stage[data-health="sick"]::after {
-  content: "";
-  position: absolute;
-  right: 8%;
-  bottom: 4%;
-  left: 8%;
-  height: 18%;
-  border-radius: 999px;
-  background: var(--color-brand-100);
+.species-stage[data-health="tired"][data-species-figure="daisy"] .species-rig,
+.species-stage[data-health="tired"][data-species-figure="sapling"] .species-rig {
+  transform: rotate(7deg);
+  transform-origin: 60px 128px;
 }
 
 .species-stage[data-health="sick"][data-species-figure="daisy"] .species-rig,
 .species-stage[data-health="sick"][data-species-figure="sapling"] .species-rig {
-  translate: 0 12%;
-  rotate: 16deg;
-  filter: saturate(0.12);
+  transform: rotate(14deg);
+  transform-origin: 60px 128px;
 }
 
-.species-stage[data-health="sick"][data-species-figure="daisy"] .species-petal,
-.species-stage[data-health="sick"][data-species-figure="sapling"] .species-leaf {
-  scale: 0.7 0.35;
-}
-
-.species-stage[data-health="recovering"] .species-rig {
-  translate: 0 4%;
+.species-stage[data-health="recovering"] .species-svg {
   filter: saturate(0.85);
-}
-
-.species-stage[data-health="recovering"] .species-leaf,
-.species-stage[data-health="recovering"] .species-flower {
-  rotate: -6deg;
-}
-
-.species-stage[data-health="recovering"]::after {
-  content: "";
-  position: absolute;
-  right: 6%;
-  bottom: 18%;
-  width: 20%;
-  height: 24%;
-  border-radius: 0 80% 0 80%;
-  background: var(--color-success-700);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .species-stage[data-health="tired"] .species-rig,
   .species-stage[data-health="sick"] .species-rig,
-  .species-stage[data-health="tired"] .species-eye,
-  .species-stage[data-health="sick"] .species-eye,
+  .species-stage[data-health="tired"] .species-eyes,
+  .species-stage[data-health="sick"] .species-eyes,
   .species-stage[data-health="tired"] .species-flower,
   .species-stage[data-health="sick"] .species-flower,
   .species-stage[data-health="tired"] .species-sway-pivot,
   .species-stage[data-health="sick"] .species-sway-pivot,
   .species-stage[data-health="tired"] .species-cat-tail,
   .species-stage[data-health="sick"] .species-cat-tail,
-  .species-stage[data-health="tired"] .species-wing,
-  .species-stage[data-health="sick"] .species-wing {
+  .species-stage[data-health="tired"] .species-sparrow-wing,
+  .species-stage[data-health="sick"] .species-sparrow-wing {
     animation: none;
   }
 }

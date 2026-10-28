@@ -4,4 +4,6 @@ import type { NavItem } from "@/lib/navigation";
 export const PREVIEW_NAV_ITEMS: readonly NavItem[] = [
   { href: "/onizleme/bilesenler", label: "Bileşenler" },
   { href: "/onizleme/durumlar", label: "Durumlar" },
+  { href: "/onizleme/karakterler", label: "Karakterler" },
+  { href: "/onizleme/ana-sayfa", label: "Ana sayfa" },
 ];

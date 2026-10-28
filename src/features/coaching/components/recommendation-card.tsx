@@ -49,7 +49,7 @@ export function RecommendationCard({
 
   return (
     <section
-      className="min-w-0 rounded-panel border border-border bg-surface p-4 shadow-card sm:p-5"
+      className="min-w-0 rounded-panel border-2 border-brand-200 bg-linear-to-br from-surface to-brand-50 p-4 shadow-card sm:p-5"
       aria-labelledby="bugunku-koc"
       data-coach-card=""
     >
@@ -61,7 +61,8 @@ export function RecommendationCard({
       </div>
 
       <div className="mt-3 grid min-w-0 gap-3">
-        <div className="min-w-0 rounded-card bg-brand-50 px-4 py-3 sm:px-5 sm:py-4">
+        <div className="flex min-w-0 items-start gap-3 rounded-card border border-brand-100 bg-brand-50 px-3 py-3 sm:items-center sm:px-5 sm:py-4">
+          <MessageMark />
           <p className="min-w-0 text-card-title font-extrabold leading-snug break-words text-ink-900 sm:text-section">
             {lead}
           </p>
@@ -127,6 +128,28 @@ export function RecommendationCard({
         )}
       </div>
     </section>
+  );
+}
+
+function MessageMark() {
+  return (
+    <span
+      aria-hidden="true"
+      className="inline-flex size-9 shrink-0 items-center justify-center rounded-control bg-surface text-brand-700 shadow-soft"
+    >
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M12 3l2.4 5.2 5.6.7-4.1 3.9 1.1 5.6L12 15.6 7 18.4l1.1-5.6L4 8.9l5.6-.7L12 3Z" />
+      </svg>
+    </span>
   );
 }
 
