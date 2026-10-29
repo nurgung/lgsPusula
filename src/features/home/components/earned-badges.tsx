@@ -7,33 +7,48 @@ import { badgesFor, type RewardEvent } from "@/features/mascot/rules";
 
 const BADGE_DETAIL_HREF = "/ogrenci/karakter";
 
-export function EarnedBadges({ rewards }: { rewards: readonly RewardEvent[] }) {
+export function EarnedBadges({
+  rewards,
+  className,
+}: {
+  rewards: readonly RewardEvent[];
+  className?: string;
+}) {
   const earned = badgesFor(rewards).filter((badge) => badge.earned);
 
   return (
-    <Card
-      title="Rozetlerin"
-      icon={<TrophyIcon />}
-      headingLevel={3}
-      description={
-        earned.length > 0 ? "Açıklamalar karakter sayfasında." : undefined
-      }
-    >
+    <Card title="Rozetlerin" icon={<TrophyIcon />} headingLevel={3} className={className}>
       {earned.length === 0 ? (
-        <StateMessage
-          variant="empty"
-          title="Henüz rozetin yok."
-          description="İlk çalışma kaydın bir rozet getirir. Bir gün ara vermek kazandığın rozeti silmez."
-        />
+        <div className="grid min-w-0 gap-4">
+          <StateMessage
+            variant="empty"
+            title="Henüz rozetin yok."
+            description="İlk çalışma kaydın bir rozet getirir. Bir gün ara vermek kazandığın rozeti silmez."
+          />
+          <div>
+            <ButtonLink href={BADGE_DETAIL_HREF} variant="secondary">
+              Tüm rozetler
+            </ButtonLink>
+          </div>
+        </div>
       ) : (
         <div className="grid min-w-0 gap-3">
-          <p className="text-ink-900">{earned.length} rozet kazandın.</p>
+          <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <p className="text-ink-900">{earned.length} rozet kazandın.</p>
+            <ButtonLink href={BADGE_DETAIL_HREF} variant="secondary">
+              Tüm rozetler
+            </ButtonLink>
+          </div>
+          {/* Phones: one controlled sideways row. From sm up the badges wrap and need no scrolling. */}
           <ul
             aria-label="Kazanılan rozetler"
-            className="flex min-w-0 snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-1 py-1"
+            className="flex min-w-0 snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-1 py-1 sm:flex-wrap sm:overflow-visible"
           >
             {earned.map((badge) => (
-              <li key={badge.id} className="w-[9.75rem] shrink-0 snap-start">
+              <li
+                key={badge.id}
+                className="w-[9.75rem] shrink-0 snap-start sm:snap-align-none"
+              >
                 <Link
                   href={BADGE_DETAIL_HREF}
                   className="flex h-full min-h-11 min-w-0 flex-col gap-2 rounded-xl border border-success-700/30 bg-success-50 p-3 break-words text-ink-900 hover:border-brand-700"
@@ -51,11 +66,6 @@ export function EarnedBadges({ rewards }: { rewards: readonly RewardEvent[] }) {
           </ul>
         </div>
       )}
-      <div className="mt-4">
-        <ButtonLink href={BADGE_DETAIL_HREF} variant="secondary">
-          Tüm rozetler
-        </ButtonLink>
-      </div>
     </Card>
   );
 }

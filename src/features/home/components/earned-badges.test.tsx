@@ -33,14 +33,18 @@ describe("EarnedBadges", () => {
       />,
     );
     expect(screen.getByText("2 rozet kazandın.")).toBeTruthy();
+    expect(screen.getAllByRole("link", { name: "Tüm rozetler" })).toHaveLength(1);
     const strip = screen.getByRole("list", { name: "Kazanılan rozetler" });
+    // Phones scroll one row; from sm up the badges wrap and need no scrolling.
     expect(strip.className).toContain("overflow-x-auto");
+    expect(strip.className).toContain("sm:flex-wrap");
+    expect(strip.className).toContain("sm:overflow-visible");
     expect(screen.getByRole("link", { name: /İlk kayıt/ }).getAttribute("href")).toBe(
       "/ogrenci/karakter",
     );
-    expect(screen.getByRole("link", { name: /Hedefe ulaştın/ }).getAttribute("href")).toBe(
-      "/ogrenci/karakter",
-    );
+    expect(
+      screen.getByRole("link", { name: /Hedefe ulaştın/ }).getAttribute("href"),
+    ).toBe("/ogrenci/karakter");
     expect(screen.getAllByText("Kazandın")).toHaveLength(2);
     expect(
       screen.queryByText("Bir çalışma kaydı eklediğinde durur. Silmek bunu geri almaz."),

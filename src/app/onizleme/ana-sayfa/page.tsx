@@ -2,16 +2,20 @@ import type { Metadata } from "next";
 import { Card } from "@/components/ui/card";
 import { RecommendationCard } from "@/features/coaching/components/recommendation-card";
 import { buildCoachingReport } from "@/features/coaching/rules";
+import { buildExamAnalysis, type AnalysisExam } from "@/features/exams/analysis";
 import { CharacterHero } from "@/features/home/components/character-hero";
-import { EarnedBadges } from "@/features/home/components/earned-badges";
 import { SubjectTiles } from "@/features/home/components/subject-tiles";
-import { WeekAndExamSummary } from "@/features/home/components/week-and-exam";
+import { HomeSummaryBand } from "@/features/home/components/home-summary-band";
 import { GrowthNotices } from "@/features/mascot/components/growth-notices";
 import { ReminderCard } from "@/features/mascot/components/mascot-panels";
 import { evaluateGrowth, type StudyContribution } from "@/features/mascot/growth";
 import type { RewardEvent } from "@/features/mascot/rules";
 import type { SpeciesCode } from "@/features/mascot/species";
-import { addCalendarDays, formatTurkishDate, istanbulToday } from "@/features/study/calendar";
+import {
+  addCalendarDays,
+  formatTurkishDate,
+  istanbulToday,
+} from "@/features/study/calendar";
 
 export const metadata: Metadata = { title: "Öğrenci ana sayfası" };
 
@@ -25,16 +29,37 @@ type Sample = {
 };
 
 const SAMPLES: readonly Sample[] = [
-  { id: "duzenli", title: "Düzenli çalışan öğrenci", species: "cat", studyDays: 9, gapDays: 0 },
-  { id: "ara", title: "Birkaç gün ara veren öğrenci", species: "capybara", studyDays: 6, gapDays: 4 },
-  { id: "yeni", title: "Karakter seçmemiş öğrenci", species: null, studyDays: 0, gapDays: 0 },
+  {
+    id: "duzenli",
+    title: "Düzenli çalışan öğrenci",
+    species: "cat",
+    studyDays: 9,
+    gapDays: 0,
+  },
+  {
+    id: "ara",
+    title: "Birkaç gün ara veren öğrenci",
+    species: "capybara",
+    studyDays: 6,
+    gapDays: 4,
+  },
+  {
+    id: "yeni",
+    title: "Karakter seçmemiş öğrenci",
+    species: null,
+    studyDays: 0,
+    gapDays: 0,
+  },
 ];
 
 function growthFor(sample: Sample, today: string) {
-  const logs: StudyContribution[] = Array.from({ length: sample.studyDays }, (_, index) => ({
-    studiedOn: addCalendarDays(today, -(sample.gapDays + index)),
-    questionCount: 20,
-  }));
+  const logs: StudyContribution[] = Array.from(
+    { length: sample.studyDays },
+    (_, index) => ({
+      studiedOn: addCalendarDays(today, -(sample.gapDays + index)),
+      questionCount: 20,
+    }),
+  );
   return evaluateGrowth({
     today,
     logs,
@@ -43,8 +68,18 @@ function growthFor(sample: Sample, today: string) {
 }
 
 const SAMPLE_REWARDS: RewardEvent[] = [
-  { eventType: "study_log", points: 5, sourceDate: "2026-10-20", ruleVersion: "mascot-v1" },
-  { eventType: "exam_saved", points: 5, sourceDate: "2026-10-21", ruleVersion: "mascot-v1" },
+  {
+    eventType: "study_log",
+    points: 5,
+    sourceDate: "2026-10-20",
+    ruleVersion: "mascot-v1",
+  },
+  {
+    eventType: "exam_saved",
+    points: 5,
+    sourceDate: "2026-10-21",
+    ruleVersion: "mascot-v1",
+  },
 ];
 
 const SAMPLE_SUBJECTS = [
@@ -53,6 +88,53 @@ const SAMPLE_SUBJECTS = [
   { id: "ornek-fen", name: "Fen Bilimleri", weekQuestions: 0 },
   { id: "ornek-inkilap", name: "T.C. İnkılap Tarihi ve Atatürkçülük", weekQuestions: 12 },
 ] as const;
+
+/** Fictional exams for the preview only. Newest first, like the real list. */
+function sampleExams(today: string): AnalysisExam[] {
+  const base = { examType: "lgs_full" } as const;
+  return [
+    {
+      ...base,
+      id: "ornek-5",
+      title: "Örnek deneme 5",
+      takenOn: addCalendarDays(today, -2),
+      totalNet: 61.67,
+      score: 438.2,
+    },
+    {
+      ...base,
+      id: "ornek-4",
+      title: "Örnek deneme 4",
+      takenOn: addCalendarDays(today, -9),
+      totalNet: 55.33,
+      score: 421.75,
+    },
+    {
+      ...base,
+      id: "ornek-3",
+      title: "Örnek deneme 3",
+      takenOn: addCalendarDays(today, -16),
+      totalNet: 57,
+      score: 426,
+    },
+    {
+      ...base,
+      id: "ornek-2",
+      title: "Örnek deneme 2",
+      takenOn: addCalendarDays(today, -23),
+      totalNet: 48.5,
+      score: 401.5,
+    },
+    {
+      ...base,
+      id: "ornek-1",
+      title: "Örnek deneme 1",
+      takenOn: addCalendarDays(today, -30),
+      totalNet: 44.25,
+      score: 389,
+    },
+  ];
+}
 
 export default function HomePreviewPage() {
   const today = istanbulToday();
@@ -111,14 +193,18 @@ export default function HomePreviewPage() {
 
   return (
     <>
-      <div className="grid min-w-0 gap-section">
+      <div data-wide-page className="grid min-w-0 gap-section">
         <Card variant="quiet" title="Öğrenci ana sayfası (örnek)">
           <p className="text-ink-900">
             Örnek veriyle hazırlanmış görünüm. Gerçek öğrenci kaydı yoktur.
           </p>
         </Card>
         {SAMPLES.map((sample) => (
-          <section key={sample.id} className="grid min-w-0 gap-3" aria-label={sample.title}>
+          <section
+            key={sample.id}
+            className="grid min-w-0 gap-3"
+            aria-label={sample.title}
+          >
             <p className="text-helper font-bold text-ink-700">{sample.title}</p>
             <CharacterHero species={sample.species} growth={growthFor(sample, today)} />
           </section>
@@ -142,18 +228,51 @@ export default function HomePreviewPage() {
           <ReminderCard noticeId="ornek-hatirlatma" />
         </div>
         <RecommendationCard report={sampleReport} explanation={null} />
-        <WeekAndExamSummary
-          summary={week}
-          exam={{
-            id: "ornek-deneme",
-            title: "Örnek deneme",
-            takenOn: addCalendarDays(today, -12),
-            examType: "lgs_full",
-            totalNet: 52.33,
-          }}
-        />
-        <EarnedBadges rewards={SAMPLE_REWARDS} />
         <SubjectTiles subjects={SAMPLE_SUBJECTS} weekLabel="Bu hafta" />
+        <section className="grid min-w-0 gap-4" aria-labelledby="ornek-ozet">
+          <h2 id="ornek-ozet" className="text-lg font-bold text-ink-900">
+            Özet (örnek denemelerle)
+          </h2>
+          <HomeSummaryBand
+            week={week}
+            analysis={buildExamAnalysis(sampleExams(today))}
+            rewards={SAMPLE_REWARDS}
+          />
+        </section>
+        <section className="grid min-w-0 gap-4" aria-labelledby="ornek-tek">
+          <h2 id="ornek-tek" className="text-lg font-bold text-ink-900">
+            Özet: tek deneme (örnek)
+          </h2>
+          <HomeSummaryBand
+            week={week}
+            analysis={buildExamAnalysis(sampleExams(today).slice(-1))}
+            rewards={[]}
+          />
+        </section>
+        <section className="grid min-w-0 gap-4" aria-labelledby="ornek-puansiz">
+          <h2 id="ornek-puansiz" className="text-lg font-bold text-ink-900">
+            Özet: son denemede puan yok (örnek)
+          </h2>
+          <HomeSummaryBand
+            week={week}
+            analysis={buildExamAnalysis(
+              sampleExams(today).map((exam, index) =>
+                index === 0 ? { ...exam, score: null } : exam,
+              ),
+            )}
+            rewards={SAMPLE_REWARDS}
+          />
+        </section>
+        <section className="grid min-w-0 gap-4" aria-labelledby="ornek-bos">
+          <h2 id="ornek-bos" className="text-lg font-bold text-ink-900">
+            Özet: deneme yok (örnek)
+          </h2>
+          <HomeSummaryBand
+            week={{ ...week, questionCount: 0, correctCount: 0, durationMinutes: 0 }}
+            analysis={buildExamAnalysis([])}
+            rewards={[]}
+          />
+        </section>
       </div>
     </>
   );

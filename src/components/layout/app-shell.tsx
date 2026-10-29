@@ -4,6 +4,13 @@ import { AppNav } from "@/components/layout/app-nav";
 import { MAIN_CONTENT_ID } from "@/components/layout/skip-link";
 import type { NavItem } from "@/lib/navigation";
 
+/**
+ * Pages normally stay in a `max-w-5xl` column. A page that needs more room on large screens
+ * renders an element with `data-wide-page`; header and main then widen to `max-w-7xl`.
+ * Pure CSS (`:has`), so no client code and no change for any other page.
+ */
+const WIDE_WHEN_REQUESTED = "[body:has([data-wide-page])_&]:max-w-7xl";
+
 type AppShellProps = {
   /** Already filtered for the signed-in user's roles (see `getNavItems`). */
   navItems: readonly NavItem[];
@@ -32,7 +39,9 @@ export function AppShell({
     <>
       {banner}
       <header className="border-b border-border bg-surface">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2">
+        <div
+          className={`mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 ${WIDE_WHEN_REQUESTED}`}
+        >
           <Link
             href={homeHref}
             className="min-h-11 content-center text-lg font-extrabold text-brand-700"
@@ -47,7 +56,7 @@ export function AppShell({
       </header>
       <main
         id={MAIN_CONTENT_ID}
-        className="mx-auto w-full max-w-5xl flex-1 px-4 pt-6 pb-24 sm:pb-10"
+        className={`mx-auto w-full max-w-5xl flex-1 px-4 pt-6 pb-24 sm:pb-10 ${WIDE_WHEN_REQUESTED}`}
       >
         {children}
       </main>

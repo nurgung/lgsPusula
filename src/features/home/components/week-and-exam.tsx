@@ -2,7 +2,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { StateMessage } from "@/components/ui/state-message";
 import { EXAM_TYPE_LABELS } from "@/features/exams/labels";
-import { formatNet, type ExamType } from "@/features/exams/net-rules";
+import type { ExamType } from "@/features/exams/net-rules";
 import { formatTurkishDate, formatTurkishDateRange } from "@/features/study/calendar";
 import type { PeriodSummary } from "@/features/study/summary";
 
@@ -11,27 +11,18 @@ export type HomeExamSummary = {
   title: string;
   takenOn: string;
   examType: ExamType;
-  totalNet: number;
 };
 
-export function WeekAndExamSummary({
+export function WeekSummary({
   summary,
-  exam,
+  className,
 }: {
   summary: PeriodSummary;
-  exam: HomeExamSummary | null;
+  className?: string;
 }) {
   return (
-    <div className="grid min-w-0 items-stretch gap-4 lg:grid-cols-2">
-      <WeekSummary summary={summary} />
-      <LatestExam exam={exam} />
-    </div>
-  );
-}
-
-function WeekSummary({ summary }: { summary: PeriodSummary }) {
-  return (
     <Card
+      className={className}
       title="Bu hafta"
       icon={<ChartIcon />}
       iconTone="accent"
@@ -64,38 +55,33 @@ function WeekSummary({ summary }: { summary: PeriodSummary }) {
   );
 }
 
-function LatestExam({ exam }: { exam: HomeExamSummary | null }) {
+/**
+ * Quiet pointer to the latest exam. Score and net live in `ExamAnalysisCard`; this card
+ * keeps only the name, date, type and the link, so the same numbers are not told twice.
+ * With no exam it renders nothing: the analysis card already explains the empty state.
+ */
+export function LatestExam({
+  exam,
+  className,
+}: {
+  exam: HomeExamSummary | null;
+  className?: string;
+}) {
+  if (!exam) return null;
   return (
-    <Card title="Son deneme" icon={<SheetIcon />} headingLevel={3}>
-      <div className="grid min-w-0 gap-4">
-        {exam ? (
-          <div className="grid min-w-0 gap-3">
-            <p className="font-semibold break-words text-ink-900">{exam.title}</p>
-            <p className="text-sm break-words text-ink-600">
-              <span>{formatTurkishDate(exam.takenOn)}</span>
-              <span> · {EXAM_TYPE_LABELS[exam.examType]}</span>
-            </p>
-            <dl className="min-w-0">
-              <Measure label="Net" value={formatNet(exam.totalNet)} unit="soru neti" prominent />
-            </dl>
-          </div>
-        ) : (
-          <StateMessage
-            variant="empty"
-            title="Henüz deneme kaydın yok."
-            description="Deneme sonucunu yazınca özeti burada görürsün."
-          />
-        )}
+    <Card title="Son deneme" icon={<SheetIcon />} headingLevel={3} className={className}>
+      <div className="grid min-w-0 gap-3">
+        <div className="grid min-w-0 gap-1">
+          <p className="font-semibold break-words text-ink-900">{exam.title}</p>
+          <p className="text-sm break-words text-ink-600">
+            <span>{formatTurkishDate(exam.takenOn)}</span>
+            <span> · {EXAM_TYPE_LABELS[exam.examType]}</span>
+          </p>
+        </div>
         <div>
-          {exam ? (
-            <ButtonLink href={`/ogrenci/denemeler/${exam.id}`} variant="secondary">
-              Denemeye bak
-            </ButtonLink>
-          ) : (
-            <ButtonLink href="/ogrenci/denemeler/yeni" variant="secondary">
-              Deneme ekle
-            </ButtonLink>
-          )}
+          <ButtonLink href={`/ogrenci/denemeler/${exam.id}`} variant="secondary">
+            Denemeye bak
+          </ButtonLink>
         </div>
       </div>
     </Card>
@@ -116,9 +102,7 @@ function Measure({
   return (
     <div
       className={
-        prominent
-          ? "min-w-0"
-          : "min-w-0 rounded-xl border border-border bg-surface p-3"
+        prominent ? "min-w-0" : "min-w-0 rounded-xl border border-border bg-surface p-3"
       }
     >
       <dt className="text-sm font-semibold break-words text-ink-700">{label}</dt>

@@ -491,6 +491,7 @@ Penceredeki düzen ikinci görsele benzer, içeriği LGS'dir:
 - [x] 14.5 Hareket azaltma açıkken konfeti ve yol animasyonu durur. Renk tek başına "tamam" demez; işaret ve "Tamam" metni durur — uçtan uca `display: none` ve `animation-name: none`
 - [x] 14.6 Birim testler ve uçtan uca: eşik aşımı pencereyi açar, aşılmayan kayıt açmaz, 320 px taşma yok, Esc kapatır — 24 Ekim 2026, 320 px ve masaüstü geçti
 - [x] 14.7 Tasarım paketi uyarlaması (28 Ekim 2026, proje sahibi isteği): karakterler net SVG çizimlere çevrildi; karakter bandı gökyüzü sahnesi, selamlama, istatistik kutuları ve sağlık kartıyla yenilendi; duyuru, koç kartı, özet ve rozet kartlarına simge eklendi. Puan, `growth-v1`, sağlık hesabı, menü ve sıra değişmedi. Birim testler ve `smoke`, `home-celebration`, `mascot`, `auth`, `coaching`, `study`, `release`, `components`, `outcomes` uçtan uca testleri 320 px ve masaüstünde geçti. Telefonda gerçek cihaz denemesi yapılmadı.
+- [x] 14.8 Deneme Analizi ve geniş özet bandı (29 Ekim 2026, proje sahibi isteği): `/ogrenci` özet bandına puan ve net gelişimini gösteren "Deneme Analizi" kartı eklendi; veri `exams.score` ve `exams.total_net` kayıtlarından, `listExams` sırasıyla okunur. Yeni tablo, net hesabı veya paket yok. Ana sayfa `xl` ve üstünde `max-w-7xl` kullanır (yalnızca `data-wide-page` olan sayfa); özet bandı 2:1 iki sütundur. Birim testler, ESLint, TypeScript ve 1280×800, 390×844, 320×568 uçtan uca koşuları geçti (yerel Supabase, kurgusal hesap). Gerçek cihaz denemesi yapılmadı.
 
 **Bitti sayılması için**
 - [x] 14.0 karar yazılı
