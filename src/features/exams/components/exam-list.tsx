@@ -2,7 +2,8 @@ import { ButtonLink } from "@/components/ui/button";
 import { StateMessage } from "@/components/ui/state-message";
 import { formatTurkishDate } from "@/features/study/calendar";
 import { EXAM_TYPE_LABELS } from "@/features/exams/labels";
-import { formatNet } from "@/features/exams/net-rules";
+import { EXAM_MESSAGES } from "@/features/exams/messages";
+import { formatExamScore, formatNet } from "@/features/exams/net-rules";
 import type { ExamListItem } from "@/services/supabase/exam-store";
 
 export function ExamList({
@@ -35,6 +36,10 @@ export function ExamList({
           </div>
           <p className="text-ink-900">
             {EXAM_TYPE_LABELS[exam.examType]} · Toplam net {formatNet(exam.totalNet)}
+          </p>
+          <p className="text-ink-900">
+            Puan:{" "}
+            {exam.score === null ? EXAM_MESSAGES.scoreMissing : formatExamScore(exam.score)}
           </p>
           <p className="text-sm text-ink-600">Kural: {exam.ruleVersion}</p>
           {editable ? (

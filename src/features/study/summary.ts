@@ -43,6 +43,9 @@ export type PeriodSummary = {
     subjectId: string;
     subjectName: string;
     questionCount: number;
+    correctCount: number;
+    wrongCount: number;
+    blankCount: number;
     durationMinutes: number;
   }[];
 };
@@ -83,9 +86,15 @@ export function summarizeLogs(
       subjectId: log.subjectId,
       subjectName: log.subjectName,
       questionCount: 0,
+      correctCount: 0,
+      wrongCount: 0,
+      blankCount: 0,
       durationMinutes: 0,
     };
     current.questionCount += log.questionCount;
+    current.correctCount += log.correctCount;
+    current.wrongCount += log.wrongCount;
+    current.blankCount += log.blankCount;
     current.durationMinutes += log.durationMinutes;
     bySubject.set(log.subjectId, current);
   }

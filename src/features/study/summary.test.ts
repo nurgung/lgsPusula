@@ -76,12 +76,18 @@ describe("summarizeLogs", () => {
         subjectId: "subject-2",
         subjectName: "Fen",
         questionCount: 6,
+        correctCount: 6,
+        wrongCount: 0,
+        blankCount: 0,
         durationMinutes: 15,
       },
       {
         subjectId: "subject-1",
         subjectName: "Matematik",
         questionCount: 4,
+        correctCount: 3,
+        wrongCount: 1,
+        blankCount: 0,
         durationMinutes: 20,
       },
     ]);

@@ -13,7 +13,11 @@ import { ExamForm } from "@/features/exams/components/exam-form";
 import { EXAM_TYPE_LABELS } from "@/features/exams/labels";
 import { loadExamDetail } from "@/features/exams/load-exams";
 import { EXAM_MESSAGES } from "@/features/exams/messages";
-import { formatNet, type LgsSubjectCode } from "@/features/exams/net-rules";
+import {
+  formatExamScore,
+  formatNet,
+  type LgsSubjectCode,
+} from "@/features/exams/net-rules";
 import { formatTurkishDate, istanbulToday } from "@/features/study/calendar";
 
 export const metadata: Metadata = { title: "Deneme detayı" };
@@ -86,7 +90,7 @@ async function ExamDetail({
     <>
       <PageHeader
         title={exam.title}
-        description={`${EXAM_TYPE_LABELS[exam.examType]} · ${formatTurkishDate(exam.takenOn)} · Toplam net ${formatNet(exam.totalNet)} (kural ${exam.ruleVersion})`}
+        description={`${EXAM_TYPE_LABELS[exam.examType]} · ${formatTurkishDate(exam.takenOn)} · Toplam net ${formatNet(exam.totalNet)} · Puan ${formatExamScore(exam.score)} (kural ${exam.ruleVersion})`}
       />
       {status ? <StateMessage variant="success" title={status} /> : null}
 
@@ -135,6 +139,10 @@ async function ExamDetail({
         <p className="mt-3 text-ink-900">
           Toplam net: <strong>{formatNet(exam.totalNet)}</strong> (eksi toplam 0 alınır)
         </p>
+        <p className="mt-1 text-ink-900">
+          Deneme puanı: <strong>{formatExamScore(exam.score)}</strong>
+          {exam.score === null ? " · sonuç kağıdından yazılmadı" : ""}
+        </p>
         <div className="mt-4">
           <ButtonLink
             href={`/ogrenci/denemeler/${exam.id}/kazanimlar`}
@@ -160,6 +168,10 @@ async function ExamDetail({
             title: exam.title,
             takenOn: exam.takenOn,
             examType: exam.examType,
+            score:
+              exam.score === null
+                ? ""
+                : String(exam.score).replace(".", ","),
             lgs: lgsDefaults,
             branch: branchSubject
               ? {

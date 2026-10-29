@@ -18,6 +18,7 @@ export type ExamPayload = {
   examType: ParsedExamInput["examType"];
   ruleVersion: ParsedExamInput["ruleVersion"];
   totalNet: number;
+  score: number | null;
   requestId: string;
   subjects: ExamSubjectRow[];
 };
@@ -37,6 +38,7 @@ function samePayload(a: ExamPayload, b: ExamPayload): boolean {
     a.examType !== b.examType ||
     a.ruleVersion !== b.ruleVersion ||
     a.totalNet !== b.totalNet ||
+    a.score !== b.score ||
     a.requestId !== b.requestId ||
     a.subjects.length !== b.subjects.length
   ) {
@@ -80,6 +82,7 @@ export function buildExamPayload(
     examType: input.examType,
     ruleVersion: input.ruleVersion,
     totalNet: nets.totalNet,
+    score: input.score,
     requestId,
     subjects: nets.subjects.map((subject) => {
       const source = byCode.get(subject.subjectCode);

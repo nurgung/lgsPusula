@@ -10,6 +10,7 @@ const payload: ExamPayload = buildExamPayload(
     takenOn: "2026-10-19",
     examType: "branch",
     ruleVersion: CURRENT_RULE_VERSION,
+    score: null,
     subjects: [
       {
         subjectCode: "matematik",

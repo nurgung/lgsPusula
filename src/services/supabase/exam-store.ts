@@ -55,8 +55,14 @@ const examRowSchema = z.object({
   exam_type: z.string(),
   rule_version: z.string(),
   total_net: z.union([z.number(), z.string()]),
+  score: z.union([z.number(), z.string()]).nullable(),
   request_id: z.uuid(),
 });
+
+function asOptionalNumber(value: unknown): number | null {
+  if (value === null || value === undefined) return null;
+  return asNumber(value);
+}
 
 const subjectRowSchema = z.object({
   id: z.uuid(),
@@ -81,6 +87,7 @@ export type ExamListItem = {
   examType: ExamType;
   ruleVersion: NetRuleVersion;
   totalNet: number;
+  score: number | null;
 };
 
 export type ExamDetail = ExamListItem & {
@@ -136,6 +143,7 @@ function toListItem(row: z.infer<typeof examRowSchema>): ExamListItem {
     examType: row.exam_type,
     ruleVersion: row.rule_version,
     totalNet: asNumber(row.total_net),
+    score: asOptionalNumber(row.score),
   };
 }
 
@@ -166,6 +174,7 @@ function toStored(
     examType: row.exam_type,
     ruleVersion: row.rule_version,
     totalNet: asNumber(row.total_net),
+    score: asOptionalNumber(row.score),
     requestId: row.request_id,
     subjects: subjects.map(toSubjectPayload),
   };
@@ -179,7 +188,7 @@ export async function listExams(
   const { data, error } = await client
     .from("exams")
     .select(
-      "id, student_id, title, taken_on, exam_type, rule_version, total_net, request_id",
+      "id, student_id, title, taken_on, exam_type, rule_version, total_net, score, request_id",
     )
     .eq("student_id", studentId)
     .gte("taken_on", window.from)
@@ -191,6 +200,67 @@ export async function listExams(
   return (data ?? []).map((row) => toListItem(examRowSchema.parse(row)));
 }
 
+async function loadSubjectsForExams(
+  client: SupabaseClient,
+  examIds: readonly string[],
+): Promise<Map<string, ExamSubjectView[]>> {
+  const byExam = new Map<string, ExamSubjectView[]>();
+  for (const id of examIds) byExam.set(id, []);
+  if (examIds.length === 0) return byExam;
+
+  const subjectWithExam = subjectRowSchema.extend({ exam_id: z.uuid() });
+  const { data, error } = await client
+    .from("exam_subject_results")
+    .select(
+      "id, exam_id, subject_id, question_count, correct_count, wrong_count, blank_count, net, subjects(name, code)",
+    )
+    .in("exam_id", [...examIds])
+    .order("created_at", { ascending: true })
+    .limit(PAGE_SIZE);
+  if (error) fail("list_exam_subjects_batch", error);
+  for (const raw of data ?? []) {
+    const row = subjectWithExam.parse(raw);
+    const list = byExam.get(row.exam_id) ?? [];
+    list.push(toSubjectRow(row));
+    byExam.set(row.exam_id, list);
+  }
+  return byExam;
+}
+
+/** List exams in a date window together with their subject nets. */
+export async function listExamsWithSubjects(
+  client: SupabaseClient,
+  studentId: string,
+  window: DateWindow,
+): Promise<ExamDetail[]> {
+  const { data, error } = await client
+    .from("exams")
+    .select(
+      "id, student_id, title, taken_on, exam_type, rule_version, total_net, score, request_id",
+    )
+    .eq("student_id", studentId)
+    .gte("taken_on", window.from)
+    .lte("taken_on", window.to)
+    .order("taken_on", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(PAGE_SIZE);
+  if (error) fail("list_exams_with_subjects", error);
+  const exams = (data ?? []).map((row) => examRowSchema.parse(row));
+  const subjectsByExam = await loadSubjectsForExams(
+    client,
+    exams.map((exam) => exam.id),
+  );
+  return exams.map((exam) => {
+    const list = toListItem(exam);
+    return {
+      ...list,
+      studentId: exam.student_id,
+      requestId: exam.request_id,
+      subjects: subjectsByExam.get(exam.id) ?? [],
+    };
+  });
+}
+
 export async function getExam(
   client: SupabaseClient,
   studentId: string,
@@ -199,7 +269,7 @@ export async function getExam(
   const { data, error } = await client
     .from("exams")
     .select(
-      "id, student_id, title, taken_on, exam_type, rule_version, total_net, request_id",
+      "id, student_id, title, taken_on, exam_type, rule_version, total_net, score, request_id",
     )
     .eq("student_id", studentId)
     .eq("id", examId)
@@ -225,7 +295,7 @@ export async function findExamByRequestId(
   const { data, error } = await client
     .from("exams")
     .select(
-      "id, student_id, title, taken_on, exam_type, rule_version, total_net, request_id",
+      "id, student_id, title, taken_on, exam_type, rule_version, total_net, score, request_id",
     )
     .eq("student_id", studentId)
     .eq("request_id", requestId)
@@ -269,10 +339,11 @@ export async function insertExam(
       exam_type: payload.examType,
       rule_version: payload.ruleVersion,
       total_net: payload.totalNet,
+      score: payload.score,
       request_id: payload.requestId,
     })
     .select(
-      "id, student_id, title, taken_on, exam_type, rule_version, total_net, request_id",
+      "id, student_id, title, taken_on, exam_type, rule_version, total_net, score, request_id",
     )
     .single();
   if (error || !data) fail("insert_exam", error);
@@ -305,11 +376,12 @@ export async function updateExam(
       exam_type: payload.examType,
       rule_version: payload.ruleVersion,
       total_net: payload.totalNet,
+      score: payload.score,
     })
     .eq("id", examId)
     .eq("student_id", studentId)
     .select(
-      "id, student_id, title, taken_on, exam_type, rule_version, total_net, request_id",
+      "id, student_id, title, taken_on, exam_type, rule_version, total_net, score, request_id",
     )
     .maybeSingle();
   if (error) fail("update_exam", error);

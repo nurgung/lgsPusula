@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CURRENT_RULE_VERSION, getNetRule } from "./net-rules";
-import { parseExamInput } from "./schemas";
+import { parseExamInput, parseOptionalExamScore } from "./schemas";
 
 const ids = new Map(
   getNetRule(CURRENT_RULE_VERSION).examTypes.lgs_full.subjects.map((slot, index) => [
@@ -55,6 +55,7 @@ describe("parseExamInput", () => {
       title: "Ekim denemesi",
       takenOn: "2026-10-19",
       examType: "lgs_full",
+      score: "412,5",
     };
     for (const slot of getNetRule(CURRENT_RULE_VERSION).examTypes.lgs_full.subjects) {
       values[`${slot.code}.correctCount`] = "0";
@@ -66,6 +67,14 @@ describe("parseExamInput", () => {
     if (result.ok) {
       expect(result.data.subjects).toHaveLength(6);
       expect(result.data.ruleVersion).toBe("lgs-v1");
+      expect(result.data.score).toBe(412.5);
     }
+  });
+
+  it("keeps score optional and rejects out-of-range values", () => {
+    expect(parseOptionalExamScore("")).toEqual({ ok: true, value: null });
+    expect(parseOptionalExamScore("350")).toEqual({ ok: true, value: 350 });
+    expect(parseOptionalExamScore("501").ok).toBe(false);
+    expect(parseOptionalExamScore("-1").ok).toBe(false);
   });
 });

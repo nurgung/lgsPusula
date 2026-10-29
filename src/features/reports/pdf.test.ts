@@ -15,7 +15,7 @@ describe("weekly report PDF", () => {
         today: "2026-10-21",
         logs: [],
         goals: [],
-        exams: [],
+        exams: [] as const,
         suggestion: {
           message: "Bugün için küçük bir soru hedefi belirleyebilirsin.",
           reason: "Bu bir ders sonucu değil.",

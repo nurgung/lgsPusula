@@ -26,7 +26,7 @@ export const REPORT_MESSAGES = {
   parentSuggestionNote:
     "Bu öneri öğrencinin kayıtlarından hesaplanır. Kayıtları yalnızca öğrenci değiştirebilir.",
   downloadHint:
-    "Rapor sunucuda hazırlanır. Dosya 24 saat sonra silinir. İçinde dönem, üretim zamanı ve ölçülerin anlamı yazar.",
+    "Aşağıdaki özet bu haftanın tablolarıdır. PDF ve Word aynı yapıyı kullanır. Dosya sunucuda hazırlanır ve 24 saat sonra silinir.",
   downloadCurrent: "Bu haftanın raporunu indir",
   downloadPrevious: "Geçen haftanın raporunu indir",
   preparing: "Rapor hazırlanıyor...",
@@ -45,6 +45,7 @@ export const REPORT_EXPLANATIONS = [
   "Soru, doğru, yanlış ve boş sayıları öğrencinin yazdığı kayıtların toplamıdır.",
   "Süre dakikadır. Hedefe sayılmaz.",
   "Net = doğru - (yanlış / 3). Boş soru neti değiştirmez. Ders neti eksi olabilir. Toplam net eksi çıkarsa 0 yazılır.",
+  "Deneme puanı öğrencinin yazdığı isteğe bağlı alandır. Netten üretilmez. Yazılmamışsa Kayıt yok görünür.",
   "Gün sınırı İstanbul saatiyle gece yarısıdır.",
   "Bu rapor başka bir öğrenciyle kıyaslama yapmaz ve bir sonuç vaadi değildir.",
 ] as const;

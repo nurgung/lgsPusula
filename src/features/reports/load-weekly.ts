@@ -1,6 +1,6 @@
 import "server-only";
 import { loadCoachingReport } from "@/features/coaching/load-coaching";
-import { loadExamList } from "@/features/exams/load-exams";
+import { loadExamListWithSubjects } from "@/features/exams/load-exams";
 import { loadStudyRecords } from "@/features/study/load-study";
 import { buildWeeklyReportBlocks } from "./document";
 import type { Block } from "./layout";
@@ -25,7 +25,7 @@ export async function loadWeeklyBlocks(input: {
   };
   const [study, exams, coaching] = await Promise.all([
     loadStudyRecords(input.studentId, readWindow),
-    loadExamList(input.studentId, readWindow),
+    loadExamListWithSubjects(input.studentId, readWindow),
     loadCoachingReport(input.studentId, input.today),
   ]);
   return {
@@ -43,7 +43,13 @@ export async function loadWeeklyBlocks(input: {
         takenOn: exam.takenOn,
         examType: exam.examType,
         totalNet: exam.totalNet,
+        score: exam.score,
         ruleVersion: exam.ruleVersion,
+        subjects: exam.subjects.map((subject) => ({
+          subjectCode: subject.subjectCode,
+          subjectName: subject.subjectName,
+          net: subject.net,
+        })),
       })),
       suggestion: {
         message: coaching.recommendation.message,

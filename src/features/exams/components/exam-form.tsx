@@ -4,6 +4,7 @@ import { useActionState, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   FormErrorSummary,
+  NumberField,
   SelectField,
   TextField,
 } from "@/components/ui/form-field";
@@ -16,6 +17,7 @@ import {
   type ExamFormState,
 } from "@/features/exams/form-state";
 import { LGS_SUBJECT_LABELS } from "@/features/exams/labels";
+import { EXAM_MESSAGES } from "@/features/exams/messages";
 import {
   CURRENT_RULE_VERSION,
   getNetRule,
@@ -39,6 +41,7 @@ type FormDefaults = {
   title: string;
   takenOn: string;
   examType: ExamType;
+  score: string;
   branch: Required<SubjectDefaults>;
   lgs: Partial<Record<LgsSubjectCode, Required<SubjectDefaults>>>;
 };
@@ -58,6 +61,7 @@ export function ExamForm({
     title?: string;
     takenOn?: string;
     examType?: ExamType;
+    score?: string;
     branch?: SubjectDefaults;
     lgs?: Partial<Record<LgsSubjectCode, SubjectDefaults>>;
   };
@@ -74,6 +78,7 @@ export function ExamForm({
     title: submitted?.title ?? defaults?.title ?? "",
     takenOn: submitted?.takenOn ?? defaults?.takenOn ?? today,
     examType: (submitted?.examType ?? defaults?.examType ?? "lgs_full") as ExamType,
+    score: submitted?.score ?? defaults?.score ?? "",
     branch: {
       subjectId:
         submitted?.["branch.subjectId"] ?? defaults?.branch?.subjectId ?? "",
@@ -198,6 +203,17 @@ function ExamFields({
           { value: "lgs_full", label: "Tam LGS denemesi (90 soru)" },
           { value: "branch", label: "Branş denemesi (tek ders)" },
         ]}
+      />
+      <NumberField
+        id={`${prefix}-score`}
+        name="score"
+        label="Deneme puanı"
+        optional
+        allowDecimal
+        defaultValue={defaults.score}
+        maxLength={8}
+        error={fieldErrors.score}
+        hint={EXAM_MESSAGES.scoreHint}
       />
 
       {selectedType === "lgs_full" ? (

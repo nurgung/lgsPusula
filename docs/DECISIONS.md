@@ -39,6 +39,7 @@ Bu belge Faz 0'da proje sahibinin verdiği kararları ve gerekçelerini tutar. K
 | 22 Ekim 2026 | Groq şartları 0.12 ölçütleriyle yeniden bakıldı. Eğitim yasağı duruyor. Sıfır saklama panelden açılır; açılmadan kod istek atmaz. Konsol kullanıcısı 18 yaşından büyük olmalıdır. Bölge ABD. |
 | 22 Ekim 2026 | Ayrı staging Supabase projesi açılmadı. Proje sahibi, önizleme ortamının bu uygulamanın bulut veritabanı `lgs-pusula-prod` üzerinde çalışmasına karar verdi. `velitakipnew` duraklatılmaz. |
 | 24 Ekim 2026 | Görünür karakter aşaması yalnızca puana bağlanmaz. `mascot-v1` puan tablosu durur. `growth-v1` seri, farklı gün, soru ve mevcut puan eşiğini birlikte ister; bir günde bir aşama ilerler. Boş gün seriyi yeniden başlatır, kazanılan aşamayı silmez. Sağlık görünümü kayıt silmez. Bildirim uygulama içidir. |
+| 29 Ekim 2026 | Deneme kaydına isteğe bağlı `score` (deneme puanı, 0–500) eklendi. Öğrenci sonuç kağıdından yazar; uygulamada netten puan üretilmez. Haftalık raporda gösterilir; yazılmamışsa "Kayıt yok". |
 
 ---
 

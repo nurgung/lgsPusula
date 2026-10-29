@@ -1,0 +1,173 @@
+import { describe, expect, it } from "vitest";
+import { supportiveCopyIssues } from "@/features/coaching/messages";
+import type { StudyGoalView, StudyLogView } from "@/features/study/summary";
+import {
+  buildWeeklyReportModel,
+  formatDurationMinutes,
+  formatNetDelta,
+  type ReportExam,
+} from "./weekly-model";
+
+const today = "2026-10-21";
+
+function log(partial: Partial<StudyLogView> & Pick<StudyLogView, "id" | "studiedOn">): StudyLogView {
+  return {
+    subjectId: "sub-1",
+    subjectName: "Türkçe",
+    topicId: null,
+    topicName: null,
+    outcomeId: null,
+    outcomeCode: null,
+    questionCount: 4,
+    correctCount: 3,
+    wrongCount: 1,
+    blankCount: 0,
+    durationMinutes: 20,
+    ...partial,
+  };
+}
+
+const suggestion = {
+  message: "Bugün için küçük bir soru hedefi belirleyebilirsin.",
+  reason: "Bu bir ders sonucu değil.",
+  evidence: ["Kayıt yok."],
+};
+
+describe("buildWeeklyReportModel", () => {
+  it("sums study rows without inventing empty days and counts unique study days", () => {
+    const model = buildWeeklyReportModel({
+      studentName: "Ayşe",
+      generatedAt: new Date("2026-10-21T07:55:00.000Z"),
+      period: "current",
+      today,
+      logs: [
+        log({ id: "a", studiedOn: "2026-10-19" }),
+        log({
+          id: "b",
+          studiedOn: "2026-10-19",
+          subjectId: "sub-2",
+          subjectName: "Matematik",
+          questionCount: 6,
+          correctCount: 4,
+          wrongCount: 1,
+          blankCount: 1,
+          durationMinutes: 30,
+        }),
+        log({ id: "c", studiedOn: "2026-10-21", questionCount: 2, durationMinutes: 10 }),
+        log({ id: "outside", studiedOn: "2026-10-13", questionCount: 50, durationMinutes: 100 }),
+      ],
+      goals: [],
+      exams: [],
+      suggestion,
+    });
+    expect(model.summary).toEqual({
+      durationMinutes: 60,
+      questionCount: 12,
+      studyDayCount: 2,
+      examCount: 0,
+    });
+    expect(model.studyRows).toHaveLength(3);
+    expect(model.studyTotals.questionCount).toBe(12);
+    expect(model.subjectRows.map((row) => row.subjectName)).toEqual([
+      "Matematik",
+      "Türkçe",
+    ]);
+    expect(model.evaluation.join("\n")).toContain("Matematik");
+    expect(supportiveCopyIssues(model.evaluation.join("\n"))).toEqual([]);
+  });
+
+  it("compares the last two exams by date and leaves missing nets blank", () => {
+    const exams: ReportExam[] = [
+      {
+        title: "Birinci",
+        takenOn: "2026-10-19",
+        examType: "lgs_full",
+        totalNet: 30,
+        score: 400,
+        ruleVersion: "lgs-v1",
+        subjects: [
+          { subjectCode: "turkce", subjectName: "Türkçe", net: 10 },
+          { subjectCode: "matematik", subjectName: "Matematik", net: 8 },
+        ],
+      },
+      {
+        title: "İkinci",
+        takenOn: "2026-10-21",
+        examType: "lgs_full",
+        totalNet: 33,
+        score: null,
+        ruleVersion: "lgs-v1",
+        subjects: [
+          { subjectCode: "turkce", subjectName: "Türkçe", net: 12 },
+          { subjectCode: "matematik", subjectName: "Matematik", net: 6 },
+          { subjectCode: "fen_bilimleri", subjectName: "Fen Bilimleri", net: 15 },
+        ],
+      },
+    ];
+    const model = buildWeeklyReportModel({
+      studentName: "Ayşe",
+      generatedAt: new Date("2026-10-21T07:55:00.000Z"),
+      period: "current",
+      today,
+      logs: [],
+      goals: [],
+      exams,
+      suggestion,
+    });
+    expect(model.summary.examCount).toBe(2);
+    expect(model.examsInPeriod.map((exam) => exam.title)).toEqual(["Birinci", "İkinci"]);
+    const turkce = model.examComparisons.find((row) => row.subjectName === "Türkçe");
+    const matematik = model.examComparisons.find((row) => row.subjectName === "Matematik");
+    const fen = model.examComparisons.find((row) => row.subjectName === "Fen Bilimleri");
+    expect(turkce).toMatchObject({ latestNet: 12, previousNet: 10, delta: 2, assessment: "Arttı" });
+    expect(matematik).toMatchObject({
+      latestNet: 6,
+      previousNet: 8,
+      delta: -2,
+      assessment: "Azaldı",
+    });
+    expect(fen).toMatchObject({
+      latestNet: 15,
+      previousNet: null,
+      delta: null,
+      assessment: "Karşılaştırma yapılamıyor",
+    });
+    expect(formatNetDelta(turkce?.delta ?? null)).toContain("+");
+  });
+
+  it("keeps goal completion uncapped above 100 percent", () => {
+    const goals: StudyGoalView[] = [
+      {
+        id: "week",
+        period: "week",
+        subjectId: null,
+        subjectName: null,
+        targetQuestions: 5,
+      },
+    ];
+    const model = buildWeeklyReportModel({
+      studentName: "Ayşe",
+      generatedAt: new Date("2026-10-21T07:55:00.000Z"),
+      period: "current",
+      today,
+      logs: [log({ id: "a", studiedOn: "2026-10-20", questionCount: 12 })],
+      goals,
+      exams: [],
+      suggestion,
+    });
+    expect(model.goalRows).toEqual([
+      {
+        label: "Haftalık hedef: Tüm dersler",
+        targetQuestions: 5,
+        doneQuestions: 12,
+        ratioLabel: "%240",
+      },
+    ]);
+  });
+
+  it("formats duration consistently", () => {
+    expect(formatDurationMinutes(45)).toBe("45 dakika");
+    expect(formatDurationMinutes(60)).toBe("1 saat");
+    expect(formatDurationMinutes(75)).toBe("1 saat 15 dakika");
+  });
+});

@@ -171,3 +171,12 @@ export function formatNet(value: number): string {
     maximumFractionDigits: 2,
   });
 }
+
+/** Optional exam booklet score. Null means the student did not record one. */
+export function formatExamScore(value: number | null): string {
+  if (value === null) return "Kayıt yok";
+  return value.toLocaleString("tr-TR", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+}

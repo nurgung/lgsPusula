@@ -43,17 +43,26 @@ function SubjectTable({ summary }: { summary: PeriodSummary }) {
     <TableScroll label="Derslere göre soru ve dakika">
       <table className={tableClassName}>
         <caption className="sr-only">
-          {formatTurkishDateRange(summary)} derslere göre soru ve dakika
+          {formatTurkishDateRange(summary)} derslere göre soru, doğru, yanlış, boş ve dakika
         </caption>
         <thead>
           <tr>
             <th className={thClassName} scope="col">
               Ders
             </th>
-            <th className={thClassName} scope="col">
+            <th className={`${thClassName} text-right`} scope="col">
               Soru
             </th>
-            <th className={thClassName} scope="col">
+            <th className={`${thClassName} text-right`} scope="col">
+              Doğru
+            </th>
+            <th className={`${thClassName} text-right`} scope="col">
+              Yanlış
+            </th>
+            <th className={`${thClassName} text-right`} scope="col">
+              Boş
+            </th>
+            <th className={`${thClassName} text-right`} scope="col">
               Dakika
             </th>
           </tr>
@@ -64,8 +73,11 @@ function SubjectTable({ summary }: { summary: PeriodSummary }) {
               <th className={`${tdClassName} text-left font-semibold`} scope="row">
                 {row.subjectName}
               </th>
-              <td className={tdClassName}>{row.questionCount} soru</td>
-              <td className={tdClassName}>{row.durationMinutes} dakika</td>
+              <td className={`${tdClassName} text-right`}>{row.questionCount}</td>
+              <td className={`${tdClassName} text-right`}>{row.correctCount}</td>
+              <td className={`${tdClassName} text-right`}>{row.wrongCount}</td>
+              <td className={`${tdClassName} text-right`}>{row.blankCount}</td>
+              <td className={`${tdClassName} text-right`}>{row.durationMinutes}</td>
             </tr>
           ))}
         </tbody>

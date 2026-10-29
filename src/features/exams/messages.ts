@@ -7,4 +7,7 @@ export const EXAM_MESSAGES = {
   updated: "Deneme güncellendi.",
   deleted: "Deneme silindi.",
   deleteConfirm: "Bu denemeyi silmek istiyor musun? Bu işlem geri alınamaz.",
+  scoreHint:
+    "Deneme kitabındaki veya sonuç kağıdındaki puanı yaz (0–500). Yoksa boş bırak. Puan netten hesaplanmaz.",
+  scoreMissing: "Kayıt yok",
 } as const;

@@ -14,19 +14,21 @@ import { RevokeLinkButton } from "@/features/family/components/revoke-link-butto
 import { loadOwnFamilyLinks } from "@/features/family/load-links";
 import { formatTurkishDateRange, istanbulToday } from "@/features/study/calendar";
 import { ExamList } from "@/features/exams/components/exam-list";
-import { loadExamList } from "@/features/exams/load-exams";
+import { loadExamListWithSubjects } from "@/features/exams/load-exams";
 import { ParentMascotCard } from "@/features/mascot/components/mascot-panels";
 import { evaluateGrowth } from "@/features/mascot/growth";
 import { loadMascotSummary } from "@/features/mascot/load-mascot";
 import { PeriodSummaryPanel } from "@/features/reports/components/period-summary";
 import { DocxDownload } from "@/features/reports/components/docx-download";
 import { ReportDownloadForm } from "@/features/reports/components/report-download-form";
+import { WeeklyReportPanel } from "@/features/reports/components/weekly-report-panel";
 import { REPORT_MESSAGES } from "@/features/reports/messages";
 import {
   monthWindows,
   parentOverviewWindow,
   weekWindows,
 } from "@/features/reports/periods";
+import { buildWeeklyReportModel } from "@/features/reports/weekly-model";
 import { purgeExpiredReportJobs } from "@/services/supabase/report-store";
 import { createServiceClient } from "@/services/supabase/server-client";
 import { GoalProgressList } from "@/features/study/components/goal-progress-list";
@@ -73,7 +75,7 @@ async function ParentStudent({
   await purgeExpiredReportJobs(createServiceClient());
   const [study, exams, mascot, coaching, contributions] = await Promise.all([
     loadStudyRecords(studentId, overview),
-    loadExamList(studentId, overview),
+    loadExamListWithSubjects(studentId, overview),
     loadMascotSummary(studentId),
     loadCoachingReport(studentId, today),
     loadStudyContributions(studentId, today),
@@ -97,6 +99,32 @@ async function ParentStudent({
   const monthNote = months.unfinished
     ? `${REPORT_MESSAGES.unfinishedMonth} ${REPORT_MESSAGES.comparisonNote}`
     : REPORT_MESSAGES.comparisonNote;
+  const weeklyReport = buildWeeklyReportModel({
+    studentName: link.student_display_name,
+    generatedAt: new Date(),
+    period: "current",
+    today,
+    logs: study.logs,
+    goals: study.goals,
+    exams: exams.map((exam) => ({
+      title: exam.title,
+      takenOn: exam.takenOn,
+      examType: exam.examType,
+      totalNet: exam.totalNet,
+      score: exam.score,
+      ruleVersion: exam.ruleVersion,
+      subjects: exam.subjects.map((subject) => ({
+        subjectCode: subject.subjectCode,
+        subjectName: subject.subjectName,
+        net: subject.net,
+      })),
+    })),
+    suggestion: {
+      message: coaching.recommendation.message,
+      reason: coaching.recommendation.reason,
+      evidence: coaching.recommendation.evidence,
+    },
+  });
 
   return (
     <>
@@ -187,6 +215,7 @@ async function ParentStudent({
           description="PDF ve Word sunucuda üretilir. İndirmeden önce bağlantın yeniden kontrol edilir."
         >
           <div className="grid gap-6">
+            <WeeklyReportPanel model={weeklyReport} />
             <ReportDownloadForm studentId={studentId} />
             <DocxDownload studentId={studentId} />
           </div>

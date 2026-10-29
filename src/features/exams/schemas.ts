@@ -43,8 +43,35 @@ export type ParsedExamInput = {
   takenOn: string;
   examType: ExamType;
   ruleVersion: NetRuleVersion;
+  /** Optional booklet score; null when the student left the field blank. */
+  score: number | null;
   subjects: SubjectCountFields[];
 };
+
+export const EXAM_SCORE_MAX = 500;
+
+/** Empty → null. Accepts `.` or `,` decimals. Does not invent a score from nets. */
+export function parseOptionalExamScore(
+  raw: string,
+): { ok: true; value: number | null } | { ok: false; message: string } {
+  const trimmed = raw.trim();
+  if (trimmed === "") return { ok: true, value: null };
+  const normalized = trimmed.replace(",", ".");
+  if (!/^\d+(\.\d{1,2})?$/.test(normalized)) {
+    return {
+      ok: false,
+      message: "Puan için 0–500 arası bir sayı yaz veya boş bırak.",
+    };
+  }
+  const value = Number(normalized);
+  if (!Number.isFinite(value) || value < 0 || value > EXAM_SCORE_MAX) {
+    return {
+      ok: false,
+      message: `Puan 0–${EXAM_SCORE_MAX} arasında olmalı veya boş bırakılmalı.`,
+    };
+  }
+  return { ok: true, value };
+}
 
 export type ExamParseResult =
   | { ok: true; data: ParsedExamInput }
@@ -166,11 +193,17 @@ export function parseExamInput(
     fieldErrors.examType = "Deneme türünü seç.";
   }
 
-  if (Object.keys(fieldErrors).length > 0 || !title.success) {
+  const scoreParsed = parseOptionalExamScore(values.score ?? "");
+  if (!scoreParsed.ok) {
+    fieldErrors.score = scoreParsed.message;
+  }
+
+  if (Object.keys(fieldErrors).length > 0 || !title.success || !scoreParsed.ok) {
     return { ok: false, fieldErrors };
   }
 
   const examType = examTypeRaw as ExamType;
+  const score = scoreParsed.value;
 
   if (examType === "lgs_full") {
     const subjects: SubjectCountFields[] = [];
@@ -205,6 +238,7 @@ export function parseExamInput(
         takenOn: takenOnRaw,
         examType,
         ruleVersion,
+        score,
         subjects,
       },
     };
@@ -243,6 +277,7 @@ export function parseExamInput(
       takenOn: takenOnRaw,
       examType,
       ruleVersion,
+      score,
       subjects: [{ subjectCode: codeEntry[0], ...parsed }],
     },
   };

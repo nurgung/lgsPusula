@@ -61,10 +61,12 @@ Migration: `supabase/migrations/20261019160000_exams.sql`. `taken_on` Europe/Ist
 
 | Tablo | Alanlar | Erişim (`authenticated`) | Erişim (`service_role`) |
 | --- | --- | --- | --- |
-| `exams` | `student_id`, `title` (1–80), `taken_on`, `exam_type` (`lgs_full`/`branch`), `rule_version`, `total_net` (≥ 0), `request_id`, zamanlar | Öğrenci kendi satırını ekler, okur, günceller ve siler. Aktif bağlantısı olan veli yalnızca okur. `student_id` ve `request_id` güncellenemez. | Okur/yazar/siler |
+| `exams` | `student_id`, `title` (1–80), `taken_on`, `exam_type` (`lgs_full`/`branch`), `rule_version`, `total_net` (≥ 0), `score` (0–500, isteğe bağlı), `request_id`, zamanlar | Öğrenci kendi satırını ekler, okur, günceller ve siler. Aktif bağlantısı olan veli yalnızca okur. `student_id` ve `request_id` güncellenemez. | Okur/yazar/siler |
 | `exam_subject_results` | `exam_id`, `subject_id`, soru sayıları (1–100 / 0–100), `net` (eksi olabilir) | Aynı sahiplik kuralı; satırlar üst denemeye bağlıdır. Ders başına bir satır. | Okur/yazar/siler |
 
 Doğru + yanlış + boş = soru sayısı. Aynı `(student_id, request_id)` ikinci deneme açmaz. Katalog satırı silinemez (`on delete restrict`); deneme silinince ders satırları silinir (`on delete cascade`).
+
+`score` sütunu `20261029120000_exam_score.sql` ile eklendi. Öğrencinin sonuç kağıdından yazdığı isteğe bağlı puandır (0–500); netten üretilmez. Boş bırakılırsa `null` kalır; raporda "Kayıt yok" yazılır. Yerel veritabanına 29 Ekim 2026'da uygulandı (`npx supabase migration up --local`). Production'a ayrıca uygulanması gerekir (`npx supabase db push`, önce `--dry-run`).
 
 ## Uygulanan şema (Faz 8)
 

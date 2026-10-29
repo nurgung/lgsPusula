@@ -132,6 +132,7 @@ export async function updateExamAction(
       examType: payload.examType,
       ruleVersion: payload.ruleVersion,
       totalNet: payload.totalNet,
+      score: payload.score,
       subjects: payload.subjects,
     });
   } catch (error) {
