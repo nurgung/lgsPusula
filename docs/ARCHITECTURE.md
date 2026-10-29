@@ -356,7 +356,7 @@ Karar 0.6: kaynak MEB 8. sınıf programları ve LGS kapsamıdır; veriyi proje 
 - **Hatırlatma.** Varsayılan açık, sessiz saat 21:00–08:00 (İstanbul), günde en fazla 1. Eşit saat sessiz saati kapatır. Cümle sabittir: bugün kayıt yoksa nazik bir davet. Kapalı, sessiz saat, kayıt veya sınır varken görünmez. Bu, telefon bildirimi değildir.
 - **Durum bildirimi.** Seri bozulunca, dinlenme başlayınca, toparlanma başlayınca ve aşama bugün kazanılınca `in_app_notices` içine bir satır yazılır. Aynı öğrenci, tür ve gün ikinci satır açmaz. Gizlenmiş satır yenilemede geri gelmez. Cümle kodda kalır.
 - **Menü.** Alt çubuk 5 öğeyle dolu olduğu için karakter ve hatırlatma ana sayfadan açılır. Adresler durur.
-- Migration: `20261020140000_mascot.sql`. Yerelde ve production'da uygulandı (20 Ekim 2026, `npx supabase db push`; önce `--dry-run`). Yeni tablolardır; mevcut satırlar değişmedi. Staging ertelendiği için orada henüz yoktur. `20261024190000_mascot_growth_notices.sql` yeni tablo açmaz; `in_app_notices.kind` kontrolünü genişletir ve `open_growth_notice` ekler. Bu dosya bu çalışmada yazıldı. Yerel ve production veritabanına ayrıca uygulanması gerekir (`npx supabase db push`, önce `--dry-run`). Fonksiyon yokken ana sayfa açılır, karakter durumu görünür, bildirim satırı yazılmaz ve bant gösterilmez. Hata sunucu günlüğüne düşer.
+- Migration: `20261020140000_mascot.sql`. Yerelde ve production'da uygulandı (20 Ekim 2026, `npx supabase db push`; önce `--dry-run`). Yeni tablolardır; mevcut satırlar değişmedi. Staging ertelendiği için orada henüz yoktur. `20261024190000_mascot_growth_notices.sql` yeni tablo açmaz; `in_app_notices.kind` kontrolünü genişletir ve `open_growth_notice` ekler. Yerel ve production veritabanına 29 Ekim 2026'da uygulandı (`npx supabase db push`; önce `--dry-run`).
 
 ## Veli paneli ve PDF rapor (Faz 11)
 
@@ -413,7 +413,7 @@ Karar 0.12, 22 Ekim 2026'da yeniden bakıldı. İstek yalnızca `https://api.gro
 
 İçe aktarma `/ogrenci/ice-aktar` üzerindedir. Öğrenci kimliği oturumdandır. CSV ve xlsx 500 KB ve 100 satırla sınırlıdır. Formül hücresi reddedilir. PDF modele gitmez; metin katmanındaki `tarih:` satırları okunur, yoksa satır uydurulmaz. Kayıt, önizlemeden sonra `confirm=evet` ile yazılır. Aynı satır aynı `request_id` üretir.
 
-Word raporu PDF ile aynı bloklardandır. Dosya `report_jobs` tablosuna yazılmaz; veli bağlantısı kontrol edildikten sonra tarayıcıya iner. Production migration `20261022100000_ai_preferences.sql` henüz gönderilmedi.
+Word raporu PDF ile aynı bloklardandır. Dosya `report_jobs` tablosuna yazılmaz; veli bağlantısı kontrol edildikten sonra tarayıcıya iner. Production migration `20261022100000_ai_preferences.sql` 29 Ekim 2026'da uygulandı.
 
 ## Öğrenci ana sayfa görünümü (Faz 14)
 

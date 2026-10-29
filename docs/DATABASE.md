@@ -66,7 +66,7 @@ Migration: `supabase/migrations/20261019160000_exams.sql`. `taken_on` Europe/Ist
 
 Doğru + yanlış + boş = soru sayısı. Aynı `(student_id, request_id)` ikinci deneme açmaz. Katalog satırı silinemez (`on delete restrict`); deneme silinince ders satırları silinir (`on delete cascade`).
 
-`score` sütunu `20261029120000_exam_score.sql` ile eklendi. Öğrencinin sonuç kağıdından yazdığı isteğe bağlı puandır (0–500); netten üretilmez. Boş bırakılırsa `null` kalır; raporda "Kayıt yok" yazılır. Yerel veritabanına 29 Ekim 2026'da uygulandı (`npx supabase migration up --local`). Production'a ayrıca uygulanması gerekir (`npx supabase db push`, önce `--dry-run`).
+`score` sütunu `20261029120000_exam_score.sql` ile eklendi. Öğrencinin sonuç kağıdından yazdığı isteğe bağlı puandır (0–500); netten üretilmez. Boş bırakılırsa `null` kalır; raporda "Kayıt yok" yazılır. Yerel veritabanına 29 Ekim 2026'da uygulandı (`npx supabase migration up --local`). Production'a 29 Ekim 2026'da uygulandı (`npx supabase db push`; önce `--dry-run`).
 
 ## Uygulanan şema (Faz 8)
 
@@ -82,7 +82,7 @@ Kazanım, ders satırının dersiyle aynı olmalıdır. Aynı türde eşleştirm
 
 Öneri cümlesi tabloda durmaz. `coaching-v1` her istekte `study_logs`, `study_goals`, `exams`, `exam_mistakes` ve `coaching_practice_completions` satırlarından hesaplanır. Neden, kural sürümü ve kanıt yalnızca o yanıtın nesnesinde durur.
 
-Migration: `supabase/migrations/20261024120000_coaching_practice_completions.sql`. Yerelde uygulandı (24 Ekim 2026). Production'a bu değişiklikle birlikte uygulanmadı.
+Migration: `supabase/migrations/20261024120000_coaching_practice_completions.sql`. Yerelde uygulandı (24 Ekim 2026). Production'a 29 Ekim 2026'da uygulandı (`npx supabase db push`).
 
 | Tablo | Alanlar | Erişim (`authenticated`) | Erişim (`service_role`) |
 | --- | --- | --- | --- |
@@ -103,7 +103,7 @@ Migration: `supabase/migrations/20261020140000_mascot.sql`. Ornitorenk ve kapiba
 
 `sync_mascot_rewards()` ve `open_study_reminder()` oturumdaki öğrenciyi ister. Veli çalıştıramaz. Hatırlatma cümlesi kodda sabittir; sınav sonucu, net veya puan içermez. Sessiz saatte ve günlük sınır dolunca yeni satır açılmaz.
 
-`open_growth_notice(kind, notice_date)` de oturumdaki öğrenciyi ister. Tür yalnızca seri, dinlenme, toparlanma veya aşama olabilir. Aynı `(student_id, kind, notice_date, sequence)` ikinci satır açmaz. Gizlenmiş satırın kimliği geri verilmez. Bu bir telefon bildirimi değildir. Migration `20261024190000_mascot_growth_notices.sql` yeni tablo açmaz. Dosya yazıldı; yerel ve production veritabanına `npx supabase db push` ile uygulanması gerekir. Bu çalışmada uzak veritabanına basılmadı.
+`open_growth_notice(kind, notice_date)` de oturumdaki öğrenciyi ister. Tür yalnızca seri, dinlenme, toparlanma veya aşama olabilir. Aynı `(student_id, kind, notice_date, sequence)` ikinci satır açmaz. Gizlenmiş satırın kimliği geri verilmez. Bu bir telefon bildirimi değildir. Migration `20261024190000_mascot_growth_notices.sql` yeni tablo açmaz. Production'a 29 Ekim 2026'da uygulandı (`npx supabase db push`).
 
 Görünür aşama sütunu yoktur. `mascot-v1` puanları durur. `growth-v1` bu puan eşiğini, çalışma serisini, farklı günleri ve soru toplamını `study_logs` satırlarından hesaplar. Sağlık da aynı satırlardan hesaplanır. Ayrı bir sağlık veya seri tablosu yoktur.
 
@@ -129,7 +129,7 @@ Hazır satır `%PDF-` ile başlar ve 400–1.500.000 bayttır. Başarısız sat�
 
 ## Uygulanan şema (Faz 13)
 
-Migration: `supabase/migrations/20261022100000_ai_preferences.sql`. Yerelde 22 Ekim 2026'da uygulandı. Production'a gönderilmedi.
+Migration: `supabase/migrations/20261022100000_ai_preferences.sql`. Yerelde 22 Ekim 2026'da uygulandı. Production'a 29 Ekim 2026'da uygulandı (`npx supabase db push`).
 
 | Tablo / fonksiyon | Alanlar | Erişim (`authenticated`) | Erişim (`service_role`) |
 | --- | --- | --- | --- |
