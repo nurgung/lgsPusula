@@ -186,6 +186,8 @@ export function StageJourney({
                       "border-2 border-brand-700 bg-brand-50 shadow-card",
                     place === "done" && "border-brand-100 bg-surface",
                     place === "next" && "border-border bg-surface",
+                    // Below lg a stop is one compact line (name, then status) so the path stays short.
+                    "max-lg:flex max-lg:flex-wrap max-lg:items-center max-lg:justify-between max-lg:gap-x-3 max-lg:gap-y-1",
                     "lg:mt-4 lg:text-center",
                   )}
                 >
@@ -201,7 +203,7 @@ export function StageJourney({
                   </p>
                   <p
                     className={cn(
-                      "mt-1 text-helper",
+                      "mt-1 text-helper max-lg:mt-0",
                       place === "current" &&
                         "inline-block rounded-pill bg-brand-100 px-2 py-0.5 font-bold text-ink-900",
                       place === "done" && "font-semibold text-ink-900",

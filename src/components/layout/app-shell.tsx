@@ -56,7 +56,7 @@ export function AppShell({
       </header>
       <main
         id={MAIN_CONTENT_ID}
-        className={`mx-auto w-full max-w-5xl flex-1 px-4 pt-6 pb-24 sm:pb-10 ${WIDE_WHEN_REQUESTED}`}
+        className={`mx-auto w-full max-w-5xl flex-1 px-4 pt-6 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pb-10 ${WIDE_WHEN_REQUESTED}`}
       >
         {children}
       </main>

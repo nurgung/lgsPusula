@@ -58,9 +58,11 @@ export function CharacterStatus({
         <div className="relative isolate min-w-0 overflow-hidden bg-linear-to-br from-accent-100 via-accent-50 to-brand-100 p-4 sm:p-6">
           <HeroScene />
           <div className="relative z-10 grid min-w-0 gap-4 lg:grid-cols-[auto_minmax(0,1fr)_16.5rem] lg:gap-x-6 lg:[grid-template-areas:'figure_intro_side'_'figure_stage_side'_'figure_stats_side']">
-            {intro ? <div className="min-w-0 lg:[grid-area:intro]">{intro}</div> : null}
+            {intro ? (
+              <div className="min-w-0 max-xs:order-1 lg:[grid-area:intro]">{intro}</div>
+            ) : null}
 
-            <div className="flex min-w-0 justify-center self-end lg:[grid-area:figure] lg:justify-start">
+            <div className="flex min-w-0 justify-center self-end max-xs:order-3 lg:[grid-area:figure] lg:justify-start">
               {chosen ? (
                 <SpeciesFigure
                   code={chosen.code}
@@ -75,7 +77,7 @@ export function CharacterStatus({
               )}
             </div>
 
-            <div className="grid min-w-0 content-start gap-2 lg:[grid-area:stage]">
+            <div className="grid min-w-0 content-start gap-2 max-xs:order-2 lg:[grid-area:stage]">
               <p className="text-helper font-semibold text-ink-700">Şu anki aşama</p>
               <p className="text-section font-extrabold break-words text-ink-900 sm:text-2xl">
                 {growth.stageName}
@@ -94,7 +96,7 @@ export function CharacterStatus({
               )}
             </div>
 
-            <dl className="grid grid-cols-3 gap-2 sm:gap-3 lg:[grid-area:stats]">
+            <dl className="grid gap-2 xs:grid-cols-3 sm:gap-3 max-xs:order-4 lg:[grid-area:stats]">
               <Stat
                 value={String(growth.points)}
                 label="Karakter puanı"
@@ -116,7 +118,7 @@ export function CharacterStatus({
             </dl>
 
             <aside
-              className="grid min-w-0 content-start gap-3 rounded-card border border-surface bg-surface/90 p-card-y px-card-x shadow-card lg:[grid-area:side]"
+              className="grid min-w-0 content-start gap-3 rounded-card border border-surface bg-surface/90 p-card-y px-card-x shadow-card max-xs:order-5 lg:[grid-area:side]"
               aria-label="Sağlık durumu ve sonraki aşama"
             >
               <div className="flex min-w-0 items-start gap-3">
@@ -305,22 +307,23 @@ function Stat({
   tone?: keyof typeof STAT_TONE;
 }) {
   return (
-    <div className="flex min-w-0 flex-col gap-2 rounded-card border border-surface bg-surface/90 p-3 shadow-card sm:p-4">
-      <div className="flex min-w-0 items-start gap-2">
+    <div className="flex min-w-0 items-center justify-between gap-3 rounded-card border border-surface bg-surface/90 p-3 shadow-card xs:flex-col xs:items-stretch xs:justify-start xs:gap-2 sm:p-4">
+      {/* Narrow phones: one row (symbol, label, value). From xs: symbol above the label, three columns. */}
+      <div className="flex min-w-0 items-center gap-2 xs:flex-col xs:items-start sm:flex-row sm:items-start">
         <span
           aria-hidden="true"
           className={cn(
-            "mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-control",
+            "inline-flex size-7 shrink-0 items-center justify-center rounded-control sm:mt-0.5",
             STAT_TONE[tone],
           )}
         >
           {icon}
         </span>
-        <dt className="text-helper font-semibold leading-snug break-words text-ink-700">
+        <dt className="min-w-0 text-helper font-semibold leading-snug break-words text-ink-700">
           {label}
         </dt>
       </div>
-      <dd className="text-section font-extrabold break-words tabular-nums text-ink-900 sm:text-page-title">
+      <dd className="shrink-0 text-section font-extrabold break-words tabular-nums text-ink-900 xs:shrink sm:text-page-title">
         {value}
       </dd>
     </div>

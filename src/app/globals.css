@@ -13,6 +13,9 @@
   --font-sans:
     var(--font-nunito), ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
 
+  /* Narrow phones (320–367 px) get compact layouts; 368 px and up keep the regular one. */
+  --breakpoint-xs: 23rem;
+
   /* --- Surfaces --- */
   --color-canvas: #f3f7fc;
   /* Soft teal wash for gentle bands; student home page stays on neutral canvas. */
@@ -101,6 +104,16 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
+  }
+
+  /*
+   * Below `sm` a fixed bottom menu (56 px + the device safe area) sits over the page. Keyboard
+   * focus and in-page scrolling keep a control above it (WCAG 2.2 Focus Not Obscured).
+   */
+  @media (width < 40rem) {
+    html {
+      scroll-padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+    }
   }
 
   body {

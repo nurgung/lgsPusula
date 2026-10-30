@@ -155,6 +155,14 @@
   height: 11.5rem;
 }
 
+/* 320-class phones: a shorter figure so the stage name fits above the fixed menu. */
+@media (width < 23rem) {
+  .species-stage[data-figure-size="hero"] {
+    width: 8rem;
+    height: 9.25rem;
+  }
+}
+
 @media (min-width: 640px) {
   .species-stage[data-figure-size="hero"] {
     width: 12.5rem;

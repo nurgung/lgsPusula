@@ -35,12 +35,16 @@ export function RecommendationCard({
 
   const action =
     showPractice || showLink ? (
-      <div className="flex min-w-0 flex-wrap items-center gap-2">
+      <div className="flex min-w-0 flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         {showPractice && item.practice ? (
           <CompletePracticeButton outcomeId={item.practice.outcomeId} />
         ) : null}
         {showLink && item.href && item.actionLabel ? (
-          <ButtonLink href={item.href} variant={showPractice ? "secondary" : "primary"}>
+          <ButtonLink
+            href={item.href}
+            variant={showPractice ? "secondary" : "primary"}
+            className="w-full sm:w-auto"
+          >
             {item.actionLabel}
           </ButtonLink>
         ) : null}
@@ -62,7 +66,7 @@ export function RecommendationCard({
 
       <div className="mt-3 grid min-w-0 gap-3">
         <div className="flex min-w-0 items-start gap-3 rounded-card border border-brand-100 bg-brand-50 px-3 py-3 sm:items-center sm:px-5 sm:py-4">
-          <MessageMark />
+          <MessageMark className="max-xs:hidden" />
           <p className="min-w-0 text-card-title font-extrabold leading-snug break-words text-ink-900 sm:text-section">
             {lead}
           </p>
@@ -131,11 +135,15 @@ export function RecommendationCard({
   );
 }
 
-function MessageMark() {
+/** Decorative. On the narrowest phones it gives its width to the sentence. */
+function MessageMark({ className }: { className?: string }) {
   return (
     <span
       aria-hidden="true"
-      className="inline-flex size-9 shrink-0 items-center justify-center rounded-control bg-surface text-brand-700 shadow-soft"
+      className={cn(
+        "inline-flex size-9 shrink-0 items-center justify-center rounded-control bg-surface text-brand-700 shadow-soft",
+        className,
+      )}
     >
       <svg
         width="22"

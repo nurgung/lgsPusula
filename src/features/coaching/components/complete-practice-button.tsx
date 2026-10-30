@@ -20,7 +20,7 @@ export function CompletePracticeButton({ outcomeId }: { outcomeId: string }) {
         <StateMessage variant="error" title={state.message} />
       ) : null}
       <div>
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" disabled={pending} className="w-full sm:w-auto">
           {pending ? COACHING_MESSAGES.completePending : COACHING_MESSAGES.completeLabel}
         </Button>
       </div>

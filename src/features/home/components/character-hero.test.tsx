@@ -95,7 +95,7 @@ describe("CharacterHero", () => {
     render(<CharacterHero species={null} growth={growth} />);
     expect(screen.getByText("Henüz bir karakter seçmedin.")).toBeTruthy();
     expect(screen.getByText("Henüz seçilmedi")).toBeTruthy();
-    const points = screen.getByText("Karakter puanı").closest("div.flex-col");
+    const points = screen.getByText("Karakter puanı").closest("div")?.parentElement;
     expect(points?.textContent).toMatch(/Karakter puanı.*0/s);
     expect(screen.getByRole("link", { name: "Karakter seç" }).getAttribute("href")).toBe(
       "/ogrenci/karakter",

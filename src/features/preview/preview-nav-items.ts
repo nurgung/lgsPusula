@@ -6,4 +6,5 @@ export const PREVIEW_NAV_ITEMS: readonly NavItem[] = [
   { href: "/onizleme/durumlar", label: "Durumlar" },
   { href: "/onizleme/karakterler", label: "Karakterler" },
   { href: "/onizleme/ana-sayfa", label: "Ana sayfa" },
+  { href: "/onizleme/ogrenci", label: "Öğrenci" },
 ];

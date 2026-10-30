@@ -198,7 +198,7 @@ function Charts({ analysis }: { analysis: ExamAnalysis }) {
         {EXAM_TYPE_LABELS[latest.examType]} · {series.length} deneme ·{" "}
         {formatTurkishDate(series[0]!.takenOn)} – {formatTurkishDate(latest.takenOn)}
       </p>
-      <div className="grid min-w-0 gap-6 sm:grid-cols-2">
+      <div className="grid min-w-0 gap-6 md:grid-cols-2">
         <ExamLineChart
           title="Puan gelişimi"
           unit="puan (0–500)"

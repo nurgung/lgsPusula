@@ -10,11 +10,36 @@ import type { AnalysisPoint } from "@/features/exams/analysis";
 
 const WIDTH = 260;
 const HEIGHT = 190;
-const MARGIN = { top: 22, right: 14, bottom: 30, left: 42 };
+const MARGIN = { top: 22, right: 16, bottom: 36, left: 42 };
 const PLOT_W = WIDTH - MARGIN.left - MARGIN.right;
 const PLOT_H = HEIGHT - MARGIN.top - MARGIN.bottom;
-/** Value labels above every point only while there is room for them. */
-const LABEL_ALL_UP_TO = 5;
+/** Skip an interior label that would sit closer than this (viewBox units) to another. */
+const MIN_LABEL_GAP = 44;
+
+/**
+ * First and last points always keep a value label. One interior peak is added only when
+ * it stays far enough from both ends, so labels do not collide on a narrow phone chart.
+ * Point positions and values are not changed.
+ */
+export function pickValueLabelIndexes(
+  xs: readonly number[],
+  values: readonly number[],
+  minGap = MIN_LABEL_GAP,
+): number[] {
+  const count = xs.length;
+  if (count <= 0) return [];
+  if (count === 1) return [0];
+  const last = count - 1;
+  if (count === 2) return [0, last];
+  let peak = 1;
+  for (let index = 2; index < last; index++) {
+    if (values[index]! > values[peak]!) peak = index;
+  }
+  if (xs[peak]! - xs[0]! >= minGap && xs[last]! - xs[peak]! >= minGap) {
+    return [0, peak, last];
+  }
+  return [0, last];
+}
 
 export function formatShortDate(isoDate: string): string {
   return new Date(`${isoDate}T00:00:00Z`).toLocaleDateString("tr-TR", {
@@ -113,7 +138,13 @@ function ChartBody({
   const label = `${title}. ${points
     .map((point) => `${formatShortDate(point.takenOn)}: ${formatValue(point.value)}`)
     .join("; ")}.`;
-  const labelled = coords.filter((item) => item.last || points.length <= LABEL_ALL_UP_TO);
+  const labelIndexes = new Set(
+    pickValueLabelIndexes(
+      coords.map((item) => item.x),
+      coords.map((item) => item.point.value),
+    ),
+  );
+  const labelled = coords.filter((_, index) => labelIndexes.has(index));
   const firstDate = points[0]!.takenOn;
   const lastDate = points[points.length - 1]!.takenOn;
 

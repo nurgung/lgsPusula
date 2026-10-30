@@ -25,15 +25,15 @@ export function ReminderCard({ noticeId }: { noticeId: string }) {
           {MASCOT_MESSAGES.reminderBody}
         </p>
       </div>
-      <div className="flex min-w-0 flex-wrap items-center gap-2 max-sm:col-span-2">
-        <ButtonLink href="/ogrenci/calisma/yeni" variant="secondary">
+      <div className="flex min-w-0 flex-col items-stretch gap-2 max-sm:col-span-2 sm:flex-row sm:flex-wrap sm:items-center">
+        <ButtonLink href="/ogrenci/calisma/yeni" variant="secondary" className="w-full sm:w-auto">
           {MASCOT_MESSAGES.reminderAction}
         </ButtonLink>
-        <form action={dismissReminderAction}>
+        <form action={dismissReminderAction} className="max-sm:w-full">
           <input type="hidden" name="noticeId" value={noticeId} />
           <button
             type="submit"
-            className="inline-flex min-h-touch min-w-touch items-center justify-center rounded-control border border-border bg-surface px-3 py-2 text-helper font-semibold text-ink-900 hover:bg-surface-muted"
+            className="inline-flex min-h-touch min-w-touch w-full items-center justify-center rounded-control border border-border bg-surface px-3 py-2 text-helper font-semibold text-ink-900 hover:bg-surface-muted sm:w-auto"
           >
             {MASCOT_MESSAGES.reminderDismiss}
           </button>

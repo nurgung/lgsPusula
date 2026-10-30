@@ -71,7 +71,7 @@ export function AppNav({ items, placement, className }: AppNavProps) {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex min-h-14 items-center justify-center px-1 text-center leading-tight font-semibold break-words",
+                  "flex h-14 items-center justify-center px-1 text-center leading-tight font-semibold break-words",
                   items.length >= 5 ? "text-xs" : "text-sm",
                   active
                     ? "text-brand-800 underline decoration-2 underline-offset-8"

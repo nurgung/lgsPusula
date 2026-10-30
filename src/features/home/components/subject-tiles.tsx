@@ -69,7 +69,7 @@ export function SubjectTiles({
                   >
                     <span
                       title={subject.name}
-                      className="line-clamp-2 text-base font-bold leading-snug break-words"
+                      className="text-base font-bold leading-snug break-words"
                     >
                       {subject.name}
                     </span>

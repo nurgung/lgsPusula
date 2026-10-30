@@ -66,7 +66,7 @@ export function Card({
               {title}
             </Heading>
             {description ? (
-              <p className="mt-1 text-helper text-ink-600">{description}</p>
+              <p className="mt-1 text-helper break-words text-ink-600">{description}</p>
             ) : null}
           </div>
         </div>
@@ -78,7 +78,7 @@ export function Card({
             </Heading>
           ) : null}
           {description ? (
-            <p className="mt-1 text-helper text-ink-600">{description}</p>
+            <p className="mt-1 text-helper break-words text-ink-600">{description}</p>
           ) : null}
         </>
       )}
