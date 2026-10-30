@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
+import { Suspense } from "react";
 import { Card } from "@/components/ui/card";
+import { StateMessage } from "@/components/ui/state-message";
 import { RecommendationCard } from "@/features/coaching/components/recommendation-card";
 import { buildCoachingReport } from "@/features/coaching/rules";
 import { buildExamAnalysis, type AnalysisExam } from "@/features/exams/analysis";
@@ -18,6 +21,8 @@ import {
 } from "@/features/study/calendar";
 
 export const metadata: Metadata = { title: "Öğrenci ana sayfası" };
+// Today's date is read per request (`connection()` inside Suspense).
+export const instant = false;
 
 type Sample = {
   id: string;
@@ -137,6 +142,15 @@ function sampleExams(today: string): AnalysisExam[] {
 }
 
 export default function HomePreviewPage() {
+  return (
+    <Suspense fallback={<StateMessage variant="loading" title="Sayfa yükleniyor..." />}>
+      <HomePreview />
+    </Suspense>
+  );
+}
+
+async function HomePreview() {
+  await connection();
   const today = istanbulToday();
   const report = buildCoachingReport({
     today,
