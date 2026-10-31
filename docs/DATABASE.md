@@ -111,7 +111,7 @@ Görünür aşama sütunu yoktur. `mascot-v1` puanları durur. `growth-v1` bu pu
 
 Migration: `supabase/migrations/20261021120000_report_jobs.sql`. Yerelde ve production'da uygulandı (21 Ekim 2026). Haftalık ve aylık PDF baytları bu tablodadır; herkese açık bir dosya yolu yoktur. Süresi en fazla 24 saat sonradır. Geçmiş bir `expires_at` yazılabilir; indirme yine de reddeder. Silme `purge_expired_report_jobs()` ile olur ve yalnızca `service_role` çalıştırır. Zamanlanmış görev yoktur.
 
-Aylık PDF genişletmesi: `supabase/migrations/20261031120000_monthly_report_jobs.sql` (`weekly_pdf` | `monthly_pdf`; haftalık dönem ≤ 7 gün, aylık ≤ 31 gün). Yerel/production uygulaması bu turda doğrulanmalıdır.
+Aylık PDF genişletmesi: `supabase/migrations/20261031120000_monthly_report_jobs.sql` (`weekly_pdf` | `monthly_pdf`; haftalık dönem ≤ 7 gün, aylık ≤ 31 gün). Yerelde ve production'da uygulandı (31 Ekim 2026, `npx supabase db push`; önce `--dry-run`).
 
 | Tablo | Alanlar | Erişim (`authenticated`) | Erişim (`service_role`) |
 | --- | --- | --- | --- |

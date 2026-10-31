@@ -377,7 +377,7 @@ Veli, aktif bağlantısındaki öğrencinin haftalık ve aylık özetini okur. H
 - **Silme.** `purge_expired_report_jobs()` veli ana sayfası, öğrenci sayfası ve indirme isteğinde çalışır. `purge_retained_rows()` buna ek olarak süresi dolmuş raporları, 1 yıllık denetim ve bitmiş bağlantı satırlarını, 7 günden eski davetleri ve 1 günden eski oran sınırı pencerelerini siler. Bunu `npm run data -- retain` çalıştırır. Kimse çalıştırmazsa satırlar sürelerini aşabilir. Fonksiyon production'da var (21 Ekim 2026); bu turda çalıştırılmadı.
 - **Route.** `instant = false` ve `connection()` ile indirme adresi oturumsuz önbelleğe alınmaz. Aksi halde herkese `/giris` yönlendirmesi yapışırdı.
 - Migration: `20261021120000_report_jobs.sql`. Yerelde ve production'da uygulandı (21 Ekim 2026, `npx supabase db push`; önce `--dry-run`). Yeni tablodur; mevcut satırlar değişmedi. Staging ertelendiği için orada henüz yoktur.
-- Aylık PDF: `20261031120000_monthly_report_jobs.sql` `report_type` değerine `monthly_pdf` ekler; haftalık dönem en fazla 7, aylık dönem en fazla 31 gün kalır. Yerel/production uygulaması bu turda doğrulanmalıdır.
+- Aylık PDF: `20261031120000_monthly_report_jobs.sql` `report_type` değerine `monthly_pdf` ekler; haftalık dönem en fazla 7, aylık dönem en fazla 31 gün kalır. Yerelde ve production'da uygulandı (31 Ekim 2026, `npx supabase db push`; önce `--dry-run`).
 
 ## Yayın hazırlığı (Faz 12)
 
