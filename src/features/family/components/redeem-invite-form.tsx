@@ -34,8 +34,8 @@ export function RedeemInviteForm() {
         key={`code-${code ?? ""}`}
         id={CODE_FIELD_ID}
         name="code"
-        label="Davet kodu"
-        hint="Öğrencinin sana söylediği kod."
+        label="Öğrencinin davet kodu"
+        hint="Öğrencinin «Veli bağla» ile ürettiği XXXX-XXXX-XXXX kodu. İki adımlı doğrulama anahtarı buraya yazılmaz."
         autoComplete="off"
         autoCapitalize="characters"
         spellCheck={false}

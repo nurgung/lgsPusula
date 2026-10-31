@@ -6,6 +6,8 @@ export type CreateInviteDeps = {
   rateLimiter: RateLimiter;
   audit: AuditLog;
   rateLimitSecret: string;
+  /** HMAC key for the stored invite hash; must match redeem. Defaults to rateLimitSecret. */
+  inviteSecret?: string;
   now: Date;
   /** Persists the hash. The plaintext code stays in the use-case result only. */
   createInvite: (studentId: string, codeHash: string, expiresAt: Date) => Promise<void>;
@@ -35,10 +37,11 @@ export async function attemptCreateInvite(
 
   const code = (deps.generateCode ?? generateInviteCode)();
   const normalized = code.replace(/-/g, "");
+  const inviteSecret = deps.inviteSecret ?? deps.rateLimitSecret;
   try {
     await deps.createInvite(
       input.studentId,
-      hashInviteCode(normalized, deps.rateLimitSecret),
+      hashInviteCode(normalized, inviteSecret),
       new Date(deps.now.getTime() + INVITE_CODE_TTL_MS),
     );
   } catch {

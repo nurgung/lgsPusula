@@ -26,8 +26,8 @@ export function MfaVerifyForm({
       {secret ? (
         <div className="grid gap-3">
           <p className="text-ink-700">
-            Kimlik doğrulayıcı uygulamasına bu anahtarı yaz. Anahtar yalnızca bu ekranda
-            görünür.
+            Bu anahtarı yalnızca telefonundaki kimlik doğrulayıcı uygulamaya yaz. Öğrenciye
+            söyleme; öğrenci bağlama kodu değildir. Anahtar yalnızca bu ekranda görünür.
           </p>
           <p className="font-mono text-lg font-bold break-all text-ink-900">
             <span className="sr-only">Kurulum anahtarı: </span>
@@ -38,8 +38,8 @@ export function MfaVerifyForm({
         </div>
       ) : (
         <p className="text-ink-700">
-          Kimlik doğrulayıcı uygulamandaki 6 haneli kodu yaz. Yönetim sayfası bu kod
-          olmadan açılmaz.
+          Kimlik doğrulayıcı uygulamandaki 6 haneli kodu yaz. Bu, öğrencinin davet kodu
+          değildir. Yönetim sayfası bu kod olmadan açılmaz.
         </p>
       )}
       {state.status === "error" && !codeError ? (

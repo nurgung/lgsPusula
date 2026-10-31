@@ -55,4 +55,16 @@ describe("attemptCreateInvite", () => {
     expect(blocked).toMatchObject({ status: "rate_limited" });
     expect(stored).toHaveLength(RATE_LIMITS.inviteCreateByUser.maxAttempts);
   });
+
+  it("hashes the invite with inviteSecret when it differs from the rate-limit secret", async () => {
+    const inviteSecret = "invite-secret-invite-secret-invite";
+    const { base, stored } = deps();
+    const result = await attemptCreateInvite(
+      { studentId: "student-1" },
+      { ...base, inviteSecret },
+    );
+    expect(result).toEqual({ status: "success", code: "ABCD-EFGH-JKMN" });
+    expect(stored[0]?.hash).toBe(hashInviteCode("ABCDEFGHJKMN", inviteSecret));
+    expect(stored[0]?.hash).not.toBe(hashInviteCode("ABCDEFGHJKMN", SECRET));
+  });
 });

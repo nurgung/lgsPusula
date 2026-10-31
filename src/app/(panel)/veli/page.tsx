@@ -89,7 +89,7 @@ async function ParentHome() {
 
         <Card
           title="Öğrenci bağla"
-          description="Kod 24 saat geçerlidir ve bir kez kullanılır."
+          description="Burada kod üretilmez. Öğrenci kendi sayfasında «Veli bağla» ile kod oluşturur; sen o kodu aşağıya yazarsın. Kod 24 saat geçerlidir ve bir kez kullanılır."
         >
           <RedeemInviteForm />
         </Card>

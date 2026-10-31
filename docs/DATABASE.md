@@ -66,7 +66,7 @@ Migration: `supabase/migrations/20261019160000_exams.sql`. `taken_on` Europe/Ist
 
 Doğru + yanlış + boş = soru sayısı. Aynı `(student_id, request_id)` ikinci deneme açmaz. Katalog satırı silinemez (`on delete restrict`); deneme silinince ders satırları silinir (`on delete cascade`).
 
-`score` sütunu `20261029120000_exam_score.sql` ile eklendi. Öğrencinin sonuç kağıdından yazdığı isteğe bağlı puandır (0–500); netten üretilmez. Boş bırakılırsa `null` kalır; raporda "Kayıt yok" yazılır. Yerel veritabanına 29 Ekim 2026'da uygulandı (`npx supabase migration up --local`). Production'a 29 Ekim 2026'da uygulandı (`npx supabase db push`; önce `--dry-run`).
+`score` sütunu `20261029120000_exam_score.sql` ile eklendi; hassasiyet `20261030210000_exam_score_3dp.sql` ile `numeric(8, 3)` oldu. Öğrencinin sonuç kağıdından yazdığı isteğe bağlı puandır (0–500, en fazla 3 ondalık); netten üretilmez. Boş bırakılırsa `null` kalır; raporda "Kayıt yok" yazılır. İlk sütun yerelde ve production'da 29 Ekim 2026'da uygulandı. 3 ondalık migration yerelde ve production'da 30 Ekim 2026'da uygulandı (`npx supabase migration up --local`; `npx supabase db push`, önce `--dry-run`).
 
 ## Uygulanan şema (Faz 8)
 

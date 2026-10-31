@@ -4,6 +4,7 @@ import {
   computeExamNets,
   computeSubjectNet,
   computeTotalNet,
+  formatExamScore,
   formatNet,
   getNetRule,
 } from "./net-rules";
@@ -111,5 +112,15 @@ describe("formatNet", () => {
     expect(formatNet(14)).toBe("14,00");
     expect(formatNet(-1).replace("−", "-")).toBe("-1,00");
     expect(formatNet(1 / 3)).toMatch(/0,33/);
+  });
+});
+
+describe("formatExamScore", () => {
+  it("shows up to three decimal places in Turkish without inventing trailing zeros", () => {
+    expect(formatExamScore(null)).toBe("Kayıt yok");
+    expect(formatExamScore(412)).toBe("412");
+    expect(formatExamScore(412.5)).toBe("412,5");
+    expect(formatExamScore(431.25)).toBe("431,25");
+    expect(formatExamScore(412.555)).toBe("412,555");
   });
 });

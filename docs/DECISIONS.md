@@ -40,6 +40,8 @@ Bu belge Faz 0'da proje sahibinin verdiği kararları ve gerekçelerini tutar. K
 | 22 Ekim 2026 | Ayrı staging Supabase projesi açılmadı. Proje sahibi, önizleme ortamının bu uygulamanın bulut veritabanı `lgs-pusula-prod` üzerinde çalışmasına karar verdi. `velitakipnew` duraklatılmaz. |
 | 24 Ekim 2026 | Görünür karakter aşaması yalnızca puana bağlanmaz. `mascot-v1` puan tablosu durur. `growth-v1` seri, farklı gün, soru ve mevcut puan eşiğini birlikte ister; bir günde bir aşama ilerler. Boş gün seriyi yeniden başlatır, kazanılan aşamayı silmez. Sağlık görünümü kayıt silmez. Bildirim uygulama içidir. |
 | 29 Ekim 2026 | Deneme kaydına isteğe bağlı `score` (deneme puanı, 0–500) eklendi. Öğrenci sonuç kağıdından yazar; uygulamada netten puan üretilmez. Haftalık raporda gösterilir; yazılmamışsa "Kayıt yok". |
+| 30 Ekim 2026 | Deneme puanı virgülle en fazla 3 ondalık basamak kabul eder (`numeric(8, 3)`). |
+| 31 Ekim 2026 | Veli-öğrenci bağlama: yalnızca öğrenci kod üretir. MFA kurulum anahtarı davet kodu değildir. Aynı Supabase projesini paylaşan ortamlarda davet özeti `FAMILY_INVITE_SECRET` ile ortak tutulur. |
 
 ---
 

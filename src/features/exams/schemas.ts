@@ -50,17 +50,18 @@ export type ParsedExamInput = {
 
 export const EXAM_SCORE_MAX = 500;
 
-/** Empty → null. Accepts `.` or `,` decimals. Does not invent a score from nets. */
+/** Empty → null. Accepts `.` or `,` with up to 3 fraction digits. Does not invent a score from nets. */
 export function parseOptionalExamScore(
   raw: string,
 ): { ok: true; value: number | null } | { ok: false; message: string } {
   const trimmed = raw.trim();
   if (trimmed === "") return { ok: true, value: null };
   const normalized = trimmed.replace(",", ".");
-  if (!/^\d+(\.\d{1,2})?$/.test(normalized)) {
+  if (!/^\d+(\.\d{1,3})?$/.test(normalized)) {
     return {
       ok: false,
-      message: "Puan için 0–500 arası bir sayı yaz veya boş bırak.",
+      message:
+        "Puan için 0–500 arası bir sayı yaz (virgülle en fazla 3 basamak) veya boş bırak.",
     };
   }
   const value = Number(normalized);

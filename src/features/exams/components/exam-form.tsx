@@ -211,7 +211,7 @@ function ExamFields({
         optional
         allowDecimal
         defaultValue={defaults.score}
-        maxLength={8}
+        maxLength={9}
         error={fieldErrors.score}
         hint={EXAM_MESSAGES.scoreHint}
       />

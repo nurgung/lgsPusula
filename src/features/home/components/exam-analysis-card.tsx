@@ -132,7 +132,7 @@ function Comparison({ analysis }: { analysis: ExamAnalysis }) {
       </p>
       <dl className="grid min-w-0 gap-3 sm:grid-cols-2">
         <Metric label="Puan farkı">
-          <ChangeValue change={scoreChange} unit="puan" maxDigits={2} />
+          <ChangeValue change={scoreChange} unit="puan" maxDigits={3} />
         </Metric>
         <Metric label="Net farkı">
           <ChangeValue change={netChange} unit="net" maxDigits={2} minDigits={2} />

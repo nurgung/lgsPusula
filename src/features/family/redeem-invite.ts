@@ -17,6 +17,8 @@ export type RedeemInviteDeps = {
   rateLimiter: RateLimiter;
   audit: AuditLog;
   rateLimitSecret: string;
+  /** HMAC key for the stored invite hash; must match create. Defaults to rateLimitSecret. */
+  inviteSecret?: string;
   redeem: (parentId: string, codeHash: string) => Promise<RedeemResultCode>;
 };
 
@@ -83,7 +85,7 @@ export async function attemptRedeemInvite(
   try {
     code = await deps.redeem(
       input.parentId,
-      hashInviteCode(normalized, deps.rateLimitSecret),
+      hashInviteCode(normalized, deps.inviteSecret ?? deps.rateLimitSecret),
     );
   } catch {
     await deps.audit.record({

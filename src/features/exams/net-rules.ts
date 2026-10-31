@@ -177,6 +177,6 @@ export function formatExamScore(value: number | null): string {
   if (value === null) return "Kayıt yok";
   return value.toLocaleString("tr-TR", {
     minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
+    maximumFractionDigits: 3,
   });
 }

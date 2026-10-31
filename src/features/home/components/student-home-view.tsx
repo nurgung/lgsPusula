@@ -142,7 +142,7 @@ export function StudentHomeView({
                   <StateMessage
                     variant="empty"
                     title="Henüz bir velin bağlı değil."
-                    description="Kod üret, veline söyle. Veli kodu girince isteği burada görürsün. Onaylamadan bağlantı kurulmaz."
+                    description="Sen kod üretirsin; velin kendi sayfasında bu kodu yazar. Veli kod üretmez. İsteği burada görürsün; onaylamadan bağlantı kurulmaz."
                   />
                   <CreateInviteForm />
                 </div>

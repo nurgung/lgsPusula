@@ -77,4 +77,15 @@ describe("parseExamInput", () => {
     expect(parseOptionalExamScore("501").ok).toBe(false);
     expect(parseOptionalExamScore("-1").ok).toBe(false);
   });
+
+  it("accepts comma or dot decimals up to three places", () => {
+    expect(parseOptionalExamScore("412,5")).toEqual({ ok: true, value: 412.5 });
+    expect(parseOptionalExamScore("412.55")).toEqual({ ok: true, value: 412.55 });
+    expect(parseOptionalExamScore("412,555")).toEqual({ ok: true, value: 412.555 });
+    expect(parseOptionalExamScore("0,001")).toEqual({ ok: true, value: 0.001 });
+    expect(parseOptionalExamScore("500,000")).toEqual({ ok: true, value: 500 });
+    expect(parseOptionalExamScore("412,5555").ok).toBe(false);
+    expect(parseOptionalExamScore("412,").ok).toBe(false);
+    expect(parseOptionalExamScore("412.5555").ok).toBe(false);
+  });
 });

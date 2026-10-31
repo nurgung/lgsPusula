@@ -58,6 +58,7 @@ export async function createInviteAction(
         rateLimiter: createRateLimiter(service),
         audit: createAuditLog(service),
         rateLimitSecret: config.authSecret,
+        inviteSecret: config.familyInviteSecret,
         now: new Date(),
         createInvite: (studentId, codeHash, expiresAt) =>
           insertFamilyInvite(service, studentId, codeHash, expiresAt),
@@ -110,6 +111,7 @@ export async function redeemInviteAction(
         rateLimiter: createRateLimiter(service),
         audit: createAuditLog(service),
         rateLimitSecret: config.authSecret,
+        inviteSecret: config.familyInviteSecret,
         redeem: (parentId, codeHash) => redeemFamilyInvite(service, parentId, codeHash),
       },
     );

@@ -20,6 +20,12 @@ export const serverEnvSchema = z
     DATABASE_URL: optionalUrl,
     // HMAC key for rate-limit bucket keys, so usernames/IPs are never stored in plain text.
     AUTH_SECRET: z.preprocess(emptyToUndefined, z.string().min(32).optional()),
+    /**
+     * HMAC key for family invite code hashes stored in the shared database.
+     * Must be identical on every environment that writes to the same Supabase project
+     * (production, preview, and local-against-prod). Falls back to AUTH_SECRET when unset.
+     */
+    FAMILY_INVITE_SECRET: z.preprocess(emptyToUndefined, z.string().min(32).optional()),
     SUPABASE_URL: optionalUrl,
     SUPABASE_ANON_KEY: optionalText,
     SUPABASE_SERVICE_ROLE_KEY: optionalText,

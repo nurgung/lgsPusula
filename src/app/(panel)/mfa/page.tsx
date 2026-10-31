@@ -36,9 +36,9 @@ async function MfaSetup() {
     <>
       <PageHeader
         title="İki adımlı doğrulama"
-        description="Yönetim sayfası bu adımı ister. Veli sayfaların doğrulama olmadan da açılır."
+        description="Yalnızca yönetim sayfası için. Veli özeti ve öğrenci bağlama bu adıma ihtiyaç duymaz. Buradaki anahtar, öğrencinin davet kodu değildir."
       />
-      <Card title={verified ? "Kodu gir" : "Uygulamayı bağla"}>
+      <Card title={verified ? "Doğrulama kodunu gir" : "Doğrulayıcıyı kur"}>
         {verified ? <MfaVerifyForm factorId={verified.id} /> : <MfaEnrollForm />}
       </Card>
     </>
