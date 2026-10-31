@@ -4,6 +4,7 @@ import {
   fieldErrorsFrom,
   loginSchema,
   passwordPolicySchema,
+  updateDisplayNameSchema,
 } from "./schemas";
 import { normalizeUsername, usernameToAuthEmail } from "./username";
 
@@ -59,6 +60,23 @@ describe("passwordPolicySchema", () => {
 
   it("rejects passwords longer than 72 bytes (bcrypt limit)", () => {
     expect(passwordPolicySchema.safeParse(`${"ş".repeat(36)}1`).success).toBe(false);
+  });
+});
+
+describe("updateDisplayNameSchema", () => {
+  it("trims and collapses spaces", () => {
+    expect(
+      updateDisplayNameSchema.parse({ displayName: "  Ayşe   Defne " }).displayName,
+    ).toBe("Ayşe Defne");
+  });
+
+  it("rejects empty and overlong names", () => {
+    expect(updateDisplayNameSchema.safeParse({ displayName: "   " }).success).toBe(
+      false,
+    );
+    expect(
+      updateDisplayNameSchema.safeParse({ displayName: "a".repeat(51) }).success,
+    ).toBe(false);
   });
 });
 

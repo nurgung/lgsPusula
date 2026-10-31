@@ -218,6 +218,11 @@ test("users cannot change their roles or read other profiles and the audit log",
     .from("profiles")
     .update({ must_change_password: false })
     .eq("id", student.id);
+  const { error: nameError } = await client
+    .from("profiles")
+    .update({ display_name: "Yeni Ad" })
+    .eq("id", student.id);
+  expect(nameError).toBeNull();
   const { error: insertError } = await client.from("profiles").insert({
     id: other.id,
     username: "e2e_sahte",
@@ -228,10 +233,12 @@ test("users cannot change their roles or read other profiles and the audit log",
 
   const { data: own } = await admin()
     .from("profiles")
-    .select("roles")
+    .select("roles, display_name, must_change_password")
     .eq("id", student.id)
     .single();
   expect(own?.roles).toEqual(["student"]);
+  expect(own?.display_name).toBe("Yeni Ad");
+  expect(own?.must_change_password).toBe(true);
 
   const { data: visible } = await client.from("profiles").select("id");
   expect(visible?.map((row) => row.id)).toEqual([student.id]);

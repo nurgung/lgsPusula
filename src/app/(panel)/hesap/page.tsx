@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { StateMessage } from "@/components/ui/state-message";
 import { AiSwitch } from "@/features/ai/components/ai-switch";
+import { DisplayNameForm } from "@/features/auth/components/display-name-form";
 import { SignOutControls } from "@/features/auth/components/sign-out-controls";
 import { MFA_PATH } from "@/features/auth/paths";
 import { CHANGE_PASSWORD_PATH, requireUser } from "@/features/auth/session";
@@ -46,14 +47,17 @@ async function AccountContent({
         ) : null}
 
         <Card title={`Merhaba, ${user.displayName}`}>
-          <dl className="grid gap-3 sm:grid-cols-[max-content_1fr] sm:gap-x-6">
-            <dt className="font-semibold text-ink-900">Kullanıcı adı</dt>
-            <dd className="min-w-0 break-words text-ink-700">{user.username}</dd>
-            <dt className="font-semibold text-ink-900">Hesap türü</dt>
-            <dd className="text-ink-700">
-              {user.roles.map((role) => ROLE_LABELS[role]).join(", ")}
-            </dd>
-          </dl>
+          <div className="grid gap-6">
+            <dl className="grid gap-3 sm:grid-cols-[max-content_1fr] sm:gap-x-6">
+              <dt className="font-semibold text-ink-900">Kullanıcı adı</dt>
+              <dd className="min-w-0 break-words text-ink-700">{user.username}</dd>
+              <dt className="font-semibold text-ink-900">Hesap türü</dt>
+              <dd className="text-ink-700">
+                {user.roles.map((role) => ROLE_LABELS[role]).join(", ")}
+              </dd>
+            </dl>
+            <DisplayNameForm displayName={user.displayName} />
+          </div>
         </Card>
 
         {user.roles.includes("admin") ? (

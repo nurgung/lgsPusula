@@ -27,4 +27,20 @@ export const AUTH_MESSAGES = {
   mfaCodeInvalid: "Kod hatalı veya süresi doldu. Uygulamadaki güncel kodu yaz.",
   mfaAlreadyEnrolled:
     "Doğrulama zaten kurulu. Uygulamadaki 6 haneli kodu girmen yeterli.",
+  displayNameSaved: "Adın kaydedildi. Ana sayfada da bu ad görünür.",
+  displayNameFailed: "Adın kaydedilemedi. Biraz sonra tekrar dene.",
 } as const;
+
+export type DisplayNameFormState =
+  | { status: "idle" }
+  | {
+      status: "error";
+      message: string;
+      fieldErrors?: Record<string, string>;
+      values?: { displayName?: string };
+    }
+  | { status: "saved"; displayName: string };
+
+export const INITIAL_DISPLAY_NAME_FORM_STATE: DisplayNameFormState = {
+  status: "idle",
+};

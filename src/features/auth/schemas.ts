@@ -66,6 +66,27 @@ export const changePasswordSchema = z
 
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 
+export const DISPLAY_NAME_MAX_LENGTH = 50;
+
+export const displayNameSchema = z
+  .string()
+  .transform((value) => value.trim().replace(/\s+/g, " "))
+  .pipe(
+    z
+      .string()
+      .min(1, "Adını yaz.")
+      .max(
+        DISPLAY_NAME_MAX_LENGTH,
+        `Ad en fazla ${DISPLAY_NAME_MAX_LENGTH} karakter olabilir.`,
+      ),
+  );
+
+export const updateDisplayNameSchema = z.object({
+  displayName: displayNameSchema,
+});
+
+export type UpdateDisplayNameInput = z.infer<typeof updateDisplayNameSchema>;
+
 /** First message per field, keyed by the top-level field name. */
 export function fieldErrorsFrom(error: z.ZodError): Record<string, string> {
   const result: Record<string, string> = {};

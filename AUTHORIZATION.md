@@ -42,7 +42,7 @@ Uygulamada iki hesap vardır ([docs/DECISIONS.md](docs/DECISIONS.md), 0.13): pro
 **Faz 3**
 
 - Oturum ve kullanıcı yalnızca sunucudaki veri erişim katmanından (`src/features/auth/session.ts`) okunur. `requireUser()` oturum yoksa `/giris`'e yönlendirir.
-- `profiles` tablosunda RLS açıktır: kullanıcı yalnızca kendi satırını okur; rolünü, geçici parola bayrağını veya başka bir profili değiştiremez (uçtan uca testle doğrulandı). `audit_events` ve oran sınırı tablolarına kullanıcıların hiç erişimi yoktur.
+- `profiles` tablosunda RLS açıktır: kullanıcı yalnızca kendi satırını okur; kendi `display_name` değerini güncelleyebilir (Hesabım). Rolünü, kullanıcı adını, geçici parola bayrağını veya başka bir profili değiştiremez (uçtan uca testle doğrulandı). `audit_events` ve oran sınırı tablolarına kullanıcıların hiç erişimi yoktur.
 
 **Faz 4**
 
