@@ -144,17 +144,19 @@ describe("weekly report document", () => {
     expect(text).toContain("1 gün");
     expect(text).toContain("1 deneme");
     expect(text).toContain("35 dakika");
-    expect(text).toContain("Haftalık çalışma kayıtları");
-    expect(text).toContain("Toplam  12 9 2 1 35 dk");
+    expect(text).toContain("Derslere göre çalışma analizi");
+    expect(text).toContain("Toplam   12 9 2 1 35 dk");
+    expect(text).toContain("Salı");
     expect(text).toContain("Ekim denemesi");
     expect(text).not.toContain("Eski deneme");
     expect(text).toContain("380,5");
     expect(text).toContain("Kayıt yok");
     expect(text).toContain("5,00");
-    expect(text).toContain("Karşılaştırma yapılamıyor");
+    expect(text).toContain("Tek deneme");
     expect(text).toContain("Günlük hedef");
     expect(text).toContain("20 soru");
     expect(text).toContain("Haftalık değerlendirme");
+    expect(text).toContain("Grafik A");
     expect(supportiveCopyIssues(text)).toEqual([]);
     expect(reportCopyIssues()).toEqual([]);
   });
@@ -189,9 +191,36 @@ describe("weekly report document", () => {
     );
     expect(text).toContain("çalışma kaydı yok");
     expect(text).toContain("deneme yok");
-    expect(text).toContain("0 soru");
-    expect(text).toContain("0 gün");
+    expect(text).toContain("Kayıt yok");
     expect(text).toContain("0 deneme");
+  });
+
+  it("builds a monthly document with the monthly title", () => {
+    const text = blockPlainText(
+      buildWeeklyReportBlocks({
+        studentName: "Ayşe",
+        generatedAt: new Date("2026-10-21T07:55:00.000Z"),
+        period: "current",
+        scope: "month",
+        today,
+        logs: [
+          log({
+            studiedOn: "2026-10-05",
+            questionCount: 4,
+            correctCount: 3,
+            wrongCount: 1,
+            blankCount: 0,
+            durationMinutes: 15,
+          }),
+        ],
+        goals: [],
+        exams: [],
+        suggestion,
+      }),
+    );
+    expect(text).toContain("Aylık akademik gelişim raporu");
+    expect(text).toContain("Aylık genel bakış");
+    expect(text).toContain("Aylık hedef yoktur");
   });
 });
 

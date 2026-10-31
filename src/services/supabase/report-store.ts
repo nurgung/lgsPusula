@@ -5,6 +5,7 @@ import {
   REPORT_TTL_MS,
   REPORT_TYPE,
   type ReportFailureCode,
+  type ReportType,
 } from "@/features/reports/constants";
 import { decodeBytea, encodeBytea } from "@/features/reports/bytes";
 
@@ -50,6 +51,7 @@ export async function saveReportJob(
     status: "ready" | "failed";
     bytes: Uint8Array | null;
     failureCode: ReportFailureCode | null;
+    reportType?: ReportType;
   },
 ): Promise<string> {
   const now = new Date();
@@ -59,7 +61,7 @@ export async function saveReportJob(
       {
         student_id: input.studentId,
         requested_by: input.requestedBy,
-        report_type: REPORT_TYPE,
+        report_type: input.reportType ?? REPORT_TYPE,
         period_from: input.periodFrom,
         period_to: input.periodTo,
         status: input.status,

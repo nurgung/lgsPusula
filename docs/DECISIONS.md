@@ -42,6 +42,7 @@ Bu belge Faz 0'da proje sahibinin verdiği kararları ve gerekçelerini tutar. K
 | 29 Ekim 2026 | Deneme kaydına isteğe bağlı `score` (deneme puanı, 0–500) eklendi. Öğrenci sonuç kağıdından yazar; uygulamada netten puan üretilmez. Haftalık raporda gösterilir; yazılmamışsa "Kayıt yok". |
 | 30 Ekim 2026 | Deneme puanı virgülle en fazla 3 ondalık basamak kabul eder (`numeric(8, 3)`). |
 | 31 Ekim 2026 | Veli-öğrenci bağlama: yalnızca öğrenci kod üretir. MFA kurulum anahtarı davet kodu değildir. Aynı Supabase projesini paylaşan ortamlarda davet özeti `FAMILY_INVITE_SECRET` ile ortak tutulur. |
+| 31 Ekim 2026 | Veli akademik gelişim raporu: haftalık PDF içeriği genişletildi (grafikler, bağlı kazanım eksikleri, ders bazlı net değişimi). Aynı kriterlerle aylık PDF/Word de üretilir. Dönem yine sunucuda İstanbul aralığıdır; istemci yalnızca `scope` + `current`/`previous` gönderir. Tek denemede gelişim yorumu yok. Puan netten üretilmez. |
 
 ---
 

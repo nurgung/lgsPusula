@@ -73,6 +73,21 @@ export function weekdayIndexMonday(isoDate: string): number {
   return sundayBased === 0 ? 6 : sundayBased - 1;
 }
 
+const TURKISH_WEEKDAYS = [
+  "Pazartesi",
+  "Salı",
+  "Çarşamba",
+  "Perşembe",
+  "Cuma",
+  "Cumartesi",
+  "Pazar",
+] as const;
+
+/** Full Turkish weekday name for a Europe/Istanbul civil date. */
+export function turkishWeekdayName(isoDate: string): string {
+  return TURKISH_WEEKDAYS[weekdayIndexMonday(isoDate)]!;
+}
+
 export function startOfWeek(isoDate: string): string {
   return addCalendarDays(isoDate, -weekdayIndexMonday(isoDate));
 }

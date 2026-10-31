@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  monthlyReportWindow,
   monthWindows,
   parentOverviewWindow,
+  reportPeriodWindow,
   weekWindows,
   weeklyReportWindow,
 } from "./periods";
@@ -25,6 +27,18 @@ describe("parent report periods", () => {
     expect(weeklyReportWindow("2026-10-21", "previous")).toEqual({
       from: "2026-10-12",
       to: "2026-10-18",
+    });
+    expect(monthlyReportWindow("2026-10-21", "current")).toEqual({
+      from: "2026-10-01",
+      to: "2026-10-21",
+    });
+    expect(monthlyReportWindow("2026-10-21", "previous")).toEqual({
+      from: "2026-09-01",
+      to: "2026-09-30",
+    });
+    expect(reportPeriodWindow("2026-10-21", "month", "previous")).toEqual({
+      from: "2026-09-01",
+      to: "2026-09-30",
     });
   });
 

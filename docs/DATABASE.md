@@ -109,13 +109,15 @@ Görünür aşama sütunu yoktur. `mascot-v1` puanları durur. `growth-v1` bu pu
 
 ## Uygulanan şema (Faz 11)
 
-Migration: `supabase/migrations/20261021120000_report_jobs.sql`. Yerelde ve production'da uygulandı (21 Ekim 2026). Haftalık PDF baytları bu tablodadır; herkese açık bir dosya yolu yoktur. Süresi en fazla 24 saat sonradır. Geçmiş bir `expires_at` yazılabilir; indirme yine de reddeder. Silme `purge_expired_report_jobs()` ile olur ve yalnızca `service_role` çalıştırır. Zamanlanmış görev yoktur.
+Migration: `supabase/migrations/20261021120000_report_jobs.sql`. Yerelde ve production'da uygulandı (21 Ekim 2026). Haftalık ve aylık PDF baytları bu tablodadır; herkese açık bir dosya yolu yoktur. Süresi en fazla 24 saat sonradır. Geçmiş bir `expires_at` yazılabilir; indirme yine de reddeder. Silme `purge_expired_report_jobs()` ile olur ve yalnızca `service_role` çalıştırır. Zamanlanmış görev yoktur.
+
+Aylık PDF genişletmesi: `supabase/migrations/20261031120000_monthly_report_jobs.sql` (`weekly_pdf` | `monthly_pdf`; haftalık dönem ≤ 7 gün, aylık ≤ 31 gün). Yerel/production uygulaması bu turda doğrulanmalıdır.
 
 | Tablo | Alanlar | Erişim (`authenticated`) | Erişim (`service_role`) |
 | --- | --- | --- | --- |
-| `report_jobs` | `student_id`, `requested_by`, `report_type` (`weekly_pdf`), `period_from`, `period_to`, `status` (`ready`/`failed`), `pdf_bytes`, `byte_size`, `failure_code`, `storage_kind` (`database`), `expires_at` | Talep sahibi, aktif bağlantısı duruyorsa ve satır hazırsa ve süresi dolmamışsa meta veriyi okur. `pdf_bytes` sütunu verilmez. Ekleme, güncelleme ve silme yok. Öğrenci okuyamaz. | Okur/yazar/siler. Uygulama, aktif bağlantıyı kontrol ettikten sonra yazar |
+| `report_jobs` | `student_id`, `requested_by`, `report_type` (`weekly_pdf` \| `monthly_pdf`), `period_from`, `period_to`, `status` (`ready`/`failed`), `pdf_bytes`, `byte_size`, `failure_code`, `storage_kind` (`database`), `expires_at` | Talep sahibi, aktif bağlantısı duruyorsa ve satır hazırsa ve süresi dolmamışsa meta veriyi okur. `pdf_bytes` sütunu verilmez. Ekleme, güncelleme ve silme yok. Öğrenci okuyamaz. | Okur/yazar/siler. Uygulama, aktif bağlantıyı kontrol ettikten sonra yazar |
 
-Hazır satır `%PDF-` ile başlar ve 400–1.500.000 bayttır. Başarısız satırda bayt yoktur. Aynı veli, öğrenci, tür ve dönem tek satırdır. Talep sahibi veli rolünde olmalıdır; konu yalnızca öğrenci rolünde olmalıdır. İkisi aynı kişi olamaz. Dönem en fazla 7 gündür.
+Hazır satır `%PDF-` ile başlar ve 400–1.500.000 bayttır. Başarısız satırda bayt yoktur. Aynı veli, öğrenci, tür ve dönem tek satırdır. Talep sahibi veli rolünde olmalıdır; konu yalnızca öğrenci rolünde olmalıdır. İkisi aynı kişi olamaz. Haftalık dönem en fazla 7, aylık dönem en fazla 31 gündür.
 
 ## Önerilen tablolar
 

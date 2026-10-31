@@ -17,10 +17,12 @@ import { canRequestReport } from "./access";
 import { renderReportDocx } from "./docx";
 import { loadWeeklyBlocks } from "./load-weekly";
 import { REPORT_MESSAGES } from "./messages";
+import type { ReportScope } from "./periods";
 
 const requestSchema = z.object({
   studentId: z.uuid(),
   period: z.enum(["current", "previous"]),
+  scope: z.enum(["week", "month"]).default("week"),
 });
 
 export type DocxFormState =
@@ -41,6 +43,7 @@ export async function requestWeeklyDocxAction(
   const parsed = requestSchema.safeParse({
     studentId: field(formData, "studentId"),
     period: field(formData, "period"),
+    scope: field(formData, "scope") || "week",
   });
   if (!parsed.success) return { status: "error", message: REPORT_MESSAGES.formInvalid };
 
@@ -75,11 +78,13 @@ export async function requestWeeklyDocxAction(
         ),
       };
     }
+    const scope = parsed.data.scope as ReportScope;
     const weekly = await loadWeeklyBlocks({
       studentId: parsed.data.studentId,
       studentName: link.student_display_name,
       period: parsed.data.period,
       today: istanbulToday(),
+      scope,
     });
     const bytes = renderReportDocx(weekly.blocks);
     if (bytes.byteLength < 400) {
@@ -95,7 +100,8 @@ export async function requestWeeklyDocxAction(
     return {
       status: "file",
       base64: Buffer.from(bytes).toString("base64"),
-      filename: "lgs-pusula-hafta.docx",
+      filename:
+        scope === "month" ? "lgs-pusula-ay.docx" : "lgs-pusula-hafta.docx",
     };
   } catch (error) {
     if (error instanceof AuthProviderError) {

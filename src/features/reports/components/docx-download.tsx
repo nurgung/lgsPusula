@@ -32,35 +32,64 @@ export function DocxDownload({ studentId }: { studentId: string }) {
   }, [state]);
 
   return (
-    <form action={action} className="grid gap-3">
+    <div className="grid gap-3">
       <p className="text-sm text-ink-700">
-        Word dosyası da aynı haftalık özeti kullanır. Dosya tarayıcıya iner ve sunucuda
-        saklanmaz.
+        Word dosyası PDF ile aynı akademik özeti kullanır. Dosya tarayıcıya iner ve
+        sunucuda saklanmaz.
       </p>
       {state.status === "error" ? (
         <StateMessage variant="error" title={state.message} />
       ) : null}
-      <input type="hidden" name="studentId" value={studentId} />
-      <div className="flex flex-wrap gap-3">
-        <Button
-          type="submit"
-          name="period"
-          value="current"
-          variant="secondary"
-          disabled={pending}
-        >
-          {pending ? "Hazırlanıyor..." : "Bu haftayı Word olarak indir"}
-        </Button>
-        <Button
-          type="submit"
-          name="period"
-          value="previous"
-          variant="secondary"
-          disabled={pending}
-        >
-          {pending ? "Hazırlanıyor..." : "Geçen haftayı Word olarak indir"}
-        </Button>
-      </div>
-    </form>
+      <form action={action} className="grid gap-3">
+        <input type="hidden" name="studentId" value={studentId} />
+        <input type="hidden" name="scope" value="week" />
+        <p className="text-sm font-semibold text-ink-900">Haftalık Word</p>
+        <div className="flex flex-wrap gap-3">
+          <Button
+            type="submit"
+            name="period"
+            value="current"
+            variant="secondary"
+            disabled={pending}
+          >
+            {pending ? "Hazırlanıyor..." : "Bu haftayı Word olarak indir"}
+          </Button>
+          <Button
+            type="submit"
+            name="period"
+            value="previous"
+            variant="secondary"
+            disabled={pending}
+          >
+            {pending ? "Hazırlanıyor..." : "Geçen haftayı Word olarak indir"}
+          </Button>
+        </div>
+      </form>
+      <form action={action} className="grid gap-3">
+        <input type="hidden" name="studentId" value={studentId} />
+        <input type="hidden" name="scope" value="month" />
+        <p className="text-sm font-semibold text-ink-900">Aylık Word</p>
+        <div className="flex flex-wrap gap-3">
+          <Button
+            type="submit"
+            name="period"
+            value="current"
+            variant="secondary"
+            disabled={pending}
+          >
+            {pending ? "Hazırlanıyor..." : "Bu ayı Word olarak indir"}
+          </Button>
+          <Button
+            type="submit"
+            name="period"
+            value="previous"
+            variant="secondary"
+            disabled={pending}
+          >
+            {pending ? "Hazırlanıyor..." : "Geçen ayı Word olarak indir"}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }

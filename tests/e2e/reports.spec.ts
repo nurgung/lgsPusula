@@ -141,7 +141,7 @@ test("a linked parent sees weekly and monthly totals and downloads a Turkish PDF
     page.waitForResponse(
       (item) => item.url().includes("/veli/rapor/") && item.request().method() === "GET",
     ),
-    page.getByRole("button", { name: "Bu haftanın raporunu indir" }).click(),
+    page.getByRole("button", { name: "Bu haftanın PDF raporunu indir" }).click(),
   ]);
   expect(response.headers()["content-type"]).toContain("application/pdf");
   expect(response.headers()["content-disposition"]).toContain("attachment");

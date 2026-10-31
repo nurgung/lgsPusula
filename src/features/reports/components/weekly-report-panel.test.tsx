@@ -41,10 +41,13 @@ describe("WeeklyReportPanel", () => {
     expect(screen.getByText("4 soru")).toBeTruthy();
     expect(screen.getByText("1 gün")).toBeTruthy();
     expect(screen.getByText("0 deneme")).toBeTruthy();
+    expect(screen.getByText("Kayıt yok")).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Haftalık çalışma" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Haftalık deneme" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Kazanım eksikleri" })).toBeTruthy();
     expect(screen.getByText("Bu dönemde deneme yok.")).toBeTruthy();
     expect(screen.getByRole("columnheader", { name: "Toplam süre" })).toBeTruthy();
+    expect(screen.getByRole("columnheader", { name: "Gün" })).toBeTruthy();
     expect(screen.getAllByText("Türkçe").length).toBeGreaterThan(0);
   });
 });

@@ -10,6 +10,7 @@ import { formatTurkishDate } from "@/features/study/calendar";
 import { REPORT_MESSAGES } from "../messages";
 import {
   formatDurationMinutes,
+  formatMetricOrMissing,
   formatNetDelta,
   formatOptionalNet,
   shortSubjectHeader,
@@ -20,11 +21,24 @@ const numericCell = `${tdClassName} text-right tabular-nums`;
 const numericHead = `${thClassName} text-right`;
 
 function SummaryCards({ model }: { model: WeeklyReportModel }) {
+  const duration =
+    model.summary.durationMinutes === null
+      ? "Kayıt yok"
+      : formatDurationMinutes(model.summary.durationMinutes);
   const items = [
-    ["Toplam süre", formatDurationMinutes(model.summary.durationMinutes)],
-    ["Toplam soru", `${model.summary.questionCount} soru`],
-    ["Çalışma günü", `${model.summary.studyDayCount} gün`],
+    ["Toplam süre", duration],
+    ["Toplam soru", formatMetricOrMissing(model.summary.questionCount, " soru")],
+    ["Doğru", formatMetricOrMissing(model.summary.correctCount)],
+    ["Yanlış", formatMetricOrMissing(model.summary.wrongCount)],
+    ["Boş", formatMetricOrMissing(model.summary.blankCount)],
+    ["Çalışma günü", formatMetricOrMissing(model.summary.studyDayCount, " gün")],
     ["Deneme", `${model.summary.examCount} deneme`],
+    [
+      "Son deneme neti",
+      model.summary.lastExamTotalNet === null
+        ? "Kayıt yok"
+        : formatNet(model.summary.lastExamTotalNet),
+    ],
   ] as const;
   return (
     <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -53,10 +67,10 @@ function StudyTables({ model }: { model: WeeklyReportModel }) {
   }
   return (
     <div className="grid min-w-0 gap-4">
-      <TableScroll label="Haftalık çalışma kayıtları">
+      <TableScroll label="Dönem çalışma kayıtları">
         <table className={tableClassName}>
           <caption className="sr-only">
-            Haftalık çalışma kayıtları: tarih, ders, soru, doğru, yanlış, boş, süre
+            Çalışma kayıtları: tarih, gün, ders, soru, doğru, yanlış, boş, süre
           </caption>
           <thead>
             <tr>
@@ -64,10 +78,13 @@ function StudyTables({ model }: { model: WeeklyReportModel }) {
                 Tarih
               </th>
               <th className={thClassName} scope="col">
+                Gün
+              </th>
+              <th className={thClassName} scope="col">
                 Ders
               </th>
               <th className={numericHead} scope="col">
-                Çözülen soru
+                Toplam soru
               </th>
               <th className={numericHead} scope="col">
                 Doğru
@@ -79,14 +96,15 @@ function StudyTables({ model }: { model: WeeklyReportModel }) {
                 Boş
               </th>
               <th className={numericHead} scope="col">
-                Çalışma süresi
+                Süre
               </th>
             </tr>
           </thead>
           <tbody>
-            {model.studyRows.map((row, index) => (
-              <tr key={`${row.studiedOn}-${row.subjectName}-${index}`}>
+            {model.studyRows.map((row) => (
+              <tr key={`${row.studiedOn}-${row.subjectId}`}>
                 <td className={tdClassName}>{formatTurkishDate(row.studiedOn)}</td>
+                <td className={tdClassName}>{row.dayName}</td>
                 <th className={`${tdClassName} text-left font-semibold`} scope="row">
                   {row.subjectName}
                 </th>
@@ -98,7 +116,7 @@ function StudyTables({ model }: { model: WeeklyReportModel }) {
               </tr>
             ))}
             <tr>
-              <th className={`${tdClassName} text-left font-bold`} scope="row" colSpan={2}>
+              <th className={`${tdClassName} text-left font-bold`} scope="row" colSpan={3}>
                 Toplam
               </th>
               <td className={`${numericCell} font-bold`}>
@@ -173,16 +191,23 @@ function ExamTables({ model }: { model: WeeklyReportModel }) {
   }
   return (
     <div className="grid min-w-0 gap-4">
+      {!model.canCompareExams ? (
+        <StateMessage
+          variant="info"
+          title="Tek deneme var."
+          description={REPORT_MESSAGES.singleExamNote}
+        />
+      ) : null}
       <TableScroll label="Deneme bazlı sonuçlar">
         <table className={tableClassName}>
           <caption className="sr-only">Deneme adı, tarih, ders netleri, toplam net ve puan</caption>
           <thead>
             <tr>
               <th className={thClassName} scope="col">
-                Deneme adı
+                Tarih
               </th>
               <th className={thClassName} scope="col">
-                Tarih
+                Deneme adı
               </th>
               {model.lgsSubjectCodes.map((code) => (
                 <th key={code} className={numericHead} scope="col">
@@ -200,10 +225,10 @@ function ExamTables({ model }: { model: WeeklyReportModel }) {
           <tbody>
             {model.examsInPeriod.map((exam) => (
               <tr key={`${exam.takenOn}-${exam.title}`}>
+                <td className={tdClassName}>{formatTurkishDate(exam.takenOn)}</td>
                 <th className={`${tdClassName} text-left font-semibold`} scope="row">
                   {exam.title}
                 </th>
-                <td className={tdClassName}>{formatTurkishDate(exam.takenOn)}</td>
                 {model.lgsSubjectCodes.map((code) => {
                   const subject = exam.subjects.find((row) => row.subjectCode === code);
                   return (
@@ -270,7 +295,89 @@ function ExamTables({ model }: { model: WeeklyReportModel }) {
   );
 }
 
+function OutcomeTables({ model }: { model: WeeklyReportModel }) {
+  if (model.outcomeGaps.length === 0) {
+    return (
+      <StateMessage
+        variant="empty"
+        title="Bağlı kazanım eksikliği yok."
+        description={REPORT_MESSAGES.noOutcomes}
+      />
+    );
+  }
+  return (
+    <div className="grid min-w-0 gap-4">
+      <TableScroll label="Yanlış ve boş kazanımlar">
+        <table className={tableClassName}>
+          <caption className="sr-only">
+            Ders, kazanım kodu, açıklama, yanlış, boş ve toplam eksik
+          </caption>
+          <thead>
+            <tr>
+              <th className={thClassName} scope="col">
+                Ders
+              </th>
+              <th className={thClassName} scope="col">
+                Kazanım kodu
+              </th>
+              <th className={thClassName} scope="col">
+                Kazanım açıklaması
+              </th>
+              <th className={numericHead} scope="col">
+                Yanlış
+              </th>
+              <th className={numericHead} scope="col">
+                Boş
+              </th>
+              <th className={numericHead} scope="col">
+                Toplam eksik
+              </th>
+              <th className={thClassName} scope="col">
+                Öncelik
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {model.outcomeGaps.map((row) => (
+              <tr key={`${row.subjectId}-${row.outcomeCode}`}>
+                <th className={`${tdClassName} text-left font-semibold`} scope="row">
+                  {row.subjectName}
+                </th>
+                <td className={tdClassName}>{row.outcomeCode}</td>
+                <td className={tdClassName}>{row.outcomeDescription}</td>
+                <td className={numericCell}>{row.wrongCount}</td>
+                <td className={numericCell}>{row.blankCount}</td>
+                <td className={numericCell}>{row.totalGap}</td>
+                <td className={tdClassName}>{row.priority ? "Öncelikli" : "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </TableScroll>
+      {model.outcomeNetLinks.length > 0 ? (
+        <ul className="grid min-w-0 gap-2 text-ink-900">
+          {model.outcomeNetLinks.map((link) => (
+            <li key={link.subjectName}>
+              <span className="font-semibold">{link.subjectName}: </span>
+              {link.note}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
 function GoalTable({ model }: { model: WeeklyReportModel }) {
+  if (model.scope === "month") {
+    return (
+      <StateMessage
+        variant="info"
+        title="Aylık hedef yok."
+        description={REPORT_MESSAGES.noMonthGoals}
+      />
+    );
+  }
   if (model.goalRows.length === 0) {
     return (
       <StateMessage
@@ -320,6 +427,10 @@ function GoalTable({ model }: { model: WeeklyReportModel }) {
 }
 
 export function WeeklyReportPanel({ model }: { model: WeeklyReportModel }) {
+  const studyTitle = model.scope === "month" ? "Aylık çalışma" : "Haftalık çalışma";
+  const examTitle = model.scope === "month" ? "Aylık deneme" : "Haftalık deneme";
+  const evalTitle =
+    model.scope === "month" ? "Aylık değerlendirme" : "Haftalık değerlendirme";
   return (
     <div className="grid min-w-0 gap-6">
       <div className="grid min-w-0 gap-2">
@@ -331,26 +442,34 @@ export function WeeklyReportPanel({ model }: { model: WeeklyReportModel }) {
       </div>
       <section className="grid min-w-0 gap-3" aria-labelledby="rapor-calisma">
         <h3 id="rapor-calisma" className="font-bold text-ink-900">
-          Haftalık çalışma
+          {studyTitle}
         </h3>
         <StudyTables model={model} />
       </section>
       <section className="grid min-w-0 gap-3" aria-labelledby="rapor-deneme">
         <h3 id="rapor-deneme" className="font-bold text-ink-900">
-          Haftalık deneme
+          {examTitle}
         </h3>
         <ExamTables model={model} />
+      </section>
+      <section className="grid min-w-0 gap-3" aria-labelledby="rapor-kazanim">
+        <h3 id="rapor-kazanim" className="font-bold text-ink-900">
+          Kazanım eksikleri
+        </h3>
+        <OutcomeTables model={model} />
       </section>
       <section className="grid min-w-0 gap-3" aria-labelledby="rapor-hedef">
         <h3 id="rapor-hedef" className="font-bold text-ink-900">
           Hedef ve gerçekleşme
         </h3>
-        <p className="text-sm text-ink-700">{REPORT_MESSAGES.goalCountNote}</p>
+        {model.scope === "week" ? (
+          <p className="text-sm text-ink-700">{REPORT_MESSAGES.goalCountNote}</p>
+        ) : null}
         <GoalTable model={model} />
       </section>
       <section className="grid min-w-0 gap-2" aria-labelledby="rapor-degerlendirme">
         <h3 id="rapor-degerlendirme" className="font-bold text-ink-900">
-          Haftalık değerlendirme
+          {evalTitle}
         </h3>
         <ul className="grid min-w-0 gap-2 text-ink-900">
           {model.evaluation.map((line) => (

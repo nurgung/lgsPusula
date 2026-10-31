@@ -211,8 +211,8 @@ async function ParentStudent({
           />
         </Card>
         <Card
-          title="Haftalık rapor"
-          description="PDF ve Word sunucuda üretilir. İndirmeden önce bağlantın yeniden kontrol edilir."
+          title="Akademik gelişim raporu"
+          description="Haftalık ve aylık PDF ile Word sunucuda üretilir. İndirmeden önce bağlantın yeniden kontrol edilir."
         >
           <div className="grid gap-6">
             <WeeklyReportPanel model={weeklyReport} />

@@ -128,7 +128,7 @@ Karar ve gerekçe: [docs/DECISIONS.md](docs/DECISIONS.md) (0.4).
 | Öğrenci karakteri       | Kendi karakteri          | Oku                      | Sistem içeriğini yönet                      |
 | Veli-öğrenci bağlantısı | Kendi bağlantısını yönet | Kendi bağlantısını yönet | İstisna desteği, denetimli                  |
 | Müfredat kataloğu       | Oku                      | Oku                      | CRUD                                        |
-| Rapor dışa aktarma      | Henüz yok (tam dışa aktarma Faz 12) | Aktif ilişkide haftalık PDF | Varsayılan olarak kapalı; yönetici rolü bağlantı olmadan açmaz |
+| Rapor dışa aktarma      | Henüz yok (tam dışa aktarma Faz 12) | Aktif ilişkide haftalık/aylık PDF | Varsayılan olarak kapalı; yönetici rolü bağlantı olmadan açmaz |
 | Sistem rolleri          | Hayır                    | Hayır                    | Sınırlı ve denetimli                        |
 
 CRUD: oluşturma, okuma, güncelleme ve silme. Tablo başlangıç politikasıdır; nihai davranış kullanıcı hikâyeleriyle netleştirilmelidir.

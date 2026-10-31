@@ -18,22 +18,50 @@ function table(headers: string[], rows: string[][]): string {
   return `<w:tbl>${line(headers, true)}${rows.map((row) => line(row, false)).join("")}</w:tbl>`;
 }
 
+function blockToXml(block: Block): string {
+  if (block.kind === "spacer" || block.kind === "page_break") return "";
+  if (block.kind === "text") return paragraph(block.text, block.bold);
+  if (block.kind === "metrics") {
+    return block.items
+      .map((item) => paragraph(`${item.label}: ${item.value}`, false))
+      .join("");
+  }
+  if (block.kind === "bar_chart") {
+    const rows =
+      block.bars.length === 0
+        ? [[block.emptyMessage, ""]]
+        : block.bars.map((bar) => [bar.label, `${bar.value} ${block.unit}`]);
+    return `${paragraph(block.title, true)}${table(["Ders", "Değer"], rows)}`;
+  }
+  if (block.kind === "line_chart") {
+    if (block.series.every((line) => line.points.length === 0)) {
+      return `${paragraph(block.title, true)}${paragraph(block.emptyMessage, false)}`;
+    }
+    return block.series
+      .map((line) => {
+        const rows = line.points
+          .filter((point) => Number.isFinite(point.value))
+          .map((point) => [point.label, String(point.value)]);
+        return `${paragraph(`${block.title} · ${line.label}`, true)}${table(
+          ["Nokta", block.yLabel],
+          rows.length > 0 ? rows : [[block.emptyMessage, ""]],
+        )}`;
+      })
+      .join("");
+  }
+  return table(
+    block.columns.map((column) => column.header),
+    block.rows,
+  );
+}
+
 function documentXml(blocks: readonly Block[]): string {
-  const body = blocks
-    .map((block) => {
-      if (block.kind === "spacer") return "";
-      if (block.kind === "text") return paragraph(block.text, block.bold);
-      return table(
-        block.columns.map((column) => column.header),
-        block.rows,
-      );
-    })
-    .join("");
+  const body = blocks.map((block) => blockToXml(block)).join("");
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${body}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/></w:sectPr></w:body></w:document>`;
 }
 
-/** A Word file built from the same blocks as the weekly PDF. It is not a public path. */
+/** A Word file built from the same blocks as the report PDF. It is not a public path. */
 export function renderReportDocx(blocks: readonly Block[]): Uint8Array {
   const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>`;

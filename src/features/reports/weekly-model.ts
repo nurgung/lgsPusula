@@ -6,11 +6,13 @@ import {
   type LgsSubjectCode,
   type NetRuleVersion,
 } from "@/features/exams/net-rules";
+import type { OutcomePriority } from "@/features/outcomes/prioritize";
 import {
   formatIstanbulDateTime,
   formatTurkishDate,
   formatTurkishDateRange,
   goalWindow,
+  turkishWeekdayName,
   type DateWindow,
 } from "@/features/study/calendar";
 import {
@@ -20,7 +22,16 @@ import {
   type StudyLogView,
 } from "@/features/study/summary";
 import { REPORT_MESSAGES } from "./messages";
-import { weekWindows, weeklyReportWindow, type WeeklyReportPeriod } from "./periods";
+import {
+  monthWindows,
+  reportPeriodWindow,
+  weekWindows,
+  type ReportPeriodChoice,
+  type ReportScope,
+  type WeeklyReportPeriod,
+} from "./periods";
+
+export type { ReportScope, ReportPeriodChoice, WeeklyReportPeriod };
 
 export type ReportExamSubject = {
   subjectCode: string;
@@ -53,10 +64,16 @@ export type WeeklyReportInput = {
   goals: readonly StudyGoalView[];
   exams: readonly ReportExam[];
   suggestion: ReportSuggestion;
+  /** Defaults to week so existing weekly callers stay valid. */
+  scope?: ReportScope;
+  /** Tagged wrong/blank outcomes in the report window only. Never invented. */
+  outcomes?: readonly OutcomePriority[];
 };
 
 export type StudyDetailRow = {
   studiedOn: string;
+  dayName: string;
+  subjectId: string;
   subjectName: string;
   questionCount: number;
   correctCount: number;
@@ -83,6 +100,7 @@ export type GoalProgressRow = {
 };
 
 export type ExamComparisonRow = {
+  subjectCode: string;
   subjectName: string;
   latestNet: number | null;
   previousNet: number | null;
@@ -90,16 +108,55 @@ export type ExamComparisonRow = {
   assessment: string;
 };
 
+export type OutcomeGapRow = {
+  subjectId: string;
+  subjectName: string;
+  outcomeCode: string;
+  outcomeDescription: string;
+  wrongCount: number;
+  blankCount: number;
+  totalGap: number;
+  priority: boolean;
+};
+
+export type OutcomeNetLinkRow = {
+  subjectName: string;
+  netDelta: number | null;
+  netAssessment: string;
+  topGaps: readonly string[];
+  note: string;
+};
+
+export type ChartSeriesPoint = {
+  label: string;
+  value: number;
+};
+
+export type ChartLineSeries = {
+  id: string;
+  label: string;
+  points: readonly ChartSeriesPoint[];
+};
+
 export type WeeklyReportModel = {
   studentName: string;
+  scope: ReportScope;
+  title: string;
   periodLabel: string;
   periodNote: string;
   generatedAtLabel: string;
+  hasStudyData: boolean;
+  hasExamData: boolean;
+  canCompareExams: boolean;
   summary: {
-    durationMinutes: number;
-    questionCount: number;
-    studyDayCount: number;
+    durationMinutes: number | null;
+    questionCount: number | null;
+    correctCount: number | null;
+    wrongCount: number | null;
+    blankCount: number | null;
+    studyDayCount: number | null;
     examCount: number;
+    lastExamTotalNet: number | null;
   };
   studyRows: StudyDetailRow[];
   studyTotals: {
@@ -110,8 +167,14 @@ export type WeeklyReportModel = {
     durationMinutes: number;
   };
   subjectRows: SubjectStudyRow[];
+  subjectQuestionBars: ChartSeriesPoint[];
   examsInPeriod: ReportExam[];
   examComparisons: ExamComparisonRow[];
+  totalNetTrend: ChartSeriesPoint[];
+  subjectNetTrends: ChartLineSeries[];
+  scoreTrend: ChartSeriesPoint[];
+  outcomeGaps: OutcomeGapRow[];
+  outcomeNetLinks: OutcomeNetLinkRow[];
   goalRows: GoalProgressRow[];
   evaluation: readonly string[];
   suggestion: ReportSuggestion;
@@ -121,6 +184,15 @@ export type WeeklyReportModel = {
 const LGS_CODES = getNetRule("lgs-v1").examTypes.lgs_full.subjects.map(
   (slot) => slot.code,
 ) as LgsSubjectCode[];
+
+const SUBJECT_TREND_COLORS = [
+  "turkce",
+  "matematik",
+  "fen_bilimleri",
+  "inkilap_tarihi",
+  "din_kulturu",
+  "ingilizce",
+] as const;
 
 function inReport(date: string, window: DateWindow): boolean {
   return date >= window.from && date <= window.to;
@@ -160,13 +232,47 @@ export function shortSubjectHeader(code: LgsSubjectCode): string {
   }
 }
 
+function mergeStudyRows(logs: readonly StudyLogView[]): StudyDetailRow[] {
+  const merged = new Map<string, StudyDetailRow>();
+  for (const log of logs) {
+    const key = `${log.studiedOn}|${log.subjectId}`;
+    const existing = merged.get(key);
+    if (!existing) {
+      merged.set(key, {
+        studiedOn: log.studiedOn,
+        dayName: turkishWeekdayName(log.studiedOn),
+        subjectId: log.subjectId,
+        subjectName: log.subjectName,
+        questionCount: log.questionCount,
+        correctCount: log.correctCount,
+        wrongCount: log.wrongCount,
+        blankCount: log.blankCount,
+        durationMinutes: log.durationMinutes,
+      });
+      continue;
+    }
+    existing.questionCount += log.questionCount;
+    existing.correctCount += log.correctCount;
+    existing.wrongCount += log.wrongCount;
+    existing.blankCount += log.blankCount;
+    existing.durationMinutes += log.durationMinutes;
+  }
+  return [...merged.values()].sort(
+    (a, b) =>
+      a.studiedOn.localeCompare(b.studiedOn) ||
+      a.subjectName.localeCompare(b.subjectName, "tr"),
+  );
+}
+
 function goalRowsForPeriod(
   goals: readonly StudyGoalView[],
   logs: readonly StudyLogView[],
   today: string,
   report: DateWindow,
   period: WeeklyReportPeriod,
+  scope: ReportScope,
 ): GoalProgressRow[] {
+  if (scope === "month") return [];
   const rows: GoalProgressRow[] = [];
   for (const goal of goals) {
     if (goal.period === "day" && period !== "current") continue;
@@ -179,7 +285,7 @@ function goalRowsForPeriod(
     const to = goalRange.to < report.to ? goalRange.to : report.to;
     if (from > to) continue;
     const done = questionsInWindow(logs, { from, to }, goal.subjectId);
-    const scope = goal.subjectName ?? "Tüm dersler";
+    const scopeLabel = goal.subjectName ?? "Tüm dersler";
     const kind = goal.period === "day" ? "Günlük hedef" : "Haftalık hedef";
     let ratioLabel: string;
     if (goal.targetQuestions <= 0) {
@@ -191,7 +297,7 @@ function goalRowsForPeriod(
       })}`;
     }
     rows.push({
-      label: `${kind}: ${scope}`,
+      label: `${kind}: ${scopeLabel}`,
       targetQuestions: goal.targetQuestions,
       doneQuestions: done,
       ratioLabel,
@@ -230,6 +336,7 @@ function examComparisons(exams: readonly ReportExam[]): ExamComparisonRow[] {
       subjectDisplayName(code);
     if (latestNet === null) {
       return {
+        subjectCode: code,
         subjectName: name,
         latestNet: null,
         previousNet,
@@ -239,64 +346,176 @@ function examComparisons(exams: readonly ReportExam[]): ExamComparisonRow[] {
     }
     if (previousNet === null) {
       return {
+        subjectCode: code,
         subjectName: name,
         latestNet,
         previousNet: null,
         delta: null,
-        assessment: "Karşılaştırma yapılamıyor",
+        assessment:
+          previous === null
+            ? "Tek deneme var; karşılaştırma yapılmadı"
+            : "Karşılaştırma yapılamıyor",
       };
     }
     const delta = latestNet - previousNet;
-    let assessment = "Değişmedi";
+    let assessment = "Durağan";
     if (delta > 0) assessment = "Arttı";
     if (delta < 0) assessment = "Azaldı";
-    return { subjectName: name, latestNet, previousNet, delta, assessment };
+    return {
+      subjectCode: code,
+      subjectName: name,
+      latestNet,
+      previousNet,
+      delta,
+      assessment,
+    };
   });
 }
 
+function outcomeGapRows(outcomes: readonly OutcomePriority[]): OutcomeGapRow[] {
+  if (outcomes.length === 0) return [];
+  const ranked = [...outcomes].sort(
+    (a, b) =>
+      b.wrongCount + b.blankCount - (a.wrongCount + a.blankCount) ||
+      b.score - a.score ||
+      a.outcomeCode.localeCompare(b.outcomeCode, "tr"),
+  );
+  return ranked.map((row, index) => ({
+    subjectId: row.subjectId,
+    subjectName: row.subjectName,
+    outcomeCode: row.outcomeCode,
+    outcomeDescription: row.outcomeDescription,
+    wrongCount: row.wrongCount,
+    blankCount: row.blankCount,
+    totalGap: row.wrongCount + row.blankCount,
+    priority: index < 5,
+  }));
+}
+
+/**
+ * Observes co-occurrence of subject net change and tagged gaps in the same period.
+ * Does not claim causation.
+ */
+function outcomeNetLinks(
+  comparisons: readonly ExamComparisonRow[],
+  gaps: readonly OutcomeGapRow[],
+  canCompare: boolean,
+): OutcomeNetLinkRow[] {
+  if (gaps.length === 0 && comparisons.length === 0) return [];
+  const bySubject = new Map<string, OutcomeGapRow[]>();
+  for (const gap of gaps) {
+    const list = bySubject.get(gap.subjectName) ?? [];
+    list.push(gap);
+    bySubject.set(gap.subjectName, list);
+  }
+  const names = new Set<string>([
+    ...comparisons.map((row) => row.subjectName),
+    ...bySubject.keys(),
+  ]);
+  const rows: OutcomeNetLinkRow[] = [];
+  for (const name of [...names].sort((a, b) => a.localeCompare(b, "tr"))) {
+    const comparison = comparisons.find((row) => row.subjectName === name) ?? null;
+    const subjectGaps = bySubject.get(name) ?? [];
+    const topGaps = subjectGaps
+      .slice(0, 3)
+      .map((gap) => `${gap.outcomeCode} (${gap.totalGap} eksik)`);
+    let note: string;
+    if (!canCompare) {
+      note =
+        subjectGaps.length > 0
+          ? "Bu dönemde bağlı kazanım eksikleri var. Tek deneme olduğu için net değişimiyle birlikte yorumlanmadı."
+          : "Bu dönemde karşılaştırma için yeterli deneme yok.";
+    } else if (comparison?.delta !== null && comparison && comparison.delta < 0 && subjectGaps.length > 0) {
+      note = `${name} neti bu dönemde azaldı ve aynı aralıkta bağlı yanlış/boş kazanımlar da görünüyor. Bu bir neden-sonuç iddiası değildir; aynı dönemdeki gözlemlerdir.`;
+    } else if (comparison?.delta !== null && comparison && comparison.delta > 0 && subjectGaps.length > 0) {
+      note = `${name} neti yükselmiş olsa da bazı kazanımlarda yanlış/boş devam ediyor.`;
+    } else if (subjectGaps.length > 0) {
+      note = `${name} için bağlı kazanım eksikleri var. Bu dönemde net karşılaştırması durağan veya eksik.`;
+    } else if (comparison?.delta !== null && comparison && comparison.delta < 0) {
+      note = `${name} neti azaldı; bu dönemde bu derse bağlı kazanım eşleştirmesi yok.`;
+    } else {
+      continue;
+    }
+    rows.push({
+      subjectName: name,
+      netDelta: comparison?.delta ?? null,
+      netAssessment: comparison?.assessment ?? "Karşılaştırma yok",
+      topGaps,
+      note,
+    });
+  }
+  return rows;
+}
+
+function buildSubjectNetTrends(exams: readonly ReportExam[]): ChartLineSeries[] {
+  if (exams.length === 0) return [];
+  const codes = SUBJECT_TREND_COLORS.filter((code) =>
+    exams.some((exam) => exam.subjects.some((subject) => subject.subjectCode === code)),
+  );
+  return codes.map((code) => ({
+    id: code,
+    label: subjectDisplayName(code),
+    points: exams.map((exam) => {
+      const net = netForCode(exam, code);
+      return {
+        label: formatTurkishDate(exam.takenOn),
+        value: net ?? Number.NaN,
+      };
+    }),
+  }));
+}
+
 function buildEvaluation(input: {
+  scope: ReportScope;
   summary: WeeklyReportModel["summary"];
   studyTotals: WeeklyReportModel["studyTotals"];
   subjectRows: SubjectStudyRow[];
   examComparisons: ExamComparisonRow[];
   examsInPeriod: ReportExam[];
+  outcomeGaps: OutcomeGapRow[];
+  canCompareExams: boolean;
   periodLabel: string;
 }): string[] {
   const lines: string[] = [];
-  const { summary, studyTotals, subjectRows, examComparisons, examsInPeriod, periodLabel } =
-    input;
+  const {
+    scope,
+    summary,
+    studyTotals,
+    subjectRows,
+    examComparisons,
+    examsInPeriod,
+    outcomeGaps,
+    canCompareExams,
+    periodLabel,
+  } = input;
+  const periodWord = scope === "week" ? "hafta" : "ay";
 
-  if (summary.studyDayCount === 0 && summary.examCount === 0) {
+  if (!input.summary.studyDayCount && summary.examCount === 0) {
     lines.push(
       `Bu dönemde (${periodLabel}) çalışma kaydı ve deneme yok. Kayıt gelince özet burada görünür.`,
     );
     return lines;
   }
 
-  if (summary.studyDayCount > 0) {
+  if (summary.studyDayCount && summary.studyDayCount > 0) {
     lines.push(
-      `Haftanın çalışma özeti: ${summary.studyDayCount} günde ${studyTotals.questionCount} soru, ${formatDurationMinutes(studyTotals.durationMinutes)}.`,
+      `Dönem çalışma özeti: ${summary.studyDayCount} günde ${studyTotals.questionCount} soru, ${formatDurationMinutes(studyTotals.durationMinutes)}.`,
     );
     const byQuestions = [...subjectRows].sort(
       (a, b) =>
         b.questionCount - a.questionCount ||
         a.subjectName.localeCompare(b.subjectName, "tr"),
     );
-    const byMinutes = [...subjectRows].sort(
-      (a, b) =>
-        b.durationMinutes - a.durationMinutes ||
-        a.subjectName.localeCompare(b.subjectName, "tr"),
-    );
-    const topQuestions = byQuestions[0];
-    const topMinutes = byMinutes[0];
-    if (topQuestions && topQuestions.questionCount > 0) {
+    const top = byQuestions[0];
+    const low = [...byQuestions].reverse().find((row) => row.questionCount > 0);
+    if (top && top.questionCount > 0) {
       lines.push(
-        `En fazla soru çözülen ders: ${topQuestions.subjectName} (${topQuestions.questionCount} soru).`,
+        `En yoğun çalışılan ders: ${top.subjectName} (${top.questionCount} soru).`,
       );
     }
-    if (topMinutes && topMinutes.durationMinutes > 0) {
+    if (low && byQuestions.length > 1 && low.subjectName !== top?.subjectName) {
       lines.push(
-        `En fazla zaman ayrılan ders: ${topMinutes.subjectName} (${formatDurationMinutes(topMinutes.durationMinutes)}).`,
+        `Çalışma yoğunluğu daha düşük görünen ders: ${low.subjectName} (${low.questionCount} soru). Kayıt olmayan dersler listelenmez.`,
       );
     }
   } else {
@@ -305,34 +524,47 @@ function buildEvaluation(input: {
 
   if (examsInPeriod.length === 0) {
     lines.push("Bu dönemde deneme yok. Ders neti karşılaştırması yapılmadı.");
-  } else if (examComparisons.length === 0) {
-    lines.push("Deneme var ama karşılaştırılacak ders neti yok.");
+  } else if (!canCompareExams) {
+    lines.push(
+      "Bu dönemde tek deneme var. Gelişim veya gerileme yorumu üretilmedi; karşılaştırma için en az iki deneme gerekir.",
+    );
   } else {
     const risen = examComparisons.filter((row) => row.delta !== null && row.delta > 0);
     const fallen = examComparisons.filter((row) => row.delta !== null && row.delta < 0);
+    const flat = examComparisons.filter((row) => row.delta === 0);
     if (risen.length > 0) {
-      lines.push(
-        `Neti artan dersler: ${risen.map((row) => row.subjectName).join(", ")}.`,
-      );
+      lines.push(`Net artışı görülen dersler: ${risen.map((row) => row.subjectName).join(", ")}.`);
     }
     if (fallen.length > 0) {
-      lines.push(
-        `Neti azalan dersler: ${fallen.map((row) => row.subjectName).join(", ")}.`,
-      );
+      lines.push(`Net kaybı görülen dersler: ${fallen.map((row) => row.subjectName).join(", ")}.`);
     }
-    if (risen.length === 0 && fallen.length === 0) {
-      const comparable = examComparisons.some((row) => row.delta !== null);
-      lines.push(
-        comparable
-          ? "Karşılaştırılabilen ders netleri aynı kaldı."
-          : "Karşılaştırma için en az iki deneme ve ortak ders neti gerekir.",
-      );
+    if (flat.length > 0) {
+      lines.push(`Gelişimi durağan olan dersler: ${flat.map((row) => row.subjectName).join(", ")}.`);
     }
+    if (risen.length === 0 && fallen.length === 0 && flat.length === 0) {
+      lines.push("Karşılaştırma için ortak ders neti bulunamadı.");
+    }
+  }
+
+  if (outcomeGaps.length > 0) {
+    const top = outcomeGaps.filter((row) => row.priority).slice(0, 3);
+    lines.push(
+      `Tekrar edilmesi gereken kazanımlar: ${top
+        .map((row) => `${row.outcomeCode} (${row.subjectName})`)
+        .join(", ")}.`,
+    );
+  } else {
+    lines.push(
+      "Bu dönemde yanlış/boş ile bağlı kazanım kaydı yok. Eşleştirilmemiş sorulardan kazanım adı üretilmez.",
+    );
   }
 
   const focus: string[] = [];
   for (const row of examComparisons) {
     if (row.delta !== null && row.delta < 0) focus.push(row.subjectName);
+  }
+  for (const gap of outcomeGaps.filter((row) => row.priority).slice(0, 2)) {
+    focus.push(`${gap.subjectName} · ${gap.outcomeCode}`);
   }
   if (focus.length === 0) {
     const withWrong = [...subjectRows]
@@ -346,11 +578,11 @@ function buildEvaluation(input: {
   }
   if (focus.length > 0) {
     lines.push(
-      `Bir sonraki hafta için öncelik verilebilecek alanlar: ${[...new Set(focus)].join(", ")}. Bu bir zorunluluk değil; kayıtlarına göre seçim yapabilirsin.`,
+      `Sonraki ${periodWord} için öncelikli çalışma önerileri: ${[...new Set(focus)].join(", ")}. Bu bir zorunluluk değil; kayıtlara göre seçim yapılabilir.`,
     );
   } else {
     lines.push(
-      "Öncelik önerisi için yeterli karşılaştırma veya çalışma kaydı yok. Yeni kayıt gelince burası dolar.",
+      `Öncelik önerisi için yeterli karşılaştırma, kazanım veya çalışma kaydı yok. Yeni kayıt gelince burası dolar.`,
     );
   }
 
@@ -358,12 +590,14 @@ function buildEvaluation(input: {
 }
 
 /**
- * Pure weekly report body. Period comes from Istanbul `today` and `period`.
- * Study and exam totals are never mixed.
+ * Pure period report body (week or month). Period comes from Istanbul `today`,
+ * `scope`, and `period`. Study and exam totals are never mixed.
  */
 export function buildWeeklyReportModel(input: WeeklyReportInput): WeeklyReportModel {
-  const report = weeklyReportWindow(input.today, input.period);
+  const scope = input.scope ?? "week";
+  const report = reportPeriodWindow(input.today, scope, input.period);
   const weeks = weekWindows(input.today);
+  const months = monthWindows(input.today);
   const periodSummary = summarizeLogs(input.logs, report);
   const matchedLogs = input.logs
     .filter((log) => inReport(log.studiedOn, report))
@@ -374,15 +608,8 @@ export function buildWeeklyReportModel(input: WeeklyReportInput): WeeklyReportMo
         a.subjectName.localeCompare(b.subjectName, "tr") ||
         a.id.localeCompare(b.id),
     );
-  const studyRows: StudyDetailRow[] = matchedLogs.map((log) => ({
-    studiedOn: log.studiedOn,
-    subjectName: log.subjectName,
-    questionCount: log.questionCount,
-    correctCount: log.correctCount,
-    wrongCount: log.wrongCount,
-    blankCount: log.blankCount,
-    durationMinutes: log.durationMinutes,
-  }));
+  const studyRows = mergeStudyRows(matchedLogs);
+  const hasStudyData = matchedLogs.length > 0;
   const studyDayCount = new Set(matchedLogs.map((log) => log.studiedOn)).size;
   const examsInPeriod = input.exams
     .filter((exam) => inReport(exam.takenOn, report))
@@ -391,6 +618,8 @@ export function buildWeeklyReportModel(input: WeeklyReportInput): WeeklyReportMo
       (a, b) =>
         a.takenOn.localeCompare(b.takenOn) || a.title.localeCompare(b.title, "tr"),
     );
+  const hasExamData = examsInPeriod.length > 0;
+  const canCompareExams = examsInPeriod.length >= 2;
   const subjectRows: SubjectStudyRow[] = periodSummary.bySubject.map((row) => ({
     subjectId: row.subjectId,
     subjectName: row.subjectName,
@@ -407,13 +636,8 @@ export function buildWeeklyReportModel(input: WeeklyReportInput): WeeklyReportMo
     input.today,
     report,
     input.period,
+    scope,
   );
-  const summary = {
-    durationMinutes: periodSummary.durationMinutes,
-    questionCount: periodSummary.questionCount,
-    studyDayCount,
-    examCount: examsInPeriod.length,
-  };
   const studyTotals = {
     questionCount: periodSummary.questionCount,
     correctCount: periodSummary.correctCount,
@@ -421,28 +645,81 @@ export function buildWeeklyReportModel(input: WeeklyReportInput): WeeklyReportMo
     blankCount: periodSummary.blankCount,
     durationMinutes: periodSummary.durationMinutes,
   };
+  const lastExam = examsInPeriod[examsInPeriod.length - 1] ?? null;
+  const summary = {
+    durationMinutes: hasStudyData ? studyTotals.durationMinutes : null,
+    questionCount: hasStudyData ? studyTotals.questionCount : null,
+    correctCount: hasStudyData ? studyTotals.correctCount : null,
+    wrongCount: hasStudyData ? studyTotals.wrongCount : null,
+    blankCount: hasStudyData ? studyTotals.blankCount : null,
+    studyDayCount: hasStudyData ? studyDayCount : null,
+    examCount: examsInPeriod.length,
+    lastExamTotalNet: lastExam ? lastExam.totalNet : null,
+  };
+  const outcomeGaps = outcomeGapRows(input.outcomes ?? []);
+  const outcomeNetLinksRows = outcomeNetLinks(
+    comparisons,
+    outcomeGaps,
+    canCompareExams,
+  );
+  const unfinished =
+    scope === "week"
+      ? input.period === "current" && weeks.unfinished
+      : input.period === "current" && months.unfinished;
+  const periodNote = unfinished
+    ? scope === "week"
+      ? REPORT_MESSAGES.unfinishedWeek
+      : REPORT_MESSAGES.unfinishedMonth
+    : scope === "week"
+      ? REPORT_MESSAGES.finishedWeek
+      : REPORT_MESSAGES.finishedMonth;
 
   return {
     studentName: input.studentName,
+    scope,
+    title:
+      scope === "week"
+        ? "Haftalık akademik gelişim raporu"
+        : "Aylık akademik gelişim raporu",
     periodLabel: rangeLabel(report),
-    periodNote:
-      input.period === "current" && weeks.unfinished
-        ? REPORT_MESSAGES.unfinishedWeek
-        : REPORT_MESSAGES.finishedWeek,
+    periodNote,
     generatedAtLabel: formatIstanbulDateTime(input.generatedAt),
+    hasStudyData,
+    hasExamData,
+    canCompareExams,
     summary,
     studyRows,
     studyTotals,
     subjectRows,
+    subjectQuestionBars: subjectRows.map((row) => ({
+      label: row.subjectName,
+      value: row.questionCount,
+    })),
     examsInPeriod,
     examComparisons: comparisons,
+    totalNetTrend: examsInPeriod.map((exam) => ({
+      label: formatTurkishDate(exam.takenOn),
+      value: exam.totalNet,
+    })),
+    subjectNetTrends: buildSubjectNetTrends(examsInPeriod),
+    scoreTrend: examsInPeriod
+      .filter((exam) => exam.score !== null)
+      .map((exam) => ({
+        label: formatTurkishDate(exam.takenOn),
+        value: exam.score as number,
+      })),
+    outcomeGaps,
+    outcomeNetLinks: outcomeNetLinksRows,
     goalRows,
     evaluation: buildEvaluation({
+      scope,
       summary,
       studyTotals,
       subjectRows,
       examComparisons: comparisons,
       examsInPeriod,
+      outcomeGaps,
+      canCompareExams,
       periodLabel: rangeLabel(report),
     }),
     suggestion: input.suggestion,
@@ -471,4 +748,13 @@ export function formatExamSubjectNet(
 
 export function formatExamDate(takenOn: string): string {
   return formatTurkishDate(takenOn);
+}
+
+/** Formats a metric that may be missing (no study data) versus a real zero. */
+export function formatMetricOrMissing(
+  value: number | null,
+  suffix = "",
+): string {
+  if (value === null) return "Kayıt yok";
+  return `${value}${suffix}`;
 }

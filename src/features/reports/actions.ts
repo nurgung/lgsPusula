@@ -24,10 +24,12 @@ import type { ReportFormState } from "./form-state";
 import { loadWeeklyBlocks } from "./load-weekly";
 import { REPORT_MESSAGES } from "./messages";
 import { renderReportPdf } from "./pdf";
+import type { ReportScope } from "./periods";
 
 const requestSchema = z.object({
   studentId: z.uuid(),
   period: z.enum(["current", "previous"]),
+  scope: z.enum(["week", "month"]).default("week"),
 });
 
 function field(formData: FormData, name: string): string {
@@ -45,14 +47,14 @@ function isRedirect(error: unknown): boolean {
   );
 }
 
-export async function requestWeeklyReportAction(
-  _previous: ReportFormState,
+async function requestReport(
   formData: FormData,
 ): Promise<ReportFormState> {
   const user = await requireParent();
   const parsed = requestSchema.safeParse({
     studentId: field(formData, "studentId"),
     period: field(formData, "period"),
+    scope: field(formData, "scope") || "week",
   });
   if (!parsed.success) return { status: "error", message: REPORT_MESSAGES.formInvalid };
 
@@ -90,18 +92,23 @@ export async function requestWeeklyReportAction(
 
     await purgeExpiredReportJobs(service);
     const today = istanbulToday();
+    const scope = parsed.data.scope as ReportScope;
     const weekly = await loadWeeklyBlocks({
       studentId: parsed.data.studentId,
       studentName: link.student_display_name,
       period: parsed.data.period,
       today,
+      scope,
     });
     const blocks = weekly.blocks;
 
     let rendered: Uint8Array | null = null;
     let renderFailed = false;
     try {
-      rendered = await renderReportPdf(blocks);
+      rendered = await renderReportPdf(blocks, {
+        headerTitle: weekly.headerTitle,
+        headerSubtitle: weekly.headerSubtitle,
+      });
     } catch {
       console.error("report render failed");
       renderFailed = true;
@@ -112,6 +119,7 @@ export async function requestWeeklyReportAction(
       requestedBy: user.id,
       periodFrom: weekly.periodFrom,
       periodTo: weekly.periodTo,
+      reportType: weekly.reportType,
       status: classified.ok ? "ready" : "failed",
       bytes: classified.ok ? classified.bytes : null,
       failureCode: classified.ok ? null : classified.failureCode,
@@ -141,4 +149,11 @@ export async function requestWeeklyReportAction(
     }
     throw error;
   }
+}
+
+export async function requestWeeklyReportAction(
+  _previous: ReportFormState,
+  formData: FormData,
+): Promise<ReportFormState> {
+  return requestReport(formData);
 }

@@ -9,6 +9,8 @@ import {
 } from "@/features/study/calendar";
 
 export type WeeklyReportPeriod = "current" | "previous";
+export type ReportScope = "week" | "month";
+export type ReportPeriodChoice = WeeklyReportPeriod;
 
 export function weekWindows(today: string): {
   current: DateWindow;
@@ -50,4 +52,28 @@ export function weeklyReportWindow(
 ): DateWindow {
   const weeks = weekWindows(today);
   return period === "current" ? weeks.current : weeks.previous;
+}
+
+/** Monthly PDF period from Istanbul today. The form only sends current or previous. */
+export function monthlyReportWindow(
+  today: string,
+  period: ReportPeriodChoice,
+): DateWindow {
+  const months = monthWindows(today);
+  return period === "current" ? months.current : months.previous;
+}
+
+/** Shared period window for weekly or monthly academic reports. */
+export function reportPeriodWindow(
+  today: string,
+  scope: ReportScope,
+  period: ReportPeriodChoice,
+): DateWindow {
+  return scope === "week"
+    ? weeklyReportWindow(today, period)
+    : monthlyReportWindow(today, period);
+}
+
+export function reportTypeForScope(scope: ReportScope): "weekly_pdf" | "monthly_pdf" {
+  return scope === "week" ? "weekly_pdf" : "monthly_pdf";
 }

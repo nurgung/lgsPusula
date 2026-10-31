@@ -14,21 +14,30 @@ export const REPORT_MESSAGES = {
   unfinishedWeek: "Bu hafta henüz bitmedi. Aralık pazartesiden bugüne kadardır.",
   finishedWeek: "Bu, bitmiş bir haftadır: pazartesiden pazara.",
   unfinishedMonth: "Bu ay henüz bitmedi. Aralık ayın ilk gününden bugüne kadardır.",
+  finishedMonth: "Bu, bitmiş bir takvim ayıdır.",
   comparisonNote:
     "İki aralığın uzunluğu eşit olmayabilir. İkisi de tarihleriyle yazılır.",
   noSubjects: "Bu dönemde çalışma kaydı yok. Kayıt yoksa bir ders sonucu çıkarılmaz.",
   noGoals: "Bu dönemde gösterilecek hedef yok.",
   goalCountNote:
     "Haftalık hedefin aralığı pazartesiden pazara kadardır. Yapılan soru, rapor dönemine giren günleri sayar. Birim sorudur.",
+  noMonthGoals: "Aylık hedef yoktur. Hedef satırları yalnızca haftalık raporda gösterilir.",
   noExams: "Bu dönemde deneme yok. Deneme yoksa net hesaplanmaz.",
+  noOutcomes:
+    "Bu dönemde yanlış veya boş ile bağlı kazanım kaydı yok. Eşleştirilmemiş sorulardan kazanım adı üretilmez.",
+  singleExamNote:
+    "Bu dönemde tek deneme var. Gelişim eğrisi ve ders neti karşılaştırması yapılmadı.",
+  noScoreTrend: "Puanı yazılmış deneme yok. Puan netten üretilmez; boş grafik gösterilmez.",
   dailyGoalSkipped:
     "Günlük hedef yalnızca içinde bulunulan gün için gösterilir. Geçen haftanın raporunda haftalık hedefler yer alır.",
   parentSuggestionNote:
     "Bu öneri öğrencinin kayıtlarından hesaplanır. Kayıtları yalnızca öğrenci değiştirebilir.",
   downloadHint:
-    "Aşağıdaki özet bu haftanın tablolarıdır. PDF ve Word aynı yapıyı kullanır. Dosya sunucuda hazırlanır ve 24 saat sonra silinir.",
-  downloadCurrent: "Bu haftanın raporunu indir",
-  downloadPrevious: "Geçen haftanın raporunu indir",
+    "Aşağıdaki özet bu dönemin tablolarıdır. PDF ve Word aynı yapıyı kullanır. Dosya sunucuda hazırlanır ve 24 saat sonra silinir.",
+  downloadCurrent: "Bu haftanın PDF raporunu indir",
+  downloadPrevious: "Geçen haftanın PDF raporunu indir",
+  downloadMonthCurrent: "Bu ayın PDF raporunu indir",
+  downloadMonthPrevious: "Geçen ayın PDF raporunu indir",
   preparing: "Rapor hazırlanıyor...",
   generationFailed: "Rapor hazırlanamadı. Dosya indirilmedi. Biraz sonra tekrar dene.",
   emptyDocument: "Rapor boş kaldı. Dosya indirilmedi.",
